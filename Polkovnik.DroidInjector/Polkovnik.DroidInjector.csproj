@@ -45,7 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ViewEventHandlerAttribute.cs" />
-    <Compile Include="IInjectAttribute.cs" />
+    <Compile Include="InjectAttribute.cs" />
     <Compile Include="InjectorException.cs" />
     <Compile Include="InjectExtensions.cs" />
     <Compile Include="InjectMenuItemAttribute.cs" />

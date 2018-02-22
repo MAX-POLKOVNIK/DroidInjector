@@ -4,9 +4,20 @@ using Android.Views;
 
 namespace Polkovnik.DroidInjector
 {
+    /// <inheritdoc />
+    /// <summary>
+    /// EXPERIMENTAL.
+    /// Subscribes to view click event at runtime. 
+    /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
     public class ViewClickEventHandlerAttribute : ViewEventHandlerAttribute
     {
+        /// <inheritdoc />
+        /// <summary>
+        /// Subscribes to view click event at runtime. 
+        /// </summary>
+        /// <param name="resourceId">Id of view that has event to subscribe.</param>
+        /// <param name="canBeNull">If true - injector will ignore view missing.</param>
         public ViewClickEventHandlerAttribute(int resourceId, bool canBeNull = false) : base(resourceId, null, canBeNull)
         {
         }

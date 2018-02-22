@@ -6,6 +6,9 @@ using Android.Views;
 
 namespace Polkovnik.DroidInjector
 {
+    /// <summary>
+    /// Injector. 
+    /// </summary>
     public sealed class Injector
     {
         #region - SINGLETON -
@@ -44,6 +47,12 @@ namespace Polkovnik.DroidInjector
         internal Type ResourceClassType { get; set; }
         internal Type ResourceIdClassType { get; set; }
 
+        /// <summary>
+        /// Registers Resource and Resource.Id classes.
+        /// Required for using experimental features.
+        /// </summary>
+        /// <typeparam name="TResource">Resource</typeparam>
+        /// <typeparam name="TResourceId">Id</typeparam>
         public void RegisterResourceClass<TResource, TResourceId>()
         {
             ResourceClassType = typeof(TResource);
