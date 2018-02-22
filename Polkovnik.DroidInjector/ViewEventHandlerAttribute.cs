@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Reflection;
 using Android.Views;
 
 namespace Polkovnik.DroidInjector
 {
-    public class ViewEventHandlerAttribute : Attribute, IInjectAttribute
+    [AttributeUsage(AttributeTargets.Method)]
+    public class ViewEventHandlerAttribute : InjectAttribute
     {
         public ViewEventHandlerAttribute(int resourceId, string eventName, bool canBeNull = false)
         {
@@ -15,8 +15,6 @@ namespace Polkovnik.DroidInjector
         }
         
         public string EventName { get; }
-        public int ResourceId { get; }
-        public bool CanBeNull { get; }
 
         internal virtual string GetNotSutableMethodErrorDescription(string methodName) => $"Method {methodName} not suitable for event {EventName}";
 

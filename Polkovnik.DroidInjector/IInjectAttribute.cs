@@ -1,8 +1,10 @@
-﻿namespace Polkovnik.DroidInjector
+﻿using System;
+
+namespace Polkovnik.DroidInjector
 {
-    internal interface IInjectAttribute
+    public abstract class InjectAttribute : Attribute
     {
-        int ResourceId { get; }
-        bool CanBeNull { get; }
+        internal int ResourceId { get; set; }
+        internal bool CanBeNull { get; set; }
     }
 }
