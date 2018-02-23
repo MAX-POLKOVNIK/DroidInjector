@@ -2,14 +2,15 @@
 <package >
   <metadata>
     <id>Polkovnik.DroidInjector</id>
-    <version>0.1</version>
+    <version>0.1.1</version>
     <authors>MAX-POLKOVNIK</authors>
     <owners>MAX-POLKOVNIK</owners>
     <licenseUrl>https://github.com/MAX-POLKOVNIK/DroidInjector/blob/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/MAX-POLKOVNIK/DroidInjector</projectUrl>
+	<iconUrl>https://github.com/MAX-POLKOVNIK/DroidInjector/raw/develop/Icons/Logo_64x64.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Simple injector for Xamarin Android</description>
-    <releaseNotes>First beta version</releaseNotes>
+    <releaseNotes>Beta version</releaseNotes>
     <copyright>Copyright 2018</copyright>
     <tags>Android View Injection</tags>
     <dependencies>
