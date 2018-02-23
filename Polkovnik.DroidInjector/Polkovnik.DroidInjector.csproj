@@ -45,6 +45,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Internal\MethodSubscriber.cs" />
+    <Compile Include="Internal\MethodSubscriberFactory.cs" />
+    <Compile Include="Internal\ParameterlessMethodSubscriber.cs" />
     <Compile Include="ViewEventHandlerAttribute.cs" />
     <Compile Include="InjectAttribute.cs" />
     <Compile Include="InjectorException.cs" />

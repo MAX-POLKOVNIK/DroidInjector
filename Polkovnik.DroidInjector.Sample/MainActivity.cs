@@ -1,4 +1,5 @@
-﻿using Android.App;
+﻿using System;
+using Android.App;
 using Android.Widget;
 using Android.OS;
 
@@ -20,16 +21,18 @@ namespace Polkovnik.DroidInjector.Sample
             SetContentView(Resource.Layout.main);
             this.InjectViews();
             this.BindViewActions();
-        }
 
+            _myButton.Text = "TExt";
+        }
+        
         [ViewClickEventHandler(Resource.Id.myButton)]
-        public void Click()
+        private void Click()
         {
             Toast.MakeText(this, "Click", ToastLength.Short).Show();
         }
 
-        [ViewEventHandler(Resource.Id.myButton, "Click")]
-        public void CustomClick(object a, object b)
+        [ViewEventHandler(Resource.Id.myButton, nameof(Button.Click))]
+        private void CustomClick(object a, EventArgs b)
         {
             Toast.MakeText(this, "CustomClick", ToastLength.Short).Show();
         }

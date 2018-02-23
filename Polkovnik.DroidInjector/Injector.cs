@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Android.Views;
+using Polkovnik.DroidInjector.Internal;
 
 namespace Polkovnik.DroidInjector
 {
@@ -33,17 +34,6 @@ namespace Polkovnik.DroidInjector
 
         #endregion // SINGLETON
         
-        private readonly Action<FieldInfo, object, object> _fieldValueSetter = (member, owner, injectedObject) => member.SetValue(owner, injectedObject);
-        private readonly Action<PropertyInfo, object, object> _propertyValueSetter = (member, owner, injectedObject) =>
-        {
-            if (member.SetMethod == null)
-            {
-                throw new InjectorException($"{member.Name} in class {member.DeclaringType} hasn't SET method. Properties with set methods allowed only");
-            }
-
-            member.SetValue(owner, injectedObject);
-        };
-
         internal Type ResourceClassType { get; set; }
         internal Type ResourceIdClassType { get; set; }
 
@@ -75,24 +65,10 @@ namespace Polkovnik.DroidInjector
             
             foreach (var runtimeMethod in runtimeMethods)
             {
-                var attributes = runtimeMethod.GetCustomAttributes(false);
-
-                var bindViewActionAttribute = (ViewEventHandlerAttribute)attributes.SingleOrDefault(x => x is ViewEventHandlerAttribute);
-                
-                if (bindViewActionAttribute == null)
-                    continue;
-
-                var interactiveView = RetrieveView(view, bindViewActionAttribute, runtimeMethod);
-
-                ValidateMissing(interactiveView, bindViewActionAttribute.ResourceId, runtimeMethod.Name, allowViewMissing);
-
-                if (!bindViewActionAttribute.IsMethodSuitable(runtimeMethod))
-                    throw new InjectorException("Not suitable method");
-
-                bindViewActionAttribute.SubscribeToEvent(instance, interactiveView, runtimeMethod);
+                Inject<ViewEventHandlerAttribute, MethodInfo, View>(instance, runtimeMethod, view, RetrieveView, SubscribeEvent, allowViewMissing);
             }
         }
-
+        
         private void InjectInternal<TInjectAttribute, TOwner, TProvider>(TOwner instance, TProvider provider,
             Func<TProvider, InjectAttribute, MemberInfo, IDisposable> retriever, bool allowInjectMissing)
             where TInjectAttribute : InjectAttribute
@@ -101,19 +77,19 @@ namespace Polkovnik.DroidInjector
 
             foreach (var runtimeField in runtimeFields)
             {
-                Inject<TInjectAttribute, FieldInfo, TProvider>(instance, runtimeField, provider, retriever, _fieldValueSetter, allowInjectMissing);
+                Inject<TInjectAttribute, FieldInfo, TProvider>(instance, runtimeField, provider, retriever, SetField, allowInjectMissing);
             }
 
             var runtimeProperties = instance.GetType().GetRuntimeProperties();
 
             foreach (var runtimeProperty in runtimeProperties)
             {
-                Inject<TInjectAttribute, PropertyInfo, TProvider>(instance, runtimeProperty, provider, retriever, _propertyValueSetter, allowInjectMissing);
+                Inject<TInjectAttribute, PropertyInfo, TProvider>(instance, runtimeProperty, provider, retriever, SetProperty, allowInjectMissing);
             }
         }
         
         private void Inject<TInjectAttribute, TMember, TProvider>(object owner, TMember memberInfo,
-            TProvider injectProvider, Func<TProvider, InjectAttribute, MemberInfo, IDisposable> retriever, Action<TMember, object, object> setter, 
+            TProvider injectProvider, Func<TProvider, InjectAttribute, MemberInfo, IDisposable> retriever, Action<TInjectAttribute, TMember, object, object> handler, 
             bool allowInjectMissing) 
             where TMember : MemberInfo 
             where TInjectAttribute : InjectAttribute
@@ -132,7 +108,7 @@ namespace Polkovnik.DroidInjector
             
             ValidateMissing(injectedObject, resourceId, memberInfo.Name, allowInjectMissing || canBeNull);
 
-            setter.Invoke(memberInfo, owner, injectedObject);
+            handler.Invoke(injectAttribute, memberInfo, owner, injectedObject);
         }
 
         private void ValidateMissing(IDisposable injectObject, int resourceId, string memberName, bool allowViewMissing)
@@ -145,6 +121,31 @@ namespace Polkovnik.DroidInjector
                 : FindConstantName(ResourceIdClassType, resourceId);
 
             throw new InjectorException($"Can't find resource with ID = \"{id}\" which injects to \"{memberName}\"");
+        }
+
+        private void SetField(InjectAttribute injectAttribute, FieldInfo info, object owner, object injectedObject)
+        {
+            info.SetValue(owner, injectedObject);
+        }
+
+        private void SetProperty(InjectAttribute injectAttribute, PropertyInfo info, object owner, object injectedObject)
+        {
+            if (info.SetMethod == null)
+            {
+                throw new InjectorException($"{info.Name} in class {info.DeclaringType} hasn't SET method. Properties with set methods allowed only");
+            }
+
+            info.SetValue(owner, injectedObject);
+        }
+
+        private void SubscribeEvent(ViewEventHandlerAttribute viewEventHandlerAttribute, MethodInfo info, object owner, object injectedObject)
+        {
+            var subscriber = MethodSubscriberFactory.Create(viewEventHandlerAttribute, injectedObject, owner, info);
+
+            if (!subscriber.IsMethodSuitable)
+                throw new InjectorException("Not suitable method");
+
+            subscriber.SubscribeToEvent();
         }
 
         private IMenuItem RetrieveMenuItem(IMenu menu, InjectAttribute attribute, MemberInfo memberInfo)
