@@ -22,8 +22,8 @@ namespace Polkovnik.DroidInjector
         /// View with <paramref name="resourceId"/> will be resolved at runtime.
         /// </summary>
         /// <param name="resourceId">Injected view's id.</param>
-        /// <param name="canBeNull">If true - injector will ignore missing view.</param>
-        public ViewAttribute(int resourceId, bool canBeNull = false) : base(resourceId, canBeNull)
+        /// <param name="allowMissing">If true - injector will ignore missing view.</param>
+        public ViewAttribute(int resourceId, bool allowMissing = false) : base(resourceId, allowMissing)
         {
         }
     }

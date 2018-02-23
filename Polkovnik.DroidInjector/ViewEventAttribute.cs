@@ -15,8 +15,8 @@ namespace Polkovnik.DroidInjector
         /// </summary>
         /// <param name="resourceId">Id of view that has event to subscribe.</param>
         /// <param name="eventName">Event to subscribe.</param>
-        /// <param name="canBeNull">If true - injector will ignore view missing.</param>
-        public ViewEventAttribute(int resourceId, string eventName, bool canBeNull = false) : base(resourceId, canBeNull)
+        /// <param name="allowMissing">If true - injector will ignore view missing.</param>
+        public ViewEventAttribute(int resourceId, string eventName, bool allowMissing = false) : base(resourceId, allowMissing)
         {
             EventName = eventName;
         }

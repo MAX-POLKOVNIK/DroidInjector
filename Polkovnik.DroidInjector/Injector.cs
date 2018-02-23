@@ -102,7 +102,7 @@ namespace Polkovnik.DroidInjector
                 return;
 
             var resourceId = injectAttribute.ResourceId;
-            var canBeNull = injectAttribute.CanBeNull;
+            var canBeNull = injectAttribute.AllowMissing;
 
             var injectedObject = retriever.Invoke(injectProvider, injectAttribute, memberInfo);
             
@@ -143,7 +143,7 @@ namespace Polkovnik.DroidInjector
             var subscriber = MethodSubscriberFactory.Create(viewEventHandlerAttribute, injectedObject, owner, info);
             
             if (!subscriber.IsMethodSuitable)
-                throw new InjectorException("Not suitable method");
+                throw new InjectorException($"Method {info.Name} is not suitable for event {viewEventHandlerAttribute.EventName}");
 
             subscriber.SubscribeToEvent();
         }

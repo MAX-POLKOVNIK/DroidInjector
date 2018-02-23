@@ -16,8 +16,8 @@ namespace Polkovnik.DroidInjector
         /// Subscribes to view click event at runtime. 
         /// </summary>
         /// <param name="resourceId">Id of view that has event to subscribe.</param>
-        /// <param name="canBeNull">If true - injector will ignore view missing.</param>
-        public ViewClickEventAttribute(int resourceId, bool canBeNull = false) : base(resourceId, nameof(View.Click), canBeNull)
+        /// <param name="allowMissing">If true - injector will ignore view missing.</param>
+        public ViewClickEventAttribute(int resourceId, bool allowMissing = false) : base(resourceId, nameof(View.Click), allowMissing)
         {
         }
     }

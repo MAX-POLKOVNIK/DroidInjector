@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using Android.App;
 using Android.Widget;
 using Android.OS;
@@ -42,7 +41,7 @@ namespace Polkovnik.DroidInjector.Sample
         }
 
         [ViewEvent(Resource.Id.myButton, nameof(Button.Click))]
-        private void CustomClick(object a, EventArgs b)
+        private void CustomClick(object a, object b)
         {
             Toast.MakeText(this, "CustomClick", ToastLength.Short).Show();
         }
