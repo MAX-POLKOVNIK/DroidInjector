@@ -8,7 +8,7 @@ namespace Polkovnik.DroidInjector
     /// Subscribes to view events at runtime. 
     /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
-    public class ViewEventHandlerAttribute : InjectAttribute
+    public class ViewEventAttribute : InjectAttribute
     {
         /// <summary>
         /// Subscribes to view events at runtime. 
@@ -16,11 +16,9 @@ namespace Polkovnik.DroidInjector
         /// <param name="resourceId">Id of view that has event to subscribe.</param>
         /// <param name="eventName">Event to subscribe.</param>
         /// <param name="canBeNull">If true - injector will ignore view missing.</param>
-        public ViewEventHandlerAttribute(int resourceId, string eventName, bool canBeNull = false)
+        public ViewEventAttribute(int resourceId, string eventName, bool canBeNull = false) : base(resourceId, canBeNull)
         {
-            ResourceId = resourceId;
             EventName = eventName;
-            CanBeNull = canBeNull;
         }
         
         internal string EventName { get; }

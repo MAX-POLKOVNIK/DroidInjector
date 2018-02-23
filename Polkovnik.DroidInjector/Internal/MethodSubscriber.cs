@@ -6,7 +6,7 @@ namespace Polkovnik.DroidInjector.Internal
 {
     internal class MethodSubscriber
     {
-        public MethodSubscriber(ViewEventHandlerAttribute viewEventHandlerAttribute, object eventOwner, object methodOwner, MethodInfo targetMethodInfo)
+        public MethodSubscriber(ViewEventAttribute viewEventHandlerAttribute, object eventOwner, object methodOwner, MethodInfo targetMethodInfo)
         {
             MethodOwner = methodOwner ?? throw new ArgumentNullException(nameof(methodOwner));
             EventOwner = eventOwner ?? throw new ArgumentNullException(nameof(eventOwner));
@@ -22,7 +22,7 @@ namespace Polkovnik.DroidInjector.Internal
 
         protected object MethodOwner { get; }
         protected object EventOwner { get; }
-        protected ViewEventHandlerAttribute ViewEventHandlerAttribute { get; }
+        protected ViewEventAttribute ViewEventHandlerAttribute { get; }
         protected MethodInfo TargetMethodInfo { get; }
         protected EventInfo EventInfo { get; }
 

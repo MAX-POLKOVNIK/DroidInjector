@@ -51,12 +51,12 @@ namespace Polkovnik.DroidInjector
 
         internal void InjectViews<T>(T injectableObject, View view, bool allowViewMissing = false)
         {
-            InjectInternal<InjectViewAttribute, T, View>(injectableObject, view, RetrieveView, allowViewMissing);
+            InjectInternal<ViewAttribute, T, View>(injectableObject, view, RetrieveView, allowViewMissing);
         }
 
         internal void InjectMenuItems<T>(T instance, IMenu menu, bool allowMenuItemsMissing = false)
         {
-            InjectInternal<InjectMenuItemAttribute, T, IMenu>(instance, menu, RetrieveMenuItem, allowMenuItemsMissing);
+            InjectInternal<MenuItemAttribute, T, IMenu>(instance, menu, RetrieveMenuItem, allowMenuItemsMissing);
         }
 
         internal void BindViewActions<T>(T instance, View view, bool allowViewMissing)
@@ -65,7 +65,7 @@ namespace Polkovnik.DroidInjector
             
             foreach (var runtimeMethod in runtimeMethods)
             {
-                Inject<ViewEventHandlerAttribute, MethodInfo, View>(instance, runtimeMethod, view, RetrieveView, SubscribeEvent, allowViewMissing);
+                Inject<ViewEventAttribute, MethodInfo, View>(instance, runtimeMethod, view, RetrieveView, SubscribeEvent, allowViewMissing);
             }
         }
         
@@ -138,10 +138,10 @@ namespace Polkovnik.DroidInjector
             info.SetValue(owner, injectedObject);
         }
 
-        private void SubscribeEvent(ViewEventHandlerAttribute viewEventHandlerAttribute, MethodInfo info, object owner, object injectedObject)
+        private void SubscribeEvent(ViewEventAttribute viewEventHandlerAttribute, MethodInfo info, object owner, object injectedObject)
         {
             var subscriber = MethodSubscriberFactory.Create(viewEventHandlerAttribute, injectedObject, owner, info);
-
+            
             if (!subscriber.IsMethodSuitable)
                 throw new InjectorException("Not suitable method");
 
@@ -164,7 +164,7 @@ namespace Polkovnik.DroidInjector
             else
             {
                 if (ResourceIdClassType == null)
-                    throw new InjectorException($"You can't use parameterless attribute {nameof(InjectViewAttribute)} without calling {nameof(RegisterResourceClass)}");
+                    throw new InjectorException($"You can't use parameterless attribute {nameof(ViewAttribute)} without calling {nameof(RegisterResourceClass)}");
 
                 var fieldName = memberInfo.Name.Trim('_');
 
