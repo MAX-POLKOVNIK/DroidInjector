@@ -44,8 +44,11 @@ namespace Polkovnik.DroidInjector.Sample
 		public partial class Id
 		{
 			
-			// aapt resource value: 0x7f050000
-			public const int myButton = 2131034112;
+			// aapt resource value: 0x7f060001
+			public const int action_search = 2131099649;
+			
+			// aapt resource value: 0x7f060000
+			public const int myButton = 2131099648;
 			
 			static Id()
 			{
@@ -69,6 +72,22 @@ namespace Polkovnik.DroidInjector.Sample
 			}
 			
 			private Layout()
+			{
+			}
+		}
+		
+		public partial class Menu
+		{
+			
+			// aapt resource value: 0x7f050000
+			public const int main = 2131034112;
+			
+			static Menu()
+			{
+				global::Android.Runtime.ResourceIdManager.UpdateIdValues();
+			}
+			
+			private Menu()
 			{
 			}
 		}
