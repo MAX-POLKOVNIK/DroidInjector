@@ -49,6 +49,19 @@ namespace Polkovnik.DroidInjector
             ResourceIdClassType = typeof(TResourceId);
         }
 
+        /// <summary>
+        /// Call this method only in types derived from Activity.
+        /// Starts resolving views.
+        /// </summary>
+        public static void InjectViews()
+        {
+            throw new InjectorException($"Method {nameof(InjectViews)} must be removed at runtime. Check if Fody is working.");
+        }
+
+        /// <summary>
+        /// Starts resolving views.
+        /// </summary>
+        /// <param name="view">View provider.</param>
         public static void InjectViews(View view)
         {
             throw new InjectorException($"Method {nameof(InjectViews)} must be removed at runtime. Check if Fody is working.");

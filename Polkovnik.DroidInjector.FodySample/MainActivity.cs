@@ -12,12 +12,7 @@ namespace Polkovnik.DroidInjector.FodySample
     public class MainActivity : Activity
     {
         [View(Resource.Id.myButton)] private Button _button;
-
-        int count = 1;
-
-        private View _view;
-        private View View { get; set; }
-
+        
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
@@ -26,30 +21,21 @@ namespace Polkovnik.DroidInjector.FodySample
 
             //InjectTest(GetView(FindViewById<View>(Android.Resource.Id.Content)));
             //
+            
+            Injector.InjectViews();
+            
+            //InjectTest(GetRootView());
 
-            _view = FindViewById<View>(Android.Resource.Id.Content);
-            View = _view;
-            //InjectTest(view);
-
-            var view2 = FindViewById<View>(Android.Resource.Id.Content);
-            Injector.InjectViews(view2);
-
-            //InjectTest(_view);
-            Injector.InjectViews(_view);
-            Injector.InjectViews(View);
-
-            Injector.InjectViews(GetView(FindViewById<View>(Android.Resource.Id.Content)));
-
-        }
-
-        private View GetView(View view)
-        {
-            return view;
         }
 
         private void InjectTest(View view)
         {
             _button = (Button)view.FindViewById(Resource.Id.myButton);
+        }
+
+        private View GetRootView()
+        {
+            return FindViewById(Android.Resource.Id.Content);
         }
     }
 }

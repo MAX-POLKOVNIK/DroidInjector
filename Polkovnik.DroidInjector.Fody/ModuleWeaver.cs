@@ -81,7 +81,10 @@ namespace Polkovnik.DroidInjector.Fody
             LogInfo("DROID INJECTOR WORKING");
             var injector = new FodyInjector(ModuleDefinition, AssemblyResolver);
             injector.DebugEvent += LogInfo;
-            injector.Execute();
+            if (!injector.Execute(out var error))
+            {
+                LogInfo(error);
+            }
             LogInfo("DROID INJECTOR FINISHED");
         }
 
