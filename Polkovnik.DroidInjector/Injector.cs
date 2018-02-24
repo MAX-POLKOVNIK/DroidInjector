@@ -49,6 +49,11 @@ namespace Polkovnik.DroidInjector
             ResourceIdClassType = typeof(TResourceId);
         }
 
+        public static void InjectViews(View view)
+        {
+            throw new InjectorException($"Method {nameof(InjectViews)} must be removed at runtime. Check if Fody is working.");
+        }
+
         internal void InjectViews<T>(T injectableObject, View view, bool allowViewMissing = false)
         {
             InjectInternal<ViewAttribute, T, View>(injectableObject, view, RetrieveView, allowViewMissing);
