@@ -9,7 +9,9 @@ namespace Polkovnik.DroidInjector.Fody
     internal class FodyInjector
     {
         private const string ViewAttributeTypeName = "Polkovnik.DroidInjector.ViewAttribute";
+        private const string ViewEventAttributeTypeName = "Polkovnik.DroidInjector.ViewEventAttribute";
         private const string InjectViewsGeneratedMethodName = "Polkovnik_DroidInjector_InjectViews";
+        private const string BindViewEventsGeneratedMethodName = "Polkovnik_DroidInjector_BindViewEvents";
         private const string GetViewGeneratedMethodName = "Polkovnik_DroidInjector_GetRootView";
 
         private readonly ModuleDefinition _moduleDefinition;
@@ -41,52 +43,59 @@ namespace Polkovnik.DroidInjector.Fody
 
             var viewInjectMembers = GetMembersMarkedWithView();
 
-            AddInjectViewMethodInTypeForFields(viewInjectMembers);
+            AddInjectViewMethodInType(viewInjectMembers);
+            AddBindViewEventsMethodInType(viewInjectMembers);
 
             foreach (var type in viewInjectMembers.Keys)
             {
                 ReplaceInjectMethodCallInType(type);
             }
         }
-
+        
         private Dictionary<TypeDefinition, List<IMemberDefinition>> GetMembersMarkedWithView()
         {
-            var dict = new Dictionary<TypeDefinition, List<IMemberDefinition>>();
-
+            var membersDictionary = new Dictionary<TypeDefinition, List<IMemberDefinition>>();
+            
             foreach (var type in _moduleDefinition.Types)
             {
-                foreach (var field in type.Fields)
+                var members = new List<IMemberDefinition>();
+                members.AddRange(type.Fields);
+                members.AddRange(type.Properties);
+                members.AddRange(type.Methods);
+
+                foreach (var member in members)
                 {
-                    if (field.CustomAttributes.All(x => x.AttributeType.FullName != ViewAttributeTypeName))
+                    string attribute;
+
+                    switch (member)
+                    {
+                        case FieldDefinition _:
+                            attribute = ViewAttributeTypeName;
+                            break;
+                        case PropertyDefinition _:
+                            attribute = ViewAttributeTypeName;
+                            break;
+                        case MethodDefinition _:
+                            attribute = ViewEventAttributeTypeName;
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+
+                    if (member.CustomAttributes.All(x => x.AttributeType.FullName != attribute))
                         continue;
 
-                    if (dict.TryGetValue(type, out var fields))
+                    if (membersDictionary.TryGetValue(type, out var list))
                     {
-                        fields.Add(field);
+                        list.Add(member);
                     }
                     else
                     {
-                        dict.Add(type, new List<IMemberDefinition> { field });
-                    }
-                }
-
-                foreach (var property in type.Properties)
-                {
-                    if (property.CustomAttributes.All(x => x.AttributeType.FullName != ViewAttributeTypeName))
-                        continue;
-
-                    if (dict.TryGetValue(type, out var properties))
-                    {
-                        properties.Add(property);
-                    }
-                    else
-                    {
-                        dict.Add(type, new List<IMemberDefinition> { property });
+                        membersDictionary.Add(type, new List<IMemberDefinition> {member});
                     }
                 }
             }
-
-            return dict;
+            return membersDictionary;
         }
 
         private void FindRequiredTypesAndMethods()
@@ -110,13 +119,126 @@ namespace Polkovnik.DroidInjector.Fody
 
             var resourceClassType = _moduleDefinition.GetType($"{_moduleDefinition.Assembly.Name.Name}.Resource");
             _resourceIdClassType = resourceClassType.NestedTypes.First(x => x.Name == "Id");
+
+            assemblyNameReference = _moduleDefinition.AssemblyReferences.First(x => x.Name == "mscorlib");
+            var mscorlibAssembly = _assemblyResolver.Resolve(assemblyNameReference);
+            //var eventHandlerType = mscorlibAssembly.MainModule.GetType("EventHandler")
         }
 
-        private void AddInjectViewMethodInTypeForFields(IDictionary<TypeDefinition, List<IMemberDefinition>> typesWithFields)
+        private void AddBindViewEventsMethodInType(Dictionary<TypeDefinition, List<IMemberDefinition>> typesWithMembers)
+        {
+            var subscribionsInitMethod = new MethodDefinition(BindViewEventsGeneratedMethodName, MethodAttributes.Private | MethodAttributes.HideBySig, _moduleDefinition.TypeSystem.Void);
+            subscribionsInitMethod.Parameters.Add(new ParameterDefinition("view", ParameterAttributes.None, _androidViewTypeReference));
+
+            foreach (var typeWithMembers in typesWithMembers)
+            {
+                var methods = typeWithMembers.Value.Where(x => x is MethodDefinition).ToArray();
+
+                if (methods.Length == 0)
+                    continue;
+
+                subscribionsInitMethod.Body.Variables.Add(new VariableDefinition(_androidViewTypeReference));
+                subscribionsInitMethod.Body.Variables.Add(new VariableDefinition(_moduleDefinition.TypeSystem.Boolean));
+
+                var ilProcessor = subscribionsInitMethod.Body.GetILProcessor();
+
+                var dict = new Dictionary<int, List<IMemberDefinition>>();
+
+                foreach (var method in methods)
+                {
+                    var attribute = method.CustomAttributes.First(x => x.AttributeType.FullName == ViewEventAttributeTypeName);
+                    var resourceId = (int)attribute.ConstructorArguments[0].Value;
+
+                    if (dict.TryGetValue(resourceId, out var methodsByResourceId))
+                    {
+                        methodsByResourceId.Add(method);
+                    }
+                    else
+                    {
+                        dict.Add(resourceId, new List<IMemberDefinition> {method});
+                    }
+                }
+
+                AddSubscribtionInstructions(null, ilProcessor, dict.ToDictionary(x => x.Key, y => y.Value.Cast<MethodDefinition>().ToList()));
+                
+            }
+        }
+
+        private Instruction AddSubscribtionInstructions(Instruction lastInstruction, ILProcessor ilProcessor,
+            Dictionary<int, List<MethodDefinition>> methods)
+        {
+            var li = lastInstruction;
+
+            foreach (var methodsWithResourceId in methods)
+            {
+                var resourceId = methodsWithResourceId.Key;
+                var methodsToSubscribe = methodsWithResourceId.Value;
+                
+                foreach (var methodToSubscribe in methodsToSubscribe)
+                {
+                    var attributeArguments = methodToSubscribe.CustomAttributes.First(x => x.AttributeType.FullName == ViewEventAttributeTypeName).ConstructorArguments;
+
+                    var argsLength = attributeArguments.Count;
+
+                    var shouldCheckIfNull =  (bool)attributeArguments[argsLength == 4 ? 3 : 2].Value;
+                    var eventName = (string)attributeArguments[argsLength == 4 ? 2 : 1].Value;
+                    var viewType = argsLength == 4 ? (TypeReference)attributeArguments[1].Value : _androidViewTypeReference;
+
+                    
+
+                    //Insert(ref li, Instruction.Create(OpCodes.Nop));
+                    //Insert(ref li, Instruction.Create(OpCodes.Nop));
+
+                    var baseType = viewType;
+                    EventDefinition eventDefinition = null;
+
+                    while (baseType != null)
+                    {
+                        eventDefinition = baseType.Resolve().Events.FirstOrDefault(x => x.Name == eventName);
+
+                        if (eventDefinition == null)
+                        {
+                            baseType = baseType.Resolve().BaseType;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    
+                    if (eventDefinition == null)
+                    {
+                        throw new FodyInjectorException($"Can't find event {eventName} in {viewType}");
+                    }
+
+                    var eventTypeDefinition = eventDefinition.EventType.Resolve();
+
+                    var addHandlerMethod = eventDefinition.AddMethod;
+
+                    Debug($"EVENT TYPE :: {eventDefinition.EventType}");
+
+                    //Insert(ref li, Instruction.Create(OpCodes.Callvirt, addHandlerMethod));
+
+
+
+                }
+
+            }
+
+            return li;
+
+            void Insert(ref Instruction firstInstruction, Instruction newInstruction)
+            {
+                ilProcessor.InsertBefore(firstInstruction, newInstruction);
+                firstInstruction = newInstruction;
+            }
+        }
+
+        private void AddInjectViewMethodInType(IDictionary<TypeDefinition, List<IMemberDefinition>> typesWithMembers)
         {
             var methodDefinition = new MethodDefinition(InjectViewsGeneratedMethodName, MethodAttributes.Private | MethodAttributes.HideBySig, _moduleDefinition.TypeSystem.Void);
             methodDefinition.Parameters.Add(new ParameterDefinition("view", ParameterAttributes.None, _androidViewTypeReference));
-            foreach (var typesAndField in typesWithFields)
+            foreach (var typesAndField in typesWithMembers)
             {
                 typesAndField.Key.Methods.Add(methodDefinition);
 
@@ -137,7 +259,6 @@ namespace Polkovnik.DroidInjector.Fody
                                 AddSetterForProperty(propertyDefinition);
                             }
                             AddInjectViewInstructionsForProperty(ilProcessor, GetResourceId(propertyDefinition), propertyDefinition.PropertyType, propertyDefinition.SetMethod);
-                            Debug($"THERE WILL BE INJECTING PROPERTY : {propertyDefinition}");
                             break;
                     }
                 }
