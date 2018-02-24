@@ -1,6 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
 using Android.App;
 using Android.Widget;
 using Android.OS;
@@ -11,7 +9,7 @@ namespace Polkovnik.DroidInjector.FodySample
     [Activity(Label = "Polkovnik.DroidInjector.FodySample", MainLauncher = true, Icon = "@mipmap/icon")]
     public class MainActivity : Activity
     {
-        [View(Resource.Id.myButton)] private Button _button;
+        [View] private Button _myButton;
         
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -21,21 +19,21 @@ namespace Polkovnik.DroidInjector.FodySample
 
             //InjectTest(GetView(FindViewById<View>(Android.Resource.Id.Content)));
             //
-            
+
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+
             Injector.InjectViews();
             
+            stopwatch.Stop();
+
             //InjectTest(GetRootView());
 
         }
 
         private void InjectTest(View view)
         {
-            _button = (Button)view.FindViewById(Resource.Id.myButton);
-        }
-
-        private View GetRootView()
-        {
-            return FindViewById(Android.Resource.Id.Content);
+            _myButton = (Button)view.FindViewById(Resource.Id.myButton);
         }
     }
 }

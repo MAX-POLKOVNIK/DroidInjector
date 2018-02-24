@@ -78,14 +78,21 @@ namespace Polkovnik.DroidInjector.Fody
 
         public void Execute()
         {
-            LogInfo("DROID INJECTOR WORKING");
+            LogInfo("STARTED");
             var injector = new FodyInjector(ModuleDefinition, AssemblyResolver);
             injector.DebugEvent += LogInfo;
-            if (!injector.Execute(out var error))
+            try
             {
-                LogInfo(error);
+                injector.Execute();
             }
-            LogInfo("DROID INJECTOR FINISHED");
+            catch (FodyInjectorException e)
+            {
+                var message = $"FATAL ERROR: {e.Message}";
+                LogInfo(message);
+                throw new FodyInjectorException(message);
+            }
+
+            LogInfo("FINISHED");
         }
 
         // Will be called when a request to cancel the build occurs. OPTIONAL

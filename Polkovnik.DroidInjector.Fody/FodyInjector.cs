@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
@@ -9,18 +8,19 @@ namespace Polkovnik.DroidInjector.Fody
 {
     internal class FodyInjector
     {
-        private readonly IAssemblyResolver _assemblyResolver;
-
         private const string ViewAttributeTypeName = "Polkovnik.DroidInjector.ViewAttribute";
         private const string InjectViewsGeneratedMethodName = "Polkovnik_DroidInjector_InjectViews";
         private const string GetViewGeneratedMethodName = "Polkovnik_DroidInjector_GetRootView";
+
         private readonly ModuleDefinition _moduleDefinition;
+        private readonly IAssemblyResolver _assemblyResolver;
 
         private TypeReference _androidViewTypeReference;
         private MethodReference _findViewByIdMethodDefinition;
         private MethodDefinition _activityInjectViewsMethodDefinition;
         private MethodDefinition _injectViewsMethodReference;
         private MethodReference _activityFindViewByIdMethodReference;
+        private TypeDefinition _resourceIdClassType;
 
         public event Action<string> DebugEvent;
 
@@ -35,10 +35,8 @@ namespace Polkovnik.DroidInjector.Fody
             DebugEvent?.Invoke(message);
         }
 
-        public bool Execute(out string errorMessage)
+        public void Execute()
         {
-            errorMessage = null;
-
             Debug("Injector started");
 
             FindRequiredTypesAndMethods();
@@ -56,18 +54,8 @@ namespace Polkovnik.DroidInjector.Fody
 
             foreach (var type in typesAndFields.Keys)
             {
-                try
-                {
                     ReplaceInjectMethodCallInType(type);
-                }
-                catch (FodyInjectorException e)
-                {
-                    errorMessage = e.Message;
-                    return false;
-                }
             }
-
-            return true;
         }
 
         private void FindRequiredTypesAndMethods()
@@ -88,6 +76,9 @@ namespace Polkovnik.DroidInjector.Fody
             var injectorTypeDefinition = droidInjectorAssembly.MainModule.GetType("Polkovnik.DroidInjector.Injector");
             _activityInjectViewsMethodDefinition = injectorTypeDefinition.Methods.First(x => x.Name == "InjectViews" && x.Parameters.Count == 0);
             _injectViewsMethodReference = injectorTypeDefinition.Methods.First(x => x.Name == "InjectViews" && x.Parameters.Count == 1);
+
+            var resourceClassType = _moduleDefinition.GetType($"{_moduleDefinition.Assembly.Name.Name}.Resource");
+            _resourceIdClassType = resourceClassType.NestedTypes.First(x => x.Name == "Id");
         }
 
         private void AddInjectViewMethodInTypeForFields(IDictionary<TypeDefinition, FieldDefinition[]> typesWithFields)
@@ -123,8 +114,20 @@ namespace Polkovnik.DroidInjector.Fody
         private int GetResourceId(FieldDefinition fieldDefinition)
         {
             var attribute = fieldDefinition.CustomAttributes.First(x => x.AttributeType.FullName == ViewAttributeTypeName);
-            var resourceId = attribute.ConstructorArguments[0].Value;
-            return (int)resourceId;
+
+            if (attribute.HasConstructorArguments)
+            {
+                var resourceId = attribute.ConstructorArguments[0].Value;
+                return (int)resourceId;
+            }
+
+            var constName = fieldDefinition.Name.Trim('_');
+            var field = _resourceIdClassType.Fields.FirstOrDefault(x => x.Name == constName);
+
+            if (field == null)
+                throw new FodyInjectorException($"Can't find id for field {fieldDefinition.FullName}.");
+            
+            return (int)field.Constant;
         }
 
         private void ReplaceInjectMethodCallInType(TypeDefinition definition)
