@@ -37,25 +37,56 @@ namespace Polkovnik.DroidInjector.Fody
 
         public void Execute()
         {
-            Debug("Injector started");
-
             FindRequiredTypesAndMethods();
 
-            var types = _moduleDefinition.Types.Where(t => t.Fields.SelectMany(y => y.CustomAttributes).Any(x => x.AttributeType.FullName == ViewAttributeTypeName));
+            var viewInjectMembers = GetMembersMarkedWithView();
 
-            var typesAndFields = types.ToDictionary(k => k, v => v.Fields.Where(x => x.CustomAttributes.Any(y => y.AttributeType.FullName == ViewAttributeTypeName)).ToArray());
-            
-            foreach (var typesAndField in typesAndFields)
-            {
-                Debug($"IN :: {typesAndField.Key} :: {typesAndField.Value.Length}");
-            }
-            
-            AddInjectViewMethodInTypeForFields(typesAndFields);
+            AddInjectViewMethodInTypeForFields(viewInjectMembers);
 
-            foreach (var type in typesAndFields.Keys)
+            foreach (var type in viewInjectMembers.Keys)
             {
-                    ReplaceInjectMethodCallInType(type);
+                ReplaceInjectMethodCallInType(type);
             }
+        }
+
+        private Dictionary<TypeDefinition, List<IMemberDefinition>> GetMembersMarkedWithView()
+        {
+            var dict = new Dictionary<TypeDefinition, List<IMemberDefinition>>();
+
+            foreach (var type in _moduleDefinition.Types)
+            {
+                foreach (var field in type.Fields)
+                {
+                    if (field.CustomAttributes.All(x => x.AttributeType.FullName != ViewAttributeTypeName))
+                        continue;
+
+                    if (dict.TryGetValue(type, out var fields))
+                    {
+                        fields.Add(field);
+                    }
+                    else
+                    {
+                        dict.Add(type, new List<IMemberDefinition> { field });
+                    }
+                }
+
+                foreach (var property in type.Properties)
+                {
+                    if (property.CustomAttributes.All(x => x.AttributeType.FullName != ViewAttributeTypeName))
+                        continue;
+
+                    if (dict.TryGetValue(type, out var properties))
+                    {
+                        properties.Add(property);
+                    }
+                    else
+                    {
+                        dict.Add(type, new List<IMemberDefinition> { property });
+                    }
+                }
+            }
+
+            return dict;
         }
 
         private void FindRequiredTypesAndMethods()
@@ -81,7 +112,7 @@ namespace Polkovnik.DroidInjector.Fody
             _resourceIdClassType = resourceClassType.NestedTypes.First(x => x.Name == "Id");
         }
 
-        private void AddInjectViewMethodInTypeForFields(IDictionary<TypeDefinition, FieldDefinition[]> typesWithFields)
+        private void AddInjectViewMethodInTypeForFields(IDictionary<TypeDefinition, List<IMemberDefinition>> typesWithFields)
         {
             var methodDefinition = new MethodDefinition(InjectViewsGeneratedMethodName, MethodAttributes.Private | MethodAttributes.HideBySig, _moduleDefinition.TypeSystem.Void);
             methodDefinition.Parameters.Add(new ParameterDefinition("view", ParameterAttributes.None, _androidViewTypeReference));
@@ -92,16 +123,72 @@ namespace Polkovnik.DroidInjector.Fody
                 var ilProcessor = methodDefinition.Body.GetILProcessor();
                 ilProcessor.Emit(OpCodes.Nop);
 
-                foreach (var fieldDefinition in typesAndField.Value)
+                foreach (var memberDefinition in typesAndField.Value)
                 {
-                    AddInjectViewInstrictions(ilProcessor, GetResourceId(fieldDefinition), fieldDefinition.FieldType, fieldDefinition);
+                    switch (memberDefinition)
+                    {
+                        case FieldDefinition fieldDefinition:
+                            AddInjectViewInstructionsForField(ilProcessor, GetResourceId(fieldDefinition), fieldDefinition.FieldType, fieldDefinition);
+                            break;
+                        case PropertyDefinition propertyDefinition:
+                            var propertyHasSetter = propertyDefinition.SetMethod != null;
+                            if (!propertyHasSetter)
+                            {
+                                AddSetterForProperty(propertyDefinition);
+                            }
+                            AddInjectViewInstructionsForProperty(ilProcessor, GetResourceId(propertyDefinition), propertyDefinition.PropertyType, propertyDefinition.SetMethod);
+                            Debug($"THERE WILL BE INJECTING PROPERTY : {propertyDefinition}");
+                            break;
+                    }
                 }
 
                 ilProcessor.Emit(OpCodes.Ret);
             }
         }
 
-        private void AddInjectViewInstrictions(ILProcessor ilProcessor, int resourceId, TypeReference targetTypeReference, FieldDefinition injectingField)
+        private void AddInjectViewInstructionsForProperty(ILProcessor ilProcessor, int resourceId, TypeReference targetPropertyType, MethodReference setterMethodDefinition)
+        {
+            ilProcessor.Emit(OpCodes.Ldarg_0);
+            ilProcessor.Emit(OpCodes.Ldarg_1);
+            ilProcessor.Emit(OpCodes.Ldc_I4, resourceId);
+            ilProcessor.Emit(OpCodes.Callvirt, _findViewByIdMethodDefinition);
+            ilProcessor.Emit(OpCodes.Castclass, targetPropertyType);
+            ilProcessor.Emit(OpCodes.Call, setterMethodDefinition);
+            ilProcessor.Emit(OpCodes.Nop);
+        }
+        
+        private void AddSetterForProperty(PropertyDefinition propertyDefinition)
+        {
+            var backingFieldName = GetBackingFieldNameForProperty(propertyDefinition);
+            var backingField = propertyDefinition.DeclaringType.Fields.FirstOrDefault(x => x.Name == backingFieldName);
+
+            if (backingField == null)
+                throw new FodyInjectorException($"Property: {propertyDefinition.FullName} hasn't setter and not auto-implemented.");
+            
+            backingField.Attributes = backingField.Attributes ^ FieldAttributes.InitOnly;
+
+            var setterMethod = new MethodDefinition($"set_{propertyDefinition.Name}", 
+                MethodAttributes.Private | MethodAttributes.HideBySig | MethodAttributes.SpecialName, _moduleDefinition.TypeSystem.Void);
+
+            setterMethod.Parameters.Add(new ParameterDefinition(propertyDefinition.PropertyType));
+            
+            propertyDefinition.DeclaringType.Methods.Add(setterMethod);
+            propertyDefinition.SetMethod = setterMethod;
+
+            var ilProcessor = setterMethod.Body.GetILProcessor();
+
+            ilProcessor.Emit(OpCodes.Ldarg_0);
+            ilProcessor.Emit(OpCodes.Ldarg_1);
+            ilProcessor.Emit(OpCodes.Stfld, backingField);
+            ilProcessor.Emit(OpCodes.Ret);
+        }
+
+        private string GetBackingFieldNameForProperty(PropertyDefinition propertyDefinition)
+        {
+            return $"<{propertyDefinition.Name}>k__BackingField";
+        }
+
+        private void AddInjectViewInstructionsForField(ILProcessor ilProcessor, int resourceId, TypeReference targetTypeReference, FieldDefinition injectingField)
         {
             ilProcessor.Emit(OpCodes.Ldarg_0);
             ilProcessor.Emit(OpCodes.Ldarg_1);
@@ -111,7 +198,7 @@ namespace Polkovnik.DroidInjector.Fody
             ilProcessor.Emit(OpCodes.Stfld, injectingField);
         }
 
-        private int GetResourceId(FieldDefinition fieldDefinition)
+        private int GetResourceId(IMemberDefinition fieldDefinition)
         {
             var attribute = fieldDefinition.CustomAttributes.First(x => x.AttributeType.FullName == ViewAttributeTypeName);
 
@@ -125,7 +212,7 @@ namespace Polkovnik.DroidInjector.Fody
             var field = _resourceIdClassType.Fields.FirstOrDefault(x => x.Name == constName);
 
             if (field == null)
-                throw new FodyInjectorException($"Can't find id for field {fieldDefinition.FullName}.");
+                throw new FodyInjectorException($"Can't find id for member {fieldDefinition.FullName}.");
             
             return (int)field.Constant;
         }
@@ -140,7 +227,6 @@ namespace Polkovnik.DroidInjector.Fody
 
             if (isTypeDerivedFromActivity)
             {
-                Debug($"ADDING GETVIEW METHOD TO {definition}");
                 activityGetViewMethodDefinition = AddGetViewMethodInActivity(definition);
             }
 

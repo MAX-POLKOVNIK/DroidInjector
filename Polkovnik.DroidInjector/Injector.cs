@@ -67,6 +67,16 @@ namespace Polkovnik.DroidInjector
             throw new InjectorException($"Method {nameof(InjectViews)} must be removed at runtime. Check if Fody is working.");
         }
 
+        //public static void InjectView<T>(ref object fieldOrProperty, View container, int resourceId, bool allowMissing)
+        //{
+        //    var view = container.FindViewById(resourceId);
+
+        //    if (!allowMissing && view == null)
+        //        throw new InjectorException($"View with ID = {resourceId} now found.");
+
+        //    fieldOrProperty = view;
+        //}
+
         internal void InjectViews<T>(T injectableObject, View view, bool allowViewMissing = false)
         {
             InjectInternal<ViewAttribute, T, View>(injectableObject, view, RetrieveView, allowViewMissing);

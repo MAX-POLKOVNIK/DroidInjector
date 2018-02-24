@@ -1,4 +1,6 @@
 ﻿using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
 using Android.App;
 using Android.Widget;
 using Android.OS;
@@ -17,23 +19,21 @@ namespace Polkovnik.DroidInjector.FodySample
             
             SetContentView(Resource.Layout.Main);
 
-            //InjectTest(GetView(FindViewById<View>(Android.Resource.Id.Content)));
-            //
+            //var stopwatch = new Stopwatch();
+            //stopwatch.Start();
 
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
+            ////Injector.InjectViews();
 
+            //stopwatch.Stop();
             Injector.InjectViews();
-            
-            stopwatch.Stop();
-
-            //InjectTest(GetRootView());
-
         }
+
+        [View(Resource.Id.myButton)] private Button Button { get; set; }
+        [View(Resource.Id.myButton)] private Button Button2 { get; }
 
         private void InjectTest(View view)
         {
-            _myButton = (Button)view.FindViewById(Resource.Id.myButton);
+            Button = (Button)view.FindViewById(Resource.Id.myButton);
         }
     }
 }
