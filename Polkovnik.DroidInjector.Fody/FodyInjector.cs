@@ -6,7 +6,7 @@ using Mono.Cecil.Cil;
 
 namespace Polkovnik.DroidInjector.Fody
 {
-    internal class Injector
+    internal class FodyInjector
     {
         private readonly IAssemblyResolver _assemblyResolver;
 
@@ -19,7 +19,7 @@ namespace Polkovnik.DroidInjector.Fody
 
         public event Action<string> DebugEvent;
 
-        public Injector(ModuleDefinition moduleDefinition, IAssemblyResolver assemblyResolver)
+        public FodyInjector(ModuleDefinition moduleDefinition, IAssemblyResolver assemblyResolver)
         {
             _assemblyResolver = assemblyResolver ?? throw new ArgumentNullException(nameof(assemblyResolver));
             _moduleDefinition = moduleDefinition ?? throw new ArgumentNullException(nameof(moduleDefinition));
@@ -51,7 +51,7 @@ namespace Polkovnik.DroidInjector.Fody
 
             foreach (var type in typesAndFields.Keys)
             {
-                ReplaceInjectMethodCall(type);
+                ReplaceInjectMethodCallInType(type);
             }
         }
 
@@ -102,27 +102,51 @@ namespace Polkovnik.DroidInjector.Fody
             return (int)resourceId;
         }
 
-        private void ReplaceInjectMethodCall(TypeDefinition definition)
+        private void ReplaceInjectMethodCallInType(TypeDefinition definition)
         {
             var value = "Polkovnik.DroidInjector.Injector::InjectViews";
 
+            var generatedMethod = definition.Methods.First(x => x.Name == InjectViewsGeneratedMethodName);
+
             foreach (var method in definition.Methods)
             {
-                var callInjectorInstruction = method.Body.Instructions.FirstOrDefault(x => x.OpCode == OpCodes.Call && x.Operand.ToString().Contains(value));
-                
-                if (callInjectorInstruction == null)
-                    continue;
+                while (true)
+                {
+                    var callInjectorInstruction = method.Body.Instructions.FirstOrDefault(x => x.OpCode == OpCodes.Call && x.Operand.ToString().Contains(value));
 
-                Debug($"FOUND CALL {callInjectorInstruction.Operand.ToString()} in {method.FullName}");
+                    if (callInjectorInstruction == null)
+                        break;
 
-                var ilProcessor = method.Body.GetILProcessor();
+                    Debug($"REPLACE CALL {value} in {method.FullName}");
 
-                ilProcessor.InsertBefore(callInjectorInstruction.Previous, Instruction.Create(OpCodes.Ldarg_0));
-
-                var generatedMethod = method.DeclaringType.Methods.First(x => x.Name == InjectViewsGeneratedMethodName);
-
-                ilProcessor.Replace(callInjectorInstruction, Instruction.Create(OpCodes.Call, generatedMethod));
+                    ReplaceInjectInsructions(callInjectorInstruction, method.Body.GetILProcessor(), generatedMethod);
+                }
             }
+        }
+
+        /// <summary>
+        /// Replaces call Polkovnik.DroidInjector.Injector::InjectViews(View).
+        /// </summary>
+        /// <param name="callInjectorInstruction">Instruction with calling Polkovnik.DroidInjector.Injector::InjectViews(View).</param>
+        /// <param name="ilProcessor">Method body's ILProcessor.</param>
+        /// <param name="injectionMethod">Activty's generated method for injecting.</param>
+        private static void ReplaceInjectInsructions(Instruction callInjectorInstruction, ILProcessor ilProcessor, MethodReference injectionMethod)
+        {
+            var targetInstruction = callInjectorInstruction;
+
+            while (targetInstruction.Previous.OpCode.Name.StartsWith("call"))
+            {
+                targetInstruction = targetInstruction.Previous;
+            }
+
+            while (targetInstruction.Previous.OpCode.Name.StartsWith("ld"))
+            {
+                targetInstruction = targetInstruction.Previous;
+            }
+
+            ilProcessor.InsertBefore(targetInstruction, Instruction.Create(OpCodes.Ldarg_0));
+            
+            ilProcessor.Replace(callInjectorInstruction, Instruction.Create(OpCodes.Call, injectionMethod));
         }
     }
 }
