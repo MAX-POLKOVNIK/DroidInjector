@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
@@ -80,7 +77,10 @@ namespace Polkovnik.DroidInjector.Fody
         {
             LogInfo("STARTED");
             var injector = new FodyInjector(ModuleDefinition, AssemblyResolver);
-            injector.DebugEvent += LogInfo;
+
+            Logger.DebugEnabled = false;
+            Logger.Log += s => LogInfo(s);
+
             try
             {
                 injector.Execute();
@@ -88,7 +88,7 @@ namespace Polkovnik.DroidInjector.Fody
             catch (FodyInjectorException e)
             {
                 var message = $"FATAL ERROR: {e.Message}";
-                LogInfo(message);
+                LogError(message);
                 throw new FodyInjectorException(message);
             }
 

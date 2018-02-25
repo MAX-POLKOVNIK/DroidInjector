@@ -30,6 +30,7 @@ namespace Polkovnik.DroidInjector.FodySample
             Injector.BindViewEvents();
 
             stopwatch.Stop();
+            Console.WriteLine($"TOTAL: {stopwatch.ElapsedMilliseconds}");
 
             _myButton.Text = "That is working";
         }
