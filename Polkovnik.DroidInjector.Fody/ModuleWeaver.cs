@@ -78,7 +78,9 @@ namespace Polkovnik.DroidInjector.Fody
             LogInfo("STARTED");
             var injector = new FodyInjector(ModuleDefinition, AssemblyResolver);
 
-            Logger.DebugEnabled = false;
+#if DEBUG
+            Logger.DebugEnabled = true;
+#endif
             Logger.Log += s => LogInfo(s);
 
             try

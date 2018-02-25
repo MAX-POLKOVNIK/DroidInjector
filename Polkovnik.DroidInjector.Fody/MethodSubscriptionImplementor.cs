@@ -72,7 +72,7 @@ namespace Polkovnik.DroidInjector.Fody
                 var resourceId = methodsWithResourceId.Key;
                 var methodsToSubscribe = methodsWithResourceId.Value;
                 var listMs = new List<MethodSubscriptionInfo>();
-                var shouldCheckIfNull = false;
+                var shouldThrowExceptionIfNull = false;
 
                 foreach (var methodToSubscribe in methodsToSubscribe)
                 {
@@ -81,7 +81,8 @@ namespace Polkovnik.DroidInjector.Fody
 
                     var argsLength = attributeArguments.Count;
 
-                    shouldCheckIfNull = shouldCheckIfNull || (bool)attributeArguments[argsLength == 4 ? 3 : 2].Value;
+                    shouldThrowExceptionIfNull = shouldThrowExceptionIfNull || !(bool)attributeArguments[argsLength == 4 ? 3 : 2].Value;
+
                     var eventName = (string)attributeArguments[argsLength == 4 ? 2 : 1].Value;
                     var viewType = argsLength == 4 ? (TypeReference)attributeArguments[1].Value : _androidViewTypeReference;
 
@@ -124,7 +125,7 @@ namespace Polkovnik.DroidInjector.Fody
                     listMs.Add(new MethodSubscriptionInfo(addHandlerMethod, importedHandlerCtor, methodToSubscribe, viewType));
                 }
 
-                lastInstruction = AddSubscribtionInstructions(lastInstruction, ilProcessor, resourceId, listMs, shouldCheckIfNull);
+                lastInstruction = AddSubscribtionInstructions(lastInstruction, ilProcessor, resourceId, listMs, shouldThrowExceptionIfNull);
             }
         }
 
@@ -175,8 +176,6 @@ namespace Polkovnik.DroidInjector.Fody
 
             InsertBefore(ref li, Instruction.Create(OpCodes.Nop));
             InsertBefore(ref li, Instruction.Create(OpCodes.Brfalse_S, nopBeforeSubscriptions));
-            InsertBefore(ref li, Instruction.Create(OpCodes.Ldloc_1));
-            InsertBefore(ref li, Instruction.Create(OpCodes.Stloc_1));
             InsertBefore(ref li, Instruction.Create(OpCodes.Ldloc_1));
             InsertBefore(ref li, Instruction.Create(OpCodes.Stloc_1));
             InsertBefore(ref li, Instruction.Create(OpCodes.Ceq));

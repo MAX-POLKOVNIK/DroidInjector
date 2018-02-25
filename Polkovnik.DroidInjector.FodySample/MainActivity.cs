@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
 using Android.App;
 using Android.Widget;
 using Android.OS;
