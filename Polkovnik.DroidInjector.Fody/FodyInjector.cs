@@ -25,6 +25,8 @@ namespace Polkovnik.DroidInjector.Fody
         private MethodReference _activityFindViewByIdMethodReference;
         private TypeDefinition _resourceIdClassType;
         private MethodReference _injectorExceptionCtor;
+        private MethodDefinition _activityBindViewEventsMethodDefinition;
+        private MethodDefinition _bindViewEventsMethodDefinition;
 
         public event Action<string> DebugEvent;
 
@@ -50,7 +52,10 @@ namespace Polkovnik.DroidInjector.Fody
 
             foreach (var type in viewInjectMembers.Keys)
             {
-                ReplaceInjectMethodCallInType(type);
+                ReplaceInjectMethodCallInType(type, InjectViewsGeneratedMethodName, _activityInjectViewsMethodDefinition, true);
+                ReplaceInjectMethodCallInType(type, InjectViewsGeneratedMethodName, _injectViewsMethodReference, false);
+                ReplaceInjectMethodCallInType(type, BindViewEventsGeneratedMethodName, _activityBindViewEventsMethodDefinition, true);
+                ReplaceInjectMethodCallInType(type, BindViewEventsGeneratedMethodName, _bindViewEventsMethodDefinition, false);
             }
         }
         
@@ -118,6 +123,8 @@ namespace Polkovnik.DroidInjector.Fody
             var injectorTypeDefinition = droidInjectorAssembly.MainModule.GetType("Polkovnik.DroidInjector.Injector");
             _activityInjectViewsMethodDefinition = injectorTypeDefinition.Methods.First(x => x.Name == "InjectViews" && x.Parameters.Count == 0);
             _injectViewsMethodReference = injectorTypeDefinition.Methods.First(x => x.Name == "InjectViews" && x.Parameters.Count == 1);
+            _activityBindViewEventsMethodDefinition = injectorTypeDefinition.Methods.First(x => x.Name == "BindViewEvents" && x.Parameters.Count == 0);
+            _bindViewEventsMethodDefinition = injectorTypeDefinition.Methods.First(x => x.Name == "BindViewEvents" && x.Parameters.Count == 1);
 
             var injectorExceptionType = droidInjectorAssembly.MainModule.GetType("Polkovnik.DroidInjector.InjectorException");
             _injectorExceptionCtor = _moduleDefinition.ImportReference(injectorExceptionType.Methods.First(x => x.IsConstructor));
@@ -421,9 +428,9 @@ namespace Polkovnik.DroidInjector.Fody
             return (int)field.Constant;
         }
 
-        private void ReplaceInjectMethodCallInType(TypeDefinition definition)
+        private void ReplaceInjectMethodCallInType(TypeDefinition definition, string methodNameToCall, MethodDefinition methodToRemove, bool methodIsParameterless)
         {
-            var generatedMethod = definition.Methods.First(x => x.Name == InjectViewsGeneratedMethodName);
+            var generatedMethod = definition.Methods.First(x => x.Name == methodNameToCall);
 
             var isTypeDerivedFromActivity = IsTypeDerivedFromAndroidActivity(definition);
 
@@ -438,29 +445,23 @@ namespace Polkovnik.DroidInjector.Fody
             {
                 while (true)
                 {
-                    var callInjectorInstruction = method.Body.Instructions.FirstOrDefault(x => x.OpCode == OpCodes.Call && IsInjectViewsMethod(x.Operand));
-
-                    if (callInjectorInstruction == null)
-                        break;
-                    
-                    Debug($"REPLACE CALL {_injectViewsMethodReference} in {method.FullName}");
-
-                    ReplaceInjectInsructions(callInjectorInstruction, method.Body.GetILProcessor(), generatedMethod);
-                }
-
-                while (true)
-                {
-                    var callActivityInjectorInstuction = method.Body.Instructions.FirstOrDefault(x => x.OpCode == OpCodes.Call && IsActivityInjectMethod(x.Operand));
-
-                    if (callActivityInjectorInstuction == null)
+                    var callInstuction = method.Body.Instructions.FirstOrDefault(x => x.OpCode == OpCodes.Call && IsMehodToRemove(x.Operand));
+                    if (callInstuction == null)
                         break;
 
-                    ReplaceInjectViewParameterlessMethodInstructions(callActivityInjectorInstuction, method.Body.GetILProcessor(), generatedMethod, activityGetViewMethodDefinition);
+                    Debug($"REPLACE CALL {methodToRemove} in {method.FullName}");
+
+                    if (methodIsParameterless)
+                    {
+                        ReplaceParameterlessMethodInstructions(callInstuction, method.Body.GetILProcessor(), generatedMethod, activityGetViewMethodDefinition);
+                    }
+                    else
+                    {
+                        ReplaceMethodCallInsructions(callInstuction, method.Body.GetILProcessor(), generatedMethod);
+                    }
                 }
             }
-
-            bool IsActivityInjectMethod(object operand) => operand is MethodReference methodReference && methodReference.Resolve() == _activityInjectViewsMethodDefinition;
-            bool IsInjectViewsMethod(object operand) => operand is MethodReference methodReference && methodReference.Resolve() == _injectViewsMethodReference;
+            bool IsMehodToRemove(object operand) => operand is MethodReference methodReference && methodReference.Resolve() == methodToRemove;
         }
 
         private bool IsTypeDerivedFromAndroidActivity(TypeDefinition typeDefinition)
@@ -480,7 +481,7 @@ namespace Polkovnik.DroidInjector.Fody
             return false;
         }
 
-        private static void ReplaceInjectViewParameterlessMethodInstructions(Instruction callInjectorInstruction, ILProcessor ilProcessor, MethodReference injectionMethod, MethodReference getViewMethod)
+        private static void ReplaceParameterlessMethodInstructions(Instruction callInjectorInstruction, ILProcessor ilProcessor, MethodReference injectionMethod, MethodReference getViewMethod)
         {
             ilProcessor.InsertBefore(callInjectorInstruction, Instruction.Create(OpCodes.Ldarg_0));
             ilProcessor.InsertBefore(callInjectorInstruction, Instruction.Create(OpCodes.Ldarg_0));
@@ -494,7 +495,7 @@ namespace Polkovnik.DroidInjector.Fody
         /// <param name="callInjectorInstruction">Instruction with calling Polkovnik.DroidInjector.Injector::InjectViews(View).</param>
         /// <param name="ilProcessor">Method body's ILProcessor.</param>
         /// <param name="injectionMethod">Activty's generated method for injecting.</param>
-        private static void ReplaceInjectInsructions(Instruction callInjectorInstruction, ILProcessor ilProcessor, MethodReference injectionMethod)
+        private static void ReplaceMethodCallInsructions(Instruction callInjectorInstruction, ILProcessor ilProcessor, MethodReference injectionMethod)
         {
             var targetInstruction = callInjectorInstruction;
 

@@ -57,7 +57,7 @@ namespace Polkovnik.DroidInjector
         {
             throw new InjectorException($"Method {nameof(InjectViews)} must be removed at runtime. Check if Fody is working.");
         }
-
+        
         /// <summary>
         /// Starts resolving views.
         /// </summary>
@@ -65,6 +65,16 @@ namespace Polkovnik.DroidInjector
         public static void InjectViews(View view)
         {
             throw new InjectorException($"Method {nameof(InjectViews)} must be removed at runtime. Check if Fody is working.");
+        }
+
+        public static void BindViewEvents()
+        {
+            throw new InjectorException($"Method {nameof(BindViewEvents)} must be removed at runtime. Check if Fody is working.");
+        }
+
+        public static void BindViewEvents(View view)
+        {
+            throw new InjectorException($"Method {nameof(BindViewEvents)} must be removed at runtime. Check if Fody is working.");
         }
 
         //public static void InjectView<T>(ref object fieldOrProperty, View container, int resourceId, bool allowMissing)
