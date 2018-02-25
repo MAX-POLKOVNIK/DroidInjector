@@ -47,6 +47,9 @@ namespace Polkovnik.DroidInjector.FodySample
 			// aapt resource value: 0x7f050000
 			public const int myButton = 2131034112;
 			
+			// aapt resource value: 0x7f050001
+			public const int myEditText = 2131034113;
+			
 			static Id()
 			{
 				global::Android.Runtime.ResourceIdManager.UpdateIdValues();
@@ -61,7 +64,7 @@ namespace Polkovnik.DroidInjector.FodySample
 		{
 			
 			// aapt resource value: 0x7f030000
-			public const int Main = 2130903040;
+			public const int main = 2130903040;
 			
 			static Layout()
 			{

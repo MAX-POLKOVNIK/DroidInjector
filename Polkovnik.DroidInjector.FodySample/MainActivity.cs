@@ -5,6 +5,7 @@ using System.Reflection;
 using Android.App;
 using Android.Widget;
 using Android.OS;
+using Android.Text;
 using Android.Views;
 
 namespace Polkovnik.DroidInjector.FodySample
@@ -20,7 +21,7 @@ namespace Polkovnik.DroidInjector.FodySample
         {
             base.OnCreate(savedInstanceState);
             
-            SetContentView(Resource.Layout.Main);
+            SetContentView(Resource.Layout.main);
             Injector.InjectViews();
 
             var stopwatch = new Stopwatch();
@@ -83,6 +84,11 @@ namespace Polkovnik.DroidInjector.FodySample
 
         //}
 
+        [ViewEvent(Resource.Id.myEditText, typeof(EditText), nameof(EditText.TextChanged))]
+        private void ButtonClick5(object sender, TextChangedEventArgs args)
+        {
+            Toast.MakeText(this, args.Text.ToString(), ToastLength.Short).Show();
+        }
 
         [ViewEvent(Resource.Id.myButton, typeof(Button), nameof(View.Click))]
         private void ButtonClick5(object sender, EventArgs args)
