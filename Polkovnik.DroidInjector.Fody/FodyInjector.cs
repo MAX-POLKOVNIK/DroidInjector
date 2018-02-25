@@ -7,19 +7,26 @@ namespace Polkovnik.DroidInjector.Fody
 {
     internal class FodyInjector
     {
-        
-
+        private readonly IAssemblyResolver _assemblyResolver;
         private readonly ModuleDefinition _moduleDefinition;
-        private readonly ReferencesAndDefinitionsProvider _referencesAndDefinitionsProvider;
+        private ReferencesAndDefinitionsProvider _referencesAndDefinitionsProvider;
         
         public FodyInjector(ModuleDefinition moduleDefinition, IAssemblyResolver assemblyResolver)
         {
+            _assemblyResolver = assemblyResolver ?? throw new ArgumentNullException(nameof(assemblyResolver));
             _moduleDefinition = moduleDefinition ?? throw new ArgumentNullException(nameof(moduleDefinition));
-            _referencesAndDefinitionsProvider = new ReferencesAndDefinitionsProvider(moduleDefinition, assemblyResolver);
         }
         
         public void Execute()
         {
+            if (_moduleDefinition.AssemblyReferences.All(x => x.Name != "Polkovnik.DroidInjector"))
+            {
+                Logger.Info("Skip injecting library due to reference to Polkovnik.DroidInjector not found");
+                return;
+            }
+
+            _referencesAndDefinitionsProvider = new ReferencesAndDefinitionsProvider(_moduleDefinition, _assemblyResolver);
+
             var viewHarvester = new ViewHarvester(_moduleDefinition);
             var requiredToInject = viewHarvester.Harvest();
             

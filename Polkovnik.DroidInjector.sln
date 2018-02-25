@@ -10,6 +10,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Polkovnik.DroidInjector.Sample", "Polkovnik.DroidInjector.Sample\Polkovnik.DroidInjector.Sample.csproj", "{56CF4A44-9E2C-4C9F-90DF-D5973F421CD6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Polkovnik.DroidInjector.Fody", "Polkovnik.DroidInjector.Fody\Polkovnik.DroidInjector.Fody.csproj", "{A5D9C4F1-5C03-4AAB-ADD0-F40CE966EB5D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{EDFC7537-0636-473A-9B58-DD7F22A29E53} = {EDFC7537-0636-473A-9B58-DD7F22A29E53}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Polkovnik.DroidInjector.FodySample", "Polkovnik.DroidInjector.FodySample\Polkovnik.DroidInjector.FodySample.csproj", "{8E36A0DA-7BC7-4540-8211-D6B85E1D1790}"
 	ProjectSection(ProjectDependencies) = postProject
