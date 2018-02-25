@@ -210,9 +210,7 @@ namespace Polkovnik.DroidInjector.Fody
                         {
                             throw new FodyInjectorException($"Can't find event {eventName} in {viewType}");
                         }
-
-                        Debug($"EVENT TYPE :: {eventDefinition.EventType}");
-
+                        
                         var eventTypeDefinition = eventDefinition.EventType.Resolve();
                         
                         var addHandlerMethod = _moduleDefinition.ImportReference(eventDefinition.AddMethod);
@@ -225,7 +223,6 @@ namespace Polkovnik.DroidInjector.Fody
                             var genericArgs = instance.GenericArguments.Select(x => _moduleDefinition.ImportReference(x)).ToArray();
 
                             importedHandlerCtor.DeclaringType = importedHandlerCtor.DeclaringType.MakeGenericInstanceType(genericArgs);
-                            Debug($"CHECK CTOR :: {importedHandlerCtor}");
                         }
                         
                         listMs.Add(new M(addHandlerMethod, importedHandlerCtor, (MethodReference)methodToSubscribe, viewType));
@@ -253,7 +250,7 @@ namespace Polkovnik.DroidInjector.Fody
             public TypeReference OwnerType { get; }
         }
         
-        private Instruction AddSubscribtionInstructions(Instruction lastInstruction, ILProcessor ilProcessor,
+        private static Instruction AddSubscribtionInstructions(Instruction lastInstruction, ILProcessor ilProcessor,
             int resourceId, List<M> methodsToSubscribe, bool shouldThrowExceptionIfNull, string exceptionMessage, MethodReference exceptionCtor, 
             MethodReference findViewMethodReference)
         {
