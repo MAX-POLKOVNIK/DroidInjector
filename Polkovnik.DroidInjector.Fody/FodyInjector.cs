@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using Mono.Cecil.Rocks;
 
 namespace Polkovnik.DroidInjector.Fody
 {
@@ -23,6 +24,7 @@ namespace Polkovnik.DroidInjector.Fody
         private MethodDefinition _injectViewsMethodReference;
         private MethodReference _activityFindViewByIdMethodReference;
         private TypeDefinition _resourceIdClassType;
+        private MethodReference _injectorExceptionCtor;
 
         public event Action<string> DebugEvent;
 
@@ -117,21 +119,20 @@ namespace Polkovnik.DroidInjector.Fody
             _activityInjectViewsMethodDefinition = injectorTypeDefinition.Methods.First(x => x.Name == "InjectViews" && x.Parameters.Count == 0);
             _injectViewsMethodReference = injectorTypeDefinition.Methods.First(x => x.Name == "InjectViews" && x.Parameters.Count == 1);
 
+            var injectorExceptionType = droidInjectorAssembly.MainModule.GetType("Polkovnik.DroidInjector.InjectorException");
+            _injectorExceptionCtor = _moduleDefinition.ImportReference(injectorExceptionType.Methods.First(x => x.IsConstructor));
+
             var resourceClassType = _moduleDefinition.GetType($"{_moduleDefinition.Assembly.Name.Name}.Resource");
             _resourceIdClassType = resourceClassType.NestedTypes.First(x => x.Name == "Id");
-
-            assemblyNameReference = _moduleDefinition.AssemblyReferences.First(x => x.Name == "mscorlib");
-            var mscorlibAssembly = _assemblyResolver.Resolve(assemblyNameReference);
-            //var eventHandlerType = mscorlibAssembly.MainModule.GetType("EventHandler")
         }
 
         private void AddBindViewEventsMethodInType(Dictionary<TypeDefinition, List<IMemberDefinition>> typesWithMembers)
         {
-            var subscribionsInitMethod = new MethodDefinition(BindViewEventsGeneratedMethodName, MethodAttributes.Private | MethodAttributes.HideBySig, _moduleDefinition.TypeSystem.Void);
-            subscribionsInitMethod.Parameters.Add(new ParameterDefinition("view", ParameterAttributes.None, _androidViewTypeReference));
-
             foreach (var typeWithMembers in typesWithMembers)
             {
+                var subscribionsInitMethod = new MethodDefinition(BindViewEventsGeneratedMethodName, MethodAttributes.Private | MethodAttributes.HideBySig, _moduleDefinition.TypeSystem.Void);
+                subscribionsInitMethod.Parameters.Add(new ParameterDefinition("view", ParameterAttributes.None, _androidViewTypeReference));
+
                 var methods = typeWithMembers.Value.Where(x => x is MethodDefinition).ToArray();
 
                 if (methods.Length == 0)
@@ -140,7 +141,12 @@ namespace Polkovnik.DroidInjector.Fody
                 subscribionsInitMethod.Body.Variables.Add(new VariableDefinition(_androidViewTypeReference));
                 subscribionsInitMethod.Body.Variables.Add(new VariableDefinition(_moduleDefinition.TypeSystem.Boolean));
 
+                typeWithMembers.Key.Methods.Add(subscribionsInitMethod);
+
+                Debug($"ADD METHOD {subscribionsInitMethod} INTO {typeWithMembers.Key}");
+
                 var ilProcessor = subscribionsInitMethod.Body.GetILProcessor();
+                Instruction lastInstruction = null;
 
                 var dict = new Dictionary<int, List<IMemberDefinition>>();
 
@@ -159,75 +165,152 @@ namespace Polkovnik.DroidInjector.Fody
                     }
                 }
 
-                AddSubscribtionInstructions(null, ilProcessor, dict.ToDictionary(x => x.Key, y => y.Value.Cast<MethodDefinition>().ToList()));
-                
-            }
-        }
-
-        private Instruction AddSubscribtionInstructions(Instruction lastInstruction, ILProcessor ilProcessor,
-            Dictionary<int, List<MethodDefinition>> methods)
-        {
-            var li = lastInstruction;
-
-            foreach (var methodsWithResourceId in methods)
-            {
-                var resourceId = methodsWithResourceId.Key;
-                var methodsToSubscribe = methodsWithResourceId.Value;
-                
-                foreach (var methodToSubscribe in methodsToSubscribe)
+                foreach (var methodsWithResourceId in dict)
                 {
-                    var attributeArguments = methodToSubscribe.CustomAttributes.First(x => x.AttributeType.FullName == ViewEventAttributeTypeName).ConstructorArguments;
+                    var resourceId = methodsWithResourceId.Key;
+                    var methodsToSubscribe = methodsWithResourceId.Value;
+                    var listMs = new List<M>();
+                    var shouldCheckIfNull = false;
 
-                    var argsLength = attributeArguments.Count;
-
-                    var shouldCheckIfNull =  (bool)attributeArguments[argsLength == 4 ? 3 : 2].Value;
-                    var eventName = (string)attributeArguments[argsLength == 4 ? 2 : 1].Value;
-                    var viewType = argsLength == 4 ? (TypeReference)attributeArguments[1].Value : _androidViewTypeReference;
-
-                    
-
-                    //Insert(ref li, Instruction.Create(OpCodes.Nop));
-                    //Insert(ref li, Instruction.Create(OpCodes.Nop));
-
-                    var baseType = viewType;
-                    EventDefinition eventDefinition = null;
-
-                    while (baseType != null)
+                    foreach (var methodToSubscribe in methodsToSubscribe)
                     {
-                        eventDefinition = baseType.Resolve().Events.FirstOrDefault(x => x.Name == eventName);
+                        var attributeArguments = methodToSubscribe.CustomAttributes.First(x => x.AttributeType.FullName == ViewEventAttributeTypeName).ConstructorArguments;
+
+                        var argsLength = attributeArguments.Count;
+
+                        shouldCheckIfNull = shouldCheckIfNull || (bool)attributeArguments[argsLength == 4 ? 3 : 2].Value;
+                        var eventName = (string)attributeArguments[argsLength == 4 ? 2 : 1].Value;
+                        var viewType = argsLength == 4 ? (TypeReference)attributeArguments[1].Value : _androidViewTypeReference;
+                        
+                        var baseType = viewType;
+                        EventDefinition eventDefinition = null;
+
+                        while (baseType != null)
+                        {
+                            eventDefinition = baseType.Resolve().Events.FirstOrDefault(x => x.Name == eventName);
+
+                            if (eventDefinition == null)
+                            {
+                                baseType = baseType.Resolve().BaseType;
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
 
                         if (eventDefinition == null)
                         {
-                            baseType = baseType.Resolve().BaseType;
+                            throw new FodyInjectorException($"Can't find event {eventName} in {viewType}");
                         }
-                        else
+
+                        Debug($"EVENT TYPE :: {eventDefinition.EventType}");
+
+                        var eventTypeDefinition = eventDefinition.EventType.Resolve();
+                        
+                        var addHandlerMethod = _moduleDefinition.ImportReference(eventDefinition.AddMethod);
+                        
+                        var handlerCtor = eventTypeDefinition.Methods.First(x => x.IsConstructor && x.Parameters.Count == 2);
+                        var importedHandlerCtor = _moduleDefinition.ImportReference(handlerCtor);
+                        if (eventDefinition.EventType.IsGenericInstance)
                         {
-                            break;
+                            var instance = (GenericInstanceType)eventDefinition.EventType;
+                            var genericArgs = instance.GenericArguments.Select(x => _moduleDefinition.ImportReference(x)).ToArray();
+
+                            importedHandlerCtor.DeclaringType = importedHandlerCtor.DeclaringType.MakeGenericInstanceType(genericArgs);
+                            Debug($"CHECK CTOR :: {importedHandlerCtor}");
                         }
-                    }
-                    
-                    if (eventDefinition == null)
-                    {
-                        throw new FodyInjectorException($"Can't find event {eventName} in {viewType}");
+                        
+                        listMs.Add(new M(addHandlerMethod, importedHandlerCtor, (MethodReference)methodToSubscribe, viewType));
                     }
 
-                    var eventTypeDefinition = eventDefinition.EventType.Resolve();
-
-                    var addHandlerMethod = eventDefinition.AddMethod;
-
-                    Debug($"EVENT TYPE :: {eventDefinition.EventType}");
-
-                    //Insert(ref li, Instruction.Create(OpCodes.Callvirt, addHandlerMethod));
-
-
-
+                    lastInstruction = AddSubscribtionInstructions(lastInstruction, ilProcessor, resourceId, listMs, shouldCheckIfNull, $"Can't find view with ID {resourceId}", 
+                        _injectorExceptionCtor, _findViewByIdMethodDefinition);
                 }
-
             }
+        }
+
+        public class M
+        {
+            public M(MethodReference addHandlerMethod, MethodReference handlerCtor, MethodReference targetMethod, TypeReference ownerType)
+            {
+                AddHandlerMethod = addHandlerMethod;
+                HandlerCtor = handlerCtor;
+                TargetMethod = targetMethod;
+                OwnerType = ownerType;
+            }
+
+            public MethodReference AddHandlerMethod { get; }
+            public MethodReference HandlerCtor { get; }
+            public MethodReference TargetMethod { get; }
+            public TypeReference OwnerType { get; }
+        }
+        
+        private Instruction AddSubscribtionInstructions(Instruction lastInstruction, ILProcessor ilProcessor,
+            int resourceId, List<M> methodsToSubscribe, bool shouldThrowExceptionIfNull, string exceptionMessage, MethodReference exceptionCtor, 
+            MethodReference findViewMethodReference)
+        {
+            Instruction li;
+
+            if (lastInstruction == null)
+            {
+                lastInstruction = li = Instruction.Create(OpCodes.Ret);
+                ilProcessor.Append(li);
+                
+            }
+            else
+            {
+                li = lastInstruction;
+            }
+
+            InsertBefore(ref li, Instruction.Create(OpCodes.Nop));
+
+            foreach (var m in methodsToSubscribe)
+            {
+                InsertBefore(ref li, Instruction.Create(OpCodes.Nop));
+                InsertBefore(ref li, Instruction.Create(OpCodes.Callvirt, m.AddHandlerMethod));
+                InsertBefore(ref li, Instruction.Create(OpCodes.Newobj, m.HandlerCtor));
+                InsertBefore(ref li, Instruction.Create(OpCodes.Ldftn, m.TargetMethod));
+                InsertBefore(ref li, Instruction.Create(OpCodes.Ldarg_0));
+                InsertBefore(ref li, Instruction.Create(OpCodes.Castclass, m.OwnerType));
+                InsertBefore(ref li, Instruction.Create(OpCodes.Ldloc_0));
+            }
+
+            var nopBeforeSubscriptions = Instruction.Create(OpCodes.Nop);
+
+            InsertBefore(ref li, nopBeforeSubscriptions);
+
+            if (shouldThrowExceptionIfNull)
+            {
+                InsertBefore(ref li, Instruction.Create(OpCodes.Throw));
+                InsertBefore(ref li, Instruction.Create(OpCodes.Newobj, exceptionCtor));
+                InsertBefore(ref li, Instruction.Create(OpCodes.Ldstr, exceptionMessage));
+            }
+            else
+            {
+                InsertBefore(ref li, Instruction.Create(OpCodes.Br_S, lastInstruction));
+                InsertBefore(ref li, Instruction.Create(OpCodes.Nop));
+            }
+
+            InsertBefore(ref li, Instruction.Create(OpCodes.Nop));
+            InsertBefore(ref li, Instruction.Create(OpCodes.Brfalse_S, nopBeforeSubscriptions));
+            InsertBefore(ref li, Instruction.Create(OpCodes.Ldloc_1));
+            InsertBefore(ref li, Instruction.Create(OpCodes.Stloc_1));
+            InsertBefore(ref li, Instruction.Create(OpCodes.Ldloc_1));
+            InsertBefore(ref li, Instruction.Create(OpCodes.Stloc_1));
+            InsertBefore(ref li, Instruction.Create(OpCodes.Ceq));
+            InsertBefore(ref li, Instruction.Create(OpCodes.Ldnull));
+            InsertBefore(ref li, Instruction.Create(OpCodes.Ldloc_0));
+
+            InsertBefore(ref li, Instruction.Create(OpCodes.Stloc_0));
+            InsertBefore(ref li, Instruction.Create(OpCodes.Callvirt, findViewMethodReference));
+            InsertBefore(ref li, Instruction.Create(OpCodes.Ldc_I4, resourceId));
+            InsertBefore(ref li, Instruction.Create(OpCodes.Ldarg_1));
+            InsertBefore(ref li, Instruction.Create(OpCodes.Nop));
 
             return li;
 
-            void Insert(ref Instruction firstInstruction, Instruction newInstruction)
+            void InsertBefore(ref Instruction firstInstruction, Instruction newInstruction)
             {
                 ilProcessor.InsertBefore(firstInstruction, newInstruction);
                 firstInstruction = newInstruction;

@@ -30,59 +30,6 @@ namespace Polkovnik.DroidInjector.FodySample
             }
             else
             {
-                ((Button)v).Click += ButtonClick;
-                ((Button)v).LongClick += ButtonClick;
-                ((TextView)v).TextChanged += ButtonClick;
-            }
-
-            v = view.FindViewById(Resource.Id.myButton);
-            b = v == null;
-            if (b)
-            {
-                //throw new Exception("Can't find view with bla bla ");
-            }
-            else
-            {
-                v.Click += ButtonClick2;
-            }
-            v = view.FindViewById(Resource.Id.myButton);
-            b = v == null;
-            if (b)
-            {
-                //throw new Exception("Can't find view with bla bla ");
-            }
-            else
-            {
-                v.Click += ButtonClick3;
-            }
-            v = view.FindViewById(Resource.Id.myButton);
-            b = v == null;
-            if (b)
-            {
-                throw new Exception("Can't find view with bla bla ");
-            }
-            else
-            {
-                v.Click += ButtonClick4;
-            }
-            v = view.FindViewById(Resource.Id.myButton);
-            b = v == null;
-            if (b)
-            {
-                throw new Exception("Can't find view with bla bla ");
-            }
-            else
-            {
-                v.Click += ButtonClick5;
-            }
-            v = view.FindViewById(Resource.Id.myButton);
-            b = v == null;
-            if (b)
-            {
-                throw new Exception("Can't find view with bla bla ");
-            }
-            else
-            {
                 ((Button)v).Click += ButtonClick6;
             }
             v = view.FindViewById(Resource.Id.myButton);
@@ -93,40 +40,41 @@ namespace Polkovnik.DroidInjector.FodySample
             }
             else
             {
+                ((View)v).Click += ButtonClick7;
                 ((Button)v).Click += ButtonClick7;
             }
         }
 
-        [ViewEvent(Resource.Id.myButton, typeof(Button), nameof(View.Click))]
-        private void ButtonClick(object sender, EventArgs args)
-        {
-            
-        }
+        //[ViewEvent(Resource.Id.myButton, typeof(Button), nameof(View.Click))]
+        //private void ButtonClick(object sender, EventArgs args)
+        //{
 
-        [ViewEvent(Resource.Id.myButton, typeof(Button), nameof(View.Click))]
-        private void ButtonClick2(object sender, EventArgs args)
-        {
+        //}
 
-        }
+        //[ViewEvent(Resource.Id.myButton, typeof(Button), nameof(View.Click))]
+        //private void ButtonClick2(object sender, EventArgs args)
+        //{
 
-        [ViewEvent(Resource.Id.myButton, typeof(Button), nameof(View.Click))]
-        private void ButtonClick3(object sender, EventArgs args)
-        {
+        //}
 
-        }
+        //[ViewEvent(Resource.Id.myButton, typeof(Button), nameof(View.Click))]
+        //private void ButtonClick3(object sender, EventArgs args)
+        //{
 
-        [ViewEvent(Resource.Id.myButton, typeof(Button), nameof(View.Click))]
-        private void ButtonClick4(object sender, EventArgs args)
-        {
+        //}
 
-        }
+        //[ViewEvent(Resource.Id.myButton, typeof(Button), nameof(View.Click))]
+        //private void ButtonClick4(object sender, EventArgs args)
+        //{
+
+        //}
 
 
-        [ViewEvent(Resource.Id.myButton, typeof(Button), nameof(View.Click))]
-        private void ButtonClick5(object sender, EventArgs args)
-        {
+        //[ViewEvent(Resource.Id.myButton, typeof(Button), nameof(View.Click))]
+        //private void ButtonClick5(object sender, EventArgs args)
+        //{
 
-        }
+    //}
 
         [ViewEvent(Resource.Id.myButton, typeof(Button), nameof(View.Click))]
         private void ButtonClick6(object sender, EventArgs args)
