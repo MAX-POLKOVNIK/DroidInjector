@@ -20,7 +20,14 @@ namespace Polkovnik.DroidInjector
         {
             EventName = eventName;
         }
-        
+
+        public ViewEventAttribute(int resourceId, Type viewType, string eventName, bool allowMissing = false) : this(resourceId,
+            eventName, allowMissing)
+        {
+            ViewType = viewType;
+        }
+
+        internal Type ViewType { get; }
         internal string EventName { get; }
     }
 }

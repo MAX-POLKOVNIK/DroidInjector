@@ -1,27 +1,32 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>Polkovnik.DroidInjector</id>
-    <version>0.1.1</version>
+    <id>Polkovnik.DroidInjector.Fody</id>
+    <version>0.1.2</version>
     <authors>MAX-POLKOVNIK</authors>
     <owners>MAX-POLKOVNIK</owners>
     <licenseUrl>https://github.com/MAX-POLKOVNIK/DroidInjector/blob/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/MAX-POLKOVNIK/DroidInjector</projectUrl>
-	<iconUrl>https://github.com/MAX-POLKOVNIK/DroidInjector/raw/develop/Icons/Logo_64x64.png</iconUrl>
+    <iconUrl>https://github.com/MAX-POLKOVNIK/DroidInjector/raw/develop/Icons/Logo_64x64.png</iconUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>Simple injector for Xamarin Android</description>
     <releaseNotes>Beta version</releaseNotes>
     <copyright>Copyright 2018</copyright>
     <tags>Android View Injection</tags>
     <dependencies>
-      <group targetFramework="MonoAndroid">
-            
-      </group>
+      <dependency id="Fody" version="2.3.18" include="All" />
     </dependencies>
+	<contentFiles>
+        <!-- Include Assets as Content -->
+        <files include="*.xml" buildAction="Content" />
+    </contentFiles>
   </metadata>
   <files>
         <!-- Android reference assemblies -->
         <file src="..\..\DroidInjector\Polkovnik.DroidInjector\bin\Release\Polkovnik.DroidInjector.dll" target="lib\MonoAndroid10\Polkovnik.DroidInjector.dll" />
         <file src="..\..\DroidInjector\Polkovnik.DroidInjector\bin\Release\Polkovnik.DroidInjector.xml" target="lib\MonoAndroid10\Polkovnik.DroidInjector.xml" />
-    </files>
+		<file src="..\..\DroidInjector\Tools\Polkovnik.DroidInjector.Fody.dll" target="netstandardweaver\Polkovnik.DroidInjector.Fody.dll" />
+		<file src="..\..\DroidInjector\Tools\Polkovnik.DroidInjector.Fody.dll" target="netclassicweaver\Polkovnik.DroidInjector.Fody.dll" />
+		<file src="..\..\DroidInjector\Polkovnik.DroidInjector.FodySample\FodyWeavers.xml" target="content\MonoAndroid10\FodyWeavers.xml" />
+    </files>	
 </package>
