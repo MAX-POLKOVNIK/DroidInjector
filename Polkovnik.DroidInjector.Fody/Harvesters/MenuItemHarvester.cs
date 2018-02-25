@@ -4,9 +4,9 @@ using Mono.Cecil;
 
 namespace Polkovnik.DroidInjector.Fody.Harvesters
 {
-    internal class ViewHarvester : Harvester
+    internal class MenuItemHarvester : Harvester
     {
-        public ViewHarvester(ModuleDefinition moduleDefinition) : base(moduleDefinition)
+        public MenuItemHarvester(ModuleDefinition moduleDefinition) : base(moduleDefinition)
         {
         }
 
@@ -16,7 +16,7 @@ namespace Polkovnik.DroidInjector.Fody.Harvesters
             {
                 case FieldDefinition _:
                 case PropertyDefinition _:
-                    return memberDefinition.CustomAttributes.Any(x => x.AttributeType.FullName == Consts.InjectorAttributes.ViewAttributeTypeName);
+                    return memberDefinition.CustomAttributes.Any(x => x.AttributeType.FullName == Consts.InjectorAttributes.MenuItemAttributeTypeName);
                 default:
                     return false;
             }
@@ -26,7 +26,7 @@ namespace Polkovnik.DroidInjector.Fody.Harvesters
         {
             var result = base.Harvest();
 
-            Logger.Info($"Found {result.SelectMany(x => x.Value).Count()} members to inject views in {result.Keys.Count} types");
+            Logger.Info($"Found {result.SelectMany(x => x.Value).Count()} members to inject menu items in {result.Keys.Count} types");
 
             return result;
         }

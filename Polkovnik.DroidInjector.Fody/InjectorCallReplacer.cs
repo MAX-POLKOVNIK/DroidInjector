@@ -18,7 +18,7 @@ namespace Polkovnik.DroidInjector.Fody
             _methodNameToCall = methodNameToCall;
             _methodToRemove = methodToRemove;
             _activityGetViewMethodImplementor = activityGetViewMethodImplementor;
-            _methodIsParameterless = !methodToRemove.HasGenericParameters;
+            _methodIsParameterless = !methodToRemove.HasParameters;
         }
 
         public void Execute()
@@ -57,6 +57,8 @@ namespace Polkovnik.DroidInjector.Fody
 
         private static void ReplaceParameterlessMethodInstructions(Instruction callInjectorInstruction, ILProcessor ilProcessor, MethodReference injectionMethod, MethodReference getViewMethod)
         {
+            Logger.Debug("#### ReplaceParameterlessMethodInstructions ");
+
             ilProcessor.InsertBefore(callInjectorInstruction, Instruction.Create(OpCodes.Ldarg_0));
             ilProcessor.InsertBefore(callInjectorInstruction, Instruction.Create(OpCodes.Ldarg_0));
             ilProcessor.InsertBefore(callInjectorInstruction, Instruction.Create(OpCodes.Call, getViewMethod));
@@ -71,6 +73,8 @@ namespace Polkovnik.DroidInjector.Fody
         /// <param name="injectionMethod">Activty's generated method for injecting.</param>
         private static void ReplaceMethodCallInsructions(Instruction callInjectorInstruction, ILProcessor ilProcessor, MethodReference injectionMethod)
         {
+            Logger.Debug("#### ReplaceMethodCallInsructions ");
+
             var targetInstruction = callInjectorInstruction;
 
             while (targetInstruction.Previous.OpCode.Name.StartsWith("call"))

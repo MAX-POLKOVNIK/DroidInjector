@@ -5,7 +5,7 @@ namespace Polkovnik.DroidInjector.Fody
     internal static class Logger
     {
         public static bool DebugEnabled { get; set; }
-        public static event Action<string> Log;
+        public static Action<string> Log;
 
         public static void Debug(string message)
         {

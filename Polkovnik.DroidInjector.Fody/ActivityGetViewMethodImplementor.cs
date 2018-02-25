@@ -7,18 +7,15 @@ namespace Polkovnik.DroidInjector.Fody
 {
     internal class ActivityGetViewMethodImplementor
     {
+        private readonly ReferencesAndDefinitionsProvider _referencesAndDefinitionsProvider;
         private const string GetViewGeneratedMethodName = "Polkovnik_DroidInjector_GetRootView";
 
         private readonly TypeDefinition _typeDefinition;
-        private readonly TypeReference _androidViewTypeReference;
-        private readonly MethodReference _activityFindViewByIdMethodReference;
-
-
-        public ActivityGetViewMethodImplementor(TypeDefinition typeDefinition, TypeReference androidViewTypeReference, MethodReference activityFindViewByIdMethodReference)
+        
+        public ActivityGetViewMethodImplementor(TypeDefinition typeDefinition, ReferencesAndDefinitionsProvider referencesAndDefinitionsProvider)
         {
+            _referencesAndDefinitionsProvider = referencesAndDefinitionsProvider ?? throw new ArgumentNullException(nameof(referencesAndDefinitionsProvider));
             _typeDefinition = typeDefinition ?? throw new ArgumentNullException(nameof(typeDefinition));
-            _androidViewTypeReference = androidViewTypeReference ?? throw new ArgumentNullException(nameof(androidViewTypeReference));
-            _activityFindViewByIdMethodReference = activityFindViewByIdMethodReference ?? throw new ArgumentNullException(nameof(activityFindViewByIdMethodReference));
         }
 
         public bool IsNeedToAddGetViewMethod 
@@ -52,9 +49,10 @@ namespace Polkovnik.DroidInjector.Fody
 
             Logger.Debug($"Adding method {GetViewGeneratedMethodName} into type {_typeDefinition}");
 
-            var methodDefinition = new MethodDefinition(GetViewGeneratedMethodName, MethodAttributes.Private | MethodAttributes.HideBySig, _androidViewTypeReference);
+            var methodDefinition = new MethodDefinition(GetViewGeneratedMethodName, MethodAttributes.Private | MethodAttributes.HideBySig, 
+                _referencesAndDefinitionsProvider.AndroidViewTypeReference);
 
-            methodDefinition.Body.Variables.Add(new VariableDefinition(_androidViewTypeReference));
+            methodDefinition.Body.Variables.Add(new VariableDefinition(_referencesAndDefinitionsProvider.AndroidViewTypeReference));
 
             _typeDefinition.Methods.Add(methodDefinition);
 
@@ -63,7 +61,7 @@ namespace Polkovnik.DroidInjector.Fody
             ilProcessor.Emit(OpCodes.Nop);
             ilProcessor.Emit(OpCodes.Ldarg_0);
             ilProcessor.Emit(OpCodes.Ldc_I4, 0x01020002);
-            ilProcessor.Emit(OpCodes.Callvirt, _activityFindViewByIdMethodReference);
+            ilProcessor.Emit(OpCodes.Callvirt, _referencesAndDefinitionsProvider.ActivityFindViewByIdMethodReference);
             ilProcessor.Emit(OpCodes.Stloc_0);
 
             var ldloc0 = Instruction.Create(OpCodes.Ldloc_0);

@@ -81,7 +81,7 @@ namespace Polkovnik.DroidInjector.Fody
 #if DEBUG
             Logger.DebugEnabled = true;
 #endif
-            Logger.Log += s => LogInfo(s);
+            Logger.Log = LogInfo;
 
             try
             {

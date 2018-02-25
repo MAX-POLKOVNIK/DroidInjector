@@ -7,23 +7,17 @@ using Mono.Cecil.Rocks;
 
 namespace Polkovnik.DroidInjector.Fody
 {
-    public class MethodSubscriptionImplementor
+    internal class MethodSubscriptionImplementor
     {
-        private readonly MethodReference _injectorExceptionCtor;
-        private readonly MethodReference _findViewByIdMethodReference;
-        private readonly TypeReference _androidViewTypeReference;
+        private readonly ReferencesAndDefinitionsProvider _referencesAndDefinitionsProvider;
         private readonly ModuleDefinition _moduleDefinition;
         private readonly MethodDefinition[] _methodsToSubscribe;
         private readonly TypeDefinition _typeDefinition;
-
-        private const string BindViewEventsGeneratedMethodName = "Polkovnik_DroidInjector_BindViewEvents";
-
+        
         public MethodSubscriptionImplementor(TypeDefinition typeDefinition, MethodDefinition[] methodsToSubscribe, ModuleDefinition moduleDefinition,
-            TypeReference androidViewTypeReference, MethodReference injectorExceptionCtor, MethodReference findViewByIdMethodDefinition)
+            ReferencesAndDefinitionsProvider referencesAndDefinitionsProvider)
         {
-            _injectorExceptionCtor = injectorExceptionCtor ?? throw new ArgumentNullException(nameof(injectorExceptionCtor));
-            _findViewByIdMethodReference = findViewByIdMethodDefinition ?? throw new ArgumentNullException(nameof(findViewByIdMethodDefinition));
-            _androidViewTypeReference = androidViewTypeReference ?? throw new ArgumentNullException(nameof(androidViewTypeReference));
+            _referencesAndDefinitionsProvider = referencesAndDefinitionsProvider ?? throw new ArgumentNullException(nameof(referencesAndDefinitionsProvider));
             _moduleDefinition = moduleDefinition ?? throw new ArgumentNullException(nameof(moduleDefinition));
             _methodsToSubscribe = methodsToSubscribe ?? throw new ArgumentNullException(nameof(methodsToSubscribe));
             _typeDefinition = typeDefinition ?? throw new ArgumentNullException(nameof(typeDefinition));
@@ -37,10 +31,10 @@ namespace Polkovnik.DroidInjector.Fody
                 return;
             }
 
-            var subscriptionsInitMethod = new MethodDefinition(BindViewEventsGeneratedMethodName, MethodAttributes.Private | MethodAttributes.HideBySig, _moduleDefinition.TypeSystem.Void);
-            subscriptionsInitMethod.Parameters.Add(new ParameterDefinition("view", ParameterAttributes.None, _androidViewTypeReference));
+            var subscriptionsInitMethod = new MethodDefinition(Consts.GeneratedMethodNames.BindViewEventsGeneratedMethodName, MethodAttributes.Private | MethodAttributes.HideBySig, _moduleDefinition.TypeSystem.Void);
+            subscriptionsInitMethod.Parameters.Add(new ParameterDefinition("view", ParameterAttributes.None, _referencesAndDefinitionsProvider.AndroidViewTypeReference));
             
-            subscriptionsInitMethod.Body.Variables.Add(new VariableDefinition(_androidViewTypeReference));
+            subscriptionsInitMethod.Body.Variables.Add(new VariableDefinition(_referencesAndDefinitionsProvider.AndroidViewTypeReference));
             subscriptionsInitMethod.Body.Variables.Add(new VariableDefinition(_moduleDefinition.TypeSystem.Boolean));
 
             Logger.Debug($"Add subscription init method {subscriptionsInitMethod} into {_typeDefinition}");
@@ -54,7 +48,7 @@ namespace Polkovnik.DroidInjector.Fody
 
             foreach (var method in _methodsToSubscribe)
             {
-                var attribute = method.CustomAttributes.First(x => x.AttributeType.FullName == InjectorAttributes.ViewEventAttributeTypeName);
+                var attribute = method.CustomAttributes.First(x => x.AttributeType.FullName == Consts.InjectorAttributes.ViewEventAttributeTypeName);
                 var resourceId = (int)attribute.ConstructorArguments[0].Value;
 
                 if (dict.TryGetValue(resourceId, out var methodsByResourceId))
@@ -77,14 +71,14 @@ namespace Polkovnik.DroidInjector.Fody
                 foreach (var methodToSubscribe in methodsToSubscribe)
                 {
                     var attributeArguments = methodToSubscribe.CustomAttributes
-                        .First(x => x.AttributeType.FullName == InjectorAttributes.ViewEventAttributeTypeName).ConstructorArguments;
+                        .First(x => x.AttributeType.FullName == Consts.InjectorAttributes.ViewEventAttributeTypeName).ConstructorArguments;
 
                     var argsLength = attributeArguments.Count;
 
                     shouldThrowExceptionIfNull = shouldThrowExceptionIfNull || !(bool)attributeArguments[argsLength == 4 ? 3 : 2].Value;
 
                     var eventName = (string)attributeArguments[argsLength == 4 ? 2 : 1].Value;
-                    var viewType = argsLength == 4 ? (TypeReference)attributeArguments[1].Value : _androidViewTypeReference;
+                    var viewType = argsLength == 4 ? (TypeReference)attributeArguments[1].Value : _referencesAndDefinitionsProvider.AndroidViewTypeReference;
 
                     var baseType = viewType;
                     EventDefinition eventDefinition = null;
@@ -165,7 +159,7 @@ namespace Polkovnik.DroidInjector.Fody
             if (shouldThrowExceptionIfNull)
             {
                 InsertBefore(ref li, Instruction.Create(OpCodes.Throw));
-                InsertBefore(ref li, Instruction.Create(OpCodes.Newobj, _injectorExceptionCtor));
+                InsertBefore(ref li, Instruction.Create(OpCodes.Newobj, _referencesAndDefinitionsProvider.InjectorExceptionCtor));
                 InsertBefore(ref li, Instruction.Create(OpCodes.Ldstr, $"Can't find view with ID {resourceId}"));
             }
             else
@@ -183,7 +177,7 @@ namespace Polkovnik.DroidInjector.Fody
             InsertBefore(ref li, Instruction.Create(OpCodes.Ldloc_0));
 
             InsertBefore(ref li, Instruction.Create(OpCodes.Stloc_0));
-            InsertBefore(ref li, Instruction.Create(OpCodes.Callvirt, _findViewByIdMethodReference));
+            InsertBefore(ref li, Instruction.Create(OpCodes.Callvirt, _referencesAndDefinitionsProvider.FindViewByIdMethodReference));
             InsertBefore(ref li, Instruction.Create(OpCodes.Ldc_I4, resourceId));
             InsertBefore(ref li, Instruction.Create(OpCodes.Ldarg_1));
             InsertBefore(ref li, Instruction.Create(OpCodes.Nop));

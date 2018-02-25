@@ -53,19 +53,22 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActivityGetViewMethodImplementor.cs" />
+    <Compile Include="Consts.cs" />
     <Compile Include="FodyInjector.cs" />
     <Compile Include="FodyInjectorException.cs" />
     <Compile Include="Harvesters\Harvester.cs" />
+    <Compile Include="Harvesters\MenuItemHarvester.cs" />
     <Compile Include="Harvesters\ViewHarvester.cs" />
-    <Compile Include="InjectorAttributes.cs" />
     <Compile Include="InjectorCallReplacer.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="Harvesters\ViewEventHarvester.cs" />
+    <Compile Include="MenuItemInjectionImplementor.cs" />
     <Compile Include="MethodSubscriptionImplementor.cs" />
     <Compile Include="MethodSubscriptionInfo.cs" />
     <Compile Include="ModuleWeaver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PropertySetterImplementor.cs" />
+    <Compile Include="ReferencesAndDefinitionsProvider.cs" />
     <Compile Include="ViewInjectionImplementor.cs" />
   </ItemGroup>
   <ItemGroup>

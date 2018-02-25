@@ -77,6 +77,11 @@ namespace Polkovnik.DroidInjector
             throw new InjectorException($"Method {nameof(BindViewEvents)} must be removed at runtime. Check if Fody is working.");
         }
 
+        public static void InjectMenuItems(IMenu menu)
+        {
+            throw new InjectorException($"Method {nameof(InjectMenuItems)} must be removed at runtime. Check if Fody is working.");
+        }
+
         //public static void InjectView<T>(ref object fieldOrProperty, View container, int resourceId, bool allowMissing)
         //{
         //    var view = container.FindViewById(resourceId);

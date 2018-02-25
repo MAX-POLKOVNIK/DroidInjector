@@ -7,20 +7,15 @@ namespace Polkovnik.DroidInjector.Fody
 {
     internal class ViewInjectionImplementor
     {
-        private readonly TypeDefinition _resourceIdClassType;
-        private readonly MethodReference _findViewByIdMethodDefinition;
-        private readonly TypeReference _androidViewTypeReference;
+        private readonly ReferencesAndDefinitionsProvider _referencesAndDefinitionsProvider;
         private readonly ModuleDefinition _moduleDefinition;
         private readonly IMemberDefinition[] _memberDefinitions;
         private readonly TypeDefinition _typeDefinition;
-        private const string InjectViewsGeneratedMethodName = "Polkovnik_DroidInjector_InjectViews";
 
         public ViewInjectionImplementor(TypeDefinition typeDefinition, IMemberDefinition[] memberDefinitions, ModuleDefinition moduleDefinition, 
-            TypeReference androidViewTypeReference, MethodReference findViewByIdMethodDefinition, TypeDefinition resourceIdClassType)
+            ReferencesAndDefinitionsProvider referencesAndDefinitionsProvider)
         {
-            _resourceIdClassType = resourceIdClassType ?? throw new ArgumentNullException(nameof(resourceIdClassType));
-            _findViewByIdMethodDefinition = findViewByIdMethodDefinition ?? throw new ArgumentNullException(nameof(findViewByIdMethodDefinition));
-            _androidViewTypeReference = androidViewTypeReference ?? throw new ArgumentNullException(nameof(androidViewTypeReference));
+            _referencesAndDefinitionsProvider = referencesAndDefinitionsProvider ?? throw new ArgumentNullException(nameof(referencesAndDefinitionsProvider));
             _moduleDefinition = moduleDefinition ?? throw new ArgumentNullException(nameof(moduleDefinition));
             _memberDefinitions = memberDefinitions ?? throw new ArgumentNullException(nameof(memberDefinitions));
             _typeDefinition = typeDefinition ?? throw new ArgumentNullException(nameof(typeDefinition));
@@ -28,8 +23,8 @@ namespace Polkovnik.DroidInjector.Fody
 
         public void Execute()
         {
-            var methodDefinition = new MethodDefinition(InjectViewsGeneratedMethodName, MethodAttributes.Private | MethodAttributes.HideBySig, _moduleDefinition.TypeSystem.Void);
-            methodDefinition.Parameters.Add(new ParameterDefinition("view", ParameterAttributes.None, _androidViewTypeReference));
+            var methodDefinition = new MethodDefinition(Consts.GeneratedMethodNames.InjectViewsGeneratedMethodName, MethodAttributes.Private | MethodAttributes.HideBySig, _moduleDefinition.TypeSystem.Void);
+            methodDefinition.Parameters.Add(new ParameterDefinition("view", ParameterAttributes.None, _referencesAndDefinitionsProvider.AndroidViewTypeReference));
             
             _typeDefinition.Methods.Add(methodDefinition);
 
@@ -63,7 +58,7 @@ namespace Polkovnik.DroidInjector.Fody
             ilProcessor.Emit(OpCodes.Ldarg_0);
             ilProcessor.Emit(OpCodes.Ldarg_1);
             ilProcessor.Emit(OpCodes.Ldc_I4, resourceId);
-            ilProcessor.Emit(OpCodes.Callvirt, _findViewByIdMethodDefinition);
+            ilProcessor.Emit(OpCodes.Callvirt, _referencesAndDefinitionsProvider.FindViewByIdMethodReference);
             ilProcessor.Emit(OpCodes.Castclass, targetPropertyType);
             ilProcessor.Emit(OpCodes.Call, setterMethodDefinition);
             ilProcessor.Emit(OpCodes.Nop);
@@ -74,14 +69,14 @@ namespace Polkovnik.DroidInjector.Fody
             ilProcessor.Emit(OpCodes.Ldarg_0);
             ilProcessor.Emit(OpCodes.Ldarg_1);
             ilProcessor.Emit(OpCodes.Ldc_I4, resourceId);
-            ilProcessor.Emit(OpCodes.Callvirt, _findViewByIdMethodDefinition);
+            ilProcessor.Emit(OpCodes.Callvirt, _referencesAndDefinitionsProvider.FindViewByIdMethodReference);
             ilProcessor.Emit(OpCodes.Castclass, targetTypeReference);
             ilProcessor.Emit(OpCodes.Stfld, injectingField);
         }
 
         private int GetResourceId(IMemberDefinition fieldDefinition)
         {
-            var attribute = fieldDefinition.CustomAttributes.First(x => x.AttributeType.FullName == InjectorAttributes.ViewAttributeTypeName);
+            var attribute = fieldDefinition.CustomAttributes.First(x => x.AttributeType.FullName == Consts.InjectorAttributes.ViewAttributeTypeName);
 
             if (attribute.HasConstructorArguments)
             {
@@ -90,7 +85,7 @@ namespace Polkovnik.DroidInjector.Fody
             }
 
             var constName = fieldDefinition.Name.Trim('_');
-            var field = _resourceIdClassType.Fields.FirstOrDefault(x => x.Name == constName);
+            var field = _referencesAndDefinitionsProvider.ResourceIdClassType.Fields.FirstOrDefault(x => x.Name == constName);
 
             if (field == null)
                 throw new FodyInjectorException($"Can't find id for member {fieldDefinition.FullName}.");

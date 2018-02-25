@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!--For all properties see: http://developer.android.com/guide/topics/resources/menu-resource.html-->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+  
+  <item android:id="@+id/action_0"
+         android:showAsAction="always"
+          android:text="Search"
+         android:actionViewClass="android.widget.SearchView"/>
+
+  <item android:id="@+id/action_1"
+        android:showAsAction="always"
+        android:text="Search"
+        android:actionViewClass="android.widget.SearchView"/>
+
+
+  <item android:id="@+id/action_2"
+        android:showAsAction="always"
+        android:text="Search"
+        android:actionViewClass="android.widget.SearchView"/>
+
+
+  <item android:id="@+id/action_3"
+        android:showAsAction="always"
+        android:text="Search"
+        android:actionViewClass="android.widget.SearchView"/>
+
+  <item android:id="@+id/action_4"
+        android:showAsAction="always"
+        android:text="Search"
+        android:actionViewClass="android.widget.SearchView"/>
+  
+</menu>

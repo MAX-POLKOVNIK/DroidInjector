@@ -44,11 +44,26 @@ namespace Polkovnik.DroidInjector.FodySample
 		public partial class Id
 		{
 			
-			// aapt resource value: 0x7f050000
-			public const int myButton = 2131034112;
+			// aapt resource value: 0x7f060002
+			public const int action_0 = 2131099650;
 			
-			// aapt resource value: 0x7f050001
-			public const int myEditText = 2131034113;
+			// aapt resource value: 0x7f060003
+			public const int action_1 = 2131099651;
+			
+			// aapt resource value: 0x7f060004
+			public const int action_2 = 2131099652;
+			
+			// aapt resource value: 0x7f060005
+			public const int action_3 = 2131099653;
+			
+			// aapt resource value: 0x7f060006
+			public const int action_4 = 2131099654;
+			
+			// aapt resource value: 0x7f060000
+			public const int myButton = 2131099648;
+			
+			// aapt resource value: 0x7f060001
+			public const int myEditText = 2131099649;
 			
 			static Id()
 			{
@@ -72,6 +87,22 @@ namespace Polkovnik.DroidInjector.FodySample
 			}
 			
 			private Layout()
+			{
+			}
+		}
+		
+		public partial class Menu
+		{
+			
+			// aapt resource value: 0x7f050000
+			public const int main = 2131034112;
+			
+			static Menu()
+			{
+				global::Android.Runtime.ResourceIdManager.UpdateIdValues();
+			}
+			
+			private Menu()
 			{
 			}
 		}

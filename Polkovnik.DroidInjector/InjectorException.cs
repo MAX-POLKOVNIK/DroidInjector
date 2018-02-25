@@ -8,9 +8,8 @@ namespace Polkovnik.DroidInjector
     /// </summary>
     public sealed class InjectorException : Exception
     {
-        internal InjectorException(string message) : base(message)
+        public InjectorException(string message) : base(message)
         {
-
         }
     }
 }

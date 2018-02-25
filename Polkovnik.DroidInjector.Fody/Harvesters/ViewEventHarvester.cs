@@ -15,7 +15,7 @@ namespace Polkovnik.DroidInjector.Fody.Harvesters
             if (!(memberDefinition is MethodDefinition))
                 return false;
 
-            return memberDefinition.CustomAttributes.Any(x => x.AttributeType.FullName == InjectorAttributes.ViewEventAttributeTypeName);
+            return memberDefinition.CustomAttributes.Any(x => x.AttributeType.FullName == Consts.InjectorAttributes.ViewEventAttributeTypeName);
         }
 
         public override IDictionary<TypeDefinition, IMemberDefinition[]> Harvest()

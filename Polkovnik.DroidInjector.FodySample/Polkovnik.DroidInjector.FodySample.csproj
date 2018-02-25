@@ -84,6 +84,7 @@
     <Content Include="FodyWeavers.xml">
       <SubType>Designer</SubType>
     </Content>
+    <AndroidResource Include="Resources\menu\main.xml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Polkovnik.DroidInjector\Polkovnik.DroidInjector.csproj">
