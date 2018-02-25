@@ -143,7 +143,7 @@ private void Click()
 
 ## Compile time injection
 
-It is is better way to increase view injection.
+It is better way to increase view injection.
 
 ### Install 
 
@@ -154,23 +154,26 @@ Find package on Nuget or
 Make sure you install Polkovnik.DroidInjector.**Fody** package. This package required for compile time injection.
 Project must contains `FodyWeavers.xml` file. 
 
-If you already using Fody plugins make sure file contains all weavers.
+If you already using Fody plugins make sure `FodyWeavers.xml` contains all weavers.
 
 ### Usage
 
 Almost same as above but there is some difference:
 
-1. To start injection call `Injector.InjectViews()`, `Injector.InjectMenuItems()`, `Injector.BindViewEvents()`. 
-    This method will be replaced with generated method for injecting in every type contains Polkovnik.DroidInjector attributes.
+1. To start injection call `Injector.InjectViews()`, `Injector.InjectMenuItems()`, `Injector.BindViewEvents()` instead of `this.InjectViews()`, `this.InjectMenuItems()`, `this.BindViewEvents()`
+
+    These methods will be replaced with generated methods for injecting in every type contains Polkovnik.DroidInjector attributes.
+    
 2. In `ViewEvent` attribute you should declare type of view. It is required for searching events at compile time. 
     ```csharp
     [ViewEvent(Resource.Id.myEditText, typeof(EditText), nameof(EditText.TextChanged))]
     ```
+    
 3. `ViewClickEvent` attribute not supported in compile time yet. I'll add it soon.
 
 ## Future 
 At this moment you can't use DroidInjector in Android library project. Only in Android app project. 
-In feature i'll try to add support Android library project.
+In feature I'll try to add support Android library project.
 
 Also I will add more special `ViewEvent` attributes like `ViewClickEvent`
 
