@@ -9,9 +9,9 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-[assembly: global::Android.Runtime.ResourceDesignerAttribute("Polkovnik.DroidInjector.Sample.Resource", IsApplication=true)]
+[assembly: global::Android.Runtime.ResourceDesignerAttribute("Polkovnik.DroidInjector.FodySample.Resource", IsApplication=true)]
 
-namespace Polkovnik.DroidInjector.Sample
+namespace Polkovnik.DroidInjector.FodySample
 {
 	
 	
@@ -44,11 +44,26 @@ namespace Polkovnik.DroidInjector.Sample
 		public partial class Id
 		{
 			
-			// aapt resource value: 0x7f060001
-			public const int action_search = 2131099649;
+			// aapt resource value: 0x7f060002
+			public const int action_0 = 2131099650;
+			
+			// aapt resource value: 0x7f060003
+			public const int action_1 = 2131099651;
+			
+			// aapt resource value: 0x7f060004
+			public const int action_2 = 2131099652;
+			
+			// aapt resource value: 0x7f060005
+			public const int action_3 = 2131099653;
+			
+			// aapt resource value: 0x7f060006
+			public const int action_4 = 2131099654;
 			
 			// aapt resource value: 0x7f060000
 			public const int myButton = 2131099648;
+			
+			// aapt resource value: 0x7f060001
+			public const int myEditText = 2131099649;
 			
 			static Id()
 			{

@@ -2,6 +2,7 @@
 using Android.App;
 using Android.Widget;
 using Android.OS;
+using Android.Views;
 
 namespace Polkovnik.DroidInjector.Sample
 {
@@ -12,7 +13,7 @@ namespace Polkovnik.DroidInjector.Sample
 
         [View] private Button _myButton;
 
-        [View(Resource.Id.myButton)] private Button _myButton2;
+        [View(Resource.Id.myButton, allowMissing:true)] private Button _myButton2;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -34,8 +35,16 @@ namespace Polkovnik.DroidInjector.Sample
             _myButton.Text = "TExt";
         }
 
+        public override bool OnCreateOptionsMenu(IMenu menu)
+        {
+            MenuInflater.Inflate(Resource.Menu.main, menu);
+            this.InjectMenuItems(menu);
+
+            return base.OnCreateOptionsMenu(menu);
+        }
+
         [ViewClickEvent(Resource.Id.myButton)]
-        private void Click(/*object a, EventArgs b*/)
+        private void Click()
         {
             Toast.MakeText(this, "Click", ToastLength.Short).Show();
         }

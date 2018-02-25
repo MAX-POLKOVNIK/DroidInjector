@@ -1,13 +1,23 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.16
+VisualStudioVersion = 15.0.27130.2036
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Polkovnik.DroidInjector", "Polkovnik.DroidInjector\Polkovnik.DroidInjector.csproj", "{EDFC7537-0636-473A-9B58-DD7F22A29E53}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Polkovnik.DroidInjector.Tests", "Polkovnik.DroidInjector.Tests\Polkovnik.DroidInjector.Tests.csproj", "{DF269B0C-E2C2-4E14-B0FF-D29ABCF0ED49}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Polkovnik.DroidInjector.Sample", "Polkovnik.DroidInjector.Sample\Polkovnik.DroidInjector.Sample.csproj", "{56CF4A44-9E2C-4C9F-90DF-D5973F421CD6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Polkovnik.DroidInjector.Fody", "Polkovnik.DroidInjector.Fody\Polkovnik.DroidInjector.Fody.csproj", "{A5D9C4F1-5C03-4AAB-ADD0-F40CE966EB5D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{EDFC7537-0636-473A-9B58-DD7F22A29E53} = {EDFC7537-0636-473A-9B58-DD7F22A29E53}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Polkovnik.DroidInjector.FodySample", "Polkovnik.DroidInjector.FodySample\Polkovnik.DroidInjector.FodySample.csproj", "{8E36A0DA-7BC7-4540-8211-D6B85E1D1790}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A5D9C4F1-5C03-4AAB-ADD0-F40CE966EB5D} = {A5D9C4F1-5C03-4AAB-ADD0-F40CE966EB5D}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,6 +41,16 @@ Global
 		{56CF4A44-9E2C-4C9F-90DF-D5973F421CD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{56CF4A44-9E2C-4C9F-90DF-D5973F421CD6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{56CF4A44-9E2C-4C9F-90DF-D5973F421CD6}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{A5D9C4F1-5C03-4AAB-ADD0-F40CE966EB5D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5D9C4F1-5C03-4AAB-ADD0-F40CE966EB5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A5D9C4F1-5C03-4AAB-ADD0-F40CE966EB5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A5D9C4F1-5C03-4AAB-ADD0-F40CE966EB5D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E36A0DA-7BC7-4540-8211-D6B85E1D1790}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E36A0DA-7BC7-4540-8211-D6B85E1D1790}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E36A0DA-7BC7-4540-8211-D6B85E1D1790}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{8E36A0DA-7BC7-4540-8211-D6B85E1D1790}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E36A0DA-7BC7-4540-8211-D6B85E1D1790}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E36A0DA-7BC7-4540-8211-D6B85E1D1790}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
