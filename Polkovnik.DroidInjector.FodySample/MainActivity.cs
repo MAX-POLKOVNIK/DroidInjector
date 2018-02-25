@@ -13,6 +13,11 @@ namespace Polkovnik.DroidInjector.FodySample
     {
 #pragma warning disable 649
         [View] private Button _myButton;
+        [View(allowMissing: true)] private Button __myButton;
+        [View(Resource.Id.action_0)] private Button _myButton2;
+
+        [View(Resource.Id.myButton)] private Button _myButton3 { get;}
+        [View(Resource.Id.myButton)] private Button _myButton4 { get; }
 
         [MenuItem(Resource.Id.action_0)] private IMenuItem _menuItem0;
         [MenuItem(Resource.Id.action_1)] private IMenuItem _menuItem1;
@@ -26,12 +31,23 @@ namespace Polkovnik.DroidInjector.FodySample
             base.OnCreate(savedInstanceState);
             
             SetContentView(Resource.Layout.main);
-            Injector.InjectViews();
+
+            try
+            {
+                Injector.InjectViews();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+
+            
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            //Injector.BindViewEvents();
+            Injector.BindViewEvents();
 
             stopwatch.Stop();
             Console.WriteLine($"TOTAL: {stopwatch.ElapsedMilliseconds}");
@@ -48,14 +64,13 @@ namespace Polkovnik.DroidInjector.FodySample
             return base.OnCreateOptionsMenu(menu);
         }
 
-        private void InjectTest(IMenu menu)
-        {
-            _menuItem0 = menu.FindItem(Resource.Id.action_0) ?? throw new Exception("Cant find 15");
-            _menuItem1 = menu.FindItem(Resource.Id.action_1);
-            _menuItem2 = menu.FindItem(Resource.Id.action_2);
-            _menuItem3 = menu.FindItem(Resource.Id.action_3);
-            _menuItem4 = menu.FindItem(Resource.Id.action_4) ?? throw new Exception("Cant find 15");
-        }
+        //private void InjectTest(View view)
+        //{
+        //    _myButton = (Button) view.FindViewById(Resource.Id.myButton) ?? throw new Exception("message");
+        //    __myButton = (Button) view.FindViewById(Resource.Id.myButton);
+        //    _myButton3 = (Button)view.FindViewById(Resource.Id.myButton) ?? throw new Exception("message");
+        //    _myButton4 = (Button) view.FindViewById(Resource.Id.myButton);
+        //}
 
         //[ViewEvent(Resource.Id.myButton, typeof(Button), nameof(View.Click))]
         //private void ButtonClick(object sender, EventArgs args)
