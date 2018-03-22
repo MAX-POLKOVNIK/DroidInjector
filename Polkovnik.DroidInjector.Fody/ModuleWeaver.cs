@@ -75,7 +75,7 @@ namespace Polkovnik.DroidInjector.Fody
 
         public void Execute()
         {
-            LogInfo("STARTED");
+            LogInfo("START");
             var injector = new FodyInjector(ModuleDefinition, AssemblyResolver);
 
 #if DEBUG
@@ -94,7 +94,7 @@ namespace Polkovnik.DroidInjector.Fody
                 throw new FodyInjectorException(message);
             }
 
-            LogInfo("FINISHED");
+            LogInfo("FINISH");
         }
 
         // Will be called when a request to cancel the build occurs. OPTIONAL

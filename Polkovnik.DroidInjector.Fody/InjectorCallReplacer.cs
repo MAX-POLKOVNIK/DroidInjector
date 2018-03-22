@@ -27,7 +27,7 @@ namespace Polkovnik.DroidInjector.Fody
             
             MethodDefinition activityGetViewMethodDefinition = null;
 
-            if (_activityGetViewMethodImplementor.IsNeedToAddGetViewMethod)
+            if (_definition.IsActivity())
             {
                 activityGetViewMethodDefinition = _activityGetViewMethodImplementor.Execute();
             }
@@ -44,9 +44,12 @@ namespace Polkovnik.DroidInjector.Fody
                         break;
 
                     Logger.Debug($"Replace call {_methodToRemove} in {method.FullName}");
-
+                    
                     if (_methodIsParameterless)
                     {
+                        if (!_definition.IsActivity())
+                            throw new FodyInjectorException($"Call Injector.InjectViews() in not activity class \"{_definition.FullName}\". Please pass view as parameter");
+
                         ReplaceParameterlessMethodInstructions(callInstuction, method.Body.GetILProcessor(), generatedMethod, activityGetViewMethodDefinition);
                     }
                     else

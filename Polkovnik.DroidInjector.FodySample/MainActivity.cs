@@ -9,7 +9,7 @@ using Android.Views;
 namespace Polkovnik.DroidInjector.FodySample
 {
     [Activity(Label = "Polkovnik.DroidInjector.FodySample", MainLauncher = true, Icon = "@mipmap/icon")]
-    public abstract class MainActivity : Activity
+    public class MainActivity : Activity
     {
 #pragma warning disable 649
         [View] private Button _myButton;
@@ -42,9 +42,6 @@ namespace Polkovnik.DroidInjector.FodySample
             _myButton.Text = "That is working";
         }
         
-        public abstract string Property { get; set; }
-        public abstract void Method();
-
         [ViewEvent(Resource.Id.myEditText, typeof(EditText), nameof(EditText.TextChanged))]
         private void ButtonClick5(object sender, TextChangedEventArgs args)
         {

@@ -17,27 +17,7 @@ namespace Polkovnik.DroidInjector.Fody
             _referencesAndDefinitionsProvider = referencesAndDefinitionsProvider ?? throw new ArgumentNullException(nameof(referencesAndDefinitionsProvider));
             _typeDefinition = typeDefinition ?? throw new ArgumentNullException(nameof(typeDefinition));
         }
-
-        public bool IsNeedToAddGetViewMethod 
-        {
-            get
-            {
-                var baseType = _typeDefinition.BaseType;
-
-                while (baseType != null)
-                {
-                    if (baseType.FullName == "Android.App.Activity")
-                    {
-                        return true;
-                    }
-
-                    baseType = baseType.Resolve().BaseType;
-                }
-
-                return false;
-            }
-        }
-
+        
         public MethodDefinition Execute()
         {
             var method = _typeDefinition.Methods.FirstOrDefault(x => x.Name == GetViewGeneratedMethodName);
