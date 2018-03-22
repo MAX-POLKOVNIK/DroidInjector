@@ -13,17 +13,12 @@ namespace Polkovnik.DroidInjector.FodySample
     {
 #pragma warning disable 649
         [View] private Button _myButton;
-        [View(allowMissing: true)] private Button __myButton;
-        [View(Resource.Id.action_0)] private Button _myButton2;
 
-        [View(Resource.Id.myButton)] private Button _myButton3 { get;}
-        [View(Resource.Id.myButton)] private Button _myButton4 { get; }
-
-        [MenuItem(Resource.Id.action_0)] private IMenuItem _menuItem0;
-        [MenuItem(Resource.Id.action_1)] private IMenuItem _menuItem1;
-        [MenuItem(Resource.Id.action_2)] private IMenuItem _menuItem2;
-        [MenuItem(Resource.Id.action_3)] private IMenuItem _menuItem3 { get; set; }
-        [MenuItem(Resource.Id.action_4, true)] private IMenuItem _menuItem4 { get; set; }
+        [MenuItem(Resource.Id.action_0)] private IMenuItem menuItem;
+        [MenuItem(Resource.Id.action_1)] private IMenuItem menuItem1;
+        [MenuItem(Resource.Id.action_2)] private IMenuItem menuItem2;
+        [MenuItem(Resource.Id.action_3)] private IMenuItem menuItem3;
+        [MenuItem(Resource.Id.action_4)] private IMenuItem menuItem4;
 #pragma warning restore 649
 
         protected override void OnCreate(Bundle savedInstanceState)
@@ -41,9 +36,7 @@ namespace Polkovnik.DroidInjector.FodySample
                 Console.WriteLine(e);
                 throw;
             }
-
             
-
             var stopwatch = new Stopwatch();
             stopwatch.Start();
 
@@ -61,40 +54,15 @@ namespace Polkovnik.DroidInjector.FodySample
 
             Injector.InjectMenuItems(menu);
 
-            return base.OnCreateOptionsMenu(menu);
+            menuItem.SetTitle("TitleSET");
+            menuItem1.SetTitle("TitleSET");
+            menuItem2.SetTitle("TitleSET");
+            menuItem3.SetTitle("TitleSET");
+            menuItem4.SetTitle("TitleSET");
+
+
+            return true;
         }
-
-        //private void InjectTest(View view)
-        //{
-        //    _myButton = (Button) view.FindViewById(Resource.Id.myButton) ?? throw new Exception("message");
-        //    __myButton = (Button) view.FindViewById(Resource.Id.myButton);
-        //    _myButton3 = (Button)view.FindViewById(Resource.Id.myButton) ?? throw new Exception("message");
-        //    _myButton4 = (Button) view.FindViewById(Resource.Id.myButton);
-        //}
-
-        //[ViewEvent(Resource.Id.myButton, typeof(Button), nameof(View.Click))]
-        //private void ButtonClick(object sender, EventArgs args)
-        //{
-
-        //}
-
-        //[ViewEvent(Resource.Id.myButton, typeof(Button), nameof(View.Click))]
-        //private void ButtonClick2(object sender, EventArgs args)
-        //{
-
-        //}
-
-        //[ViewEvent(Resource.Id.myButton, typeof(Button), nameof(View.Click))]
-        //private void ButtonClick3(object sender, EventArgs args)
-        //{
-
-        //}
-
-        //[ViewEvent(Resource.Id.myButton, typeof(Button), nameof(View.Click))]
-        //private void ButtonClick4(object sender, EventArgs args)
-        //{
-
-        //}
 
         [ViewEvent(Resource.Id.myEditText, typeof(EditText), nameof(EditText.TextChanged))]
         private void ButtonClick5(object sender, TextChangedEventArgs args)
@@ -105,7 +73,7 @@ namespace Polkovnik.DroidInjector.FodySample
         [ViewEvent(Resource.Id.myButton, typeof(Button), nameof(View.Click))]
         private void ButtonClick5(object sender, EventArgs args)
         {
-            Toast.MakeText(this, "5", ToastLength.Short).Show();
+            StartActivity(typeof(SecondActivity));
         }
 
         [ViewEvent(Resource.Id.myButton, typeof(Button), nameof(View.Click))]
@@ -113,12 +81,6 @@ namespace Polkovnik.DroidInjector.FodySample
         {
             Toast.MakeText(this, "6", ToastLength.Short).Show();
         }
-
-        //[ViewEvent(Resource.Id.myButton, typeof(TextView), nameof(TextView.TextChanged))]
-        //private void ButtonClick7(object sender, EventArgs args)
-        //{
-
-        //}
     }
 }
 

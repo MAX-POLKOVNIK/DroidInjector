@@ -2,6 +2,7 @@
 using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using Polkovnik.DroidInjector.Fody.Log;
 
 namespace Polkovnik.DroidInjector.Fody
 {
@@ -17,29 +18,11 @@ namespace Polkovnik.DroidInjector.Fody
             _referencesAndDefinitionsProvider = referencesAndDefinitionsProvider ?? throw new ArgumentNullException(nameof(referencesAndDefinitionsProvider));
             _typeDefinition = typeDefinition ?? throw new ArgumentNullException(nameof(typeDefinition));
         }
-
-        public bool IsNeedToAddGetViewMethod 
-        {
-            get
-            {
-                var baseType = _typeDefinition.BaseType;
-
-                while (baseType != null)
-                {
-                    if (baseType.FullName == "Android.App.Activity")
-                    {
-                        return true;
-                    }
-
-                    baseType = baseType.Resolve().BaseType;
-                }
-
-                return false;
-            }
-        }
-
+        
         public MethodDefinition Execute()
         {
+            Logger.LogExecute(this);
+
             var method = _typeDefinition.Methods.FirstOrDefault(x => x.Name == GetViewGeneratedMethodName);
             if (method != null)
             {
@@ -71,6 +54,11 @@ namespace Polkovnik.DroidInjector.Fody
             ilProcessor.Emit(OpCodes.Ret);
 
             return methodDefinition;
+        }
+
+        public override string ToString()
+        {
+            return $"{nameof(_referencesAndDefinitionsProvider)}: {_referencesAndDefinitionsProvider}, {nameof(_typeDefinition)}: {_typeDefinition}";
         }
     }
 }

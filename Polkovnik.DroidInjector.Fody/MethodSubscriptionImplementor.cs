@@ -4,6 +4,7 @@ using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Mono.Cecil.Rocks;
+using Polkovnik.DroidInjector.Fody.Log;
 
 namespace Polkovnik.DroidInjector.Fody
 {
@@ -25,6 +26,8 @@ namespace Polkovnik.DroidInjector.Fody
 
         public void Execute()
         {
+            Logger.LogExecute(this);
+
             if (_methodsToSubscribe.Length == 0)
             {
                 Logger.Debug($"Nothing to subscribe in {_typeDefinition}");
@@ -99,7 +102,7 @@ namespace Polkovnik.DroidInjector.Fody
 
                     if (eventDefinition == null)
                     {
-                        throw new FodyInjectorException($"Can't find event {eventName} in {viewType}");
+                        throw new WeavingException($"Can't find event {eventName} in {viewType}");
                     }
 
                     var eventTypeDefinition = eventDefinition.EventType.Resolve();
@@ -189,6 +192,11 @@ namespace Polkovnik.DroidInjector.Fody
                 ilProcessor.InsertBefore(firstInstruction, newInstruction);
                 firstInstruction = newInstruction;
             }
+        }
+
+        public override string ToString()
+        {
+            return $"{nameof(_referencesAndDefinitionsProvider)}: {_referencesAndDefinitionsProvider}, {nameof(_moduleDefinition)}: {_moduleDefinition}, {nameof(_methodsToSubscribe)}: {_methodsToSubscribe}, {nameof(_typeDefinition)}: {_typeDefinition}";
         }
     }
 }

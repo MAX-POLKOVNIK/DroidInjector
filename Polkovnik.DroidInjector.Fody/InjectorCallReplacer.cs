@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using Polkovnik.DroidInjector.Fody.Log;
 
 namespace Polkovnik.DroidInjector.Fody
 {
@@ -23,17 +24,22 @@ namespace Polkovnik.DroidInjector.Fody
 
         public void Execute()
         {
+            Logger.LogExecute(this);
+
             var generatedMethod = _definition.Methods.First(x => x.Name == _methodNameToCall);
             
             MethodDefinition activityGetViewMethodDefinition = null;
 
-            if (_activityGetViewMethodImplementor.IsNeedToAddGetViewMethod)
+            if (_definition.IsActivity())
             {
                 activityGetViewMethodDefinition = _activityGetViewMethodImplementor.Execute();
             }
 
             foreach (var method in _definition.Methods)
             {
+                if (!method.HasBody)
+                    continue;
+
                 while (true)
                 {
                     var callInstuction = method.Body.Instructions.FirstOrDefault(x => x.OpCode == OpCodes.Call && IsMehodToRemove(x.Operand));
@@ -41,9 +47,12 @@ namespace Polkovnik.DroidInjector.Fody
                         break;
 
                     Logger.Debug($"Replace call {_methodToRemove} in {method.FullName}");
-
+                    
                     if (_methodIsParameterless)
                     {
+                        if (!_definition.IsActivity())
+                            throw new WeavingException($"Call Injector.InjectViews() in not activity class \"{_definition.FullName}\". Please pass view as parameter");
+
                         ReplaceParameterlessMethodInstructions(callInstuction, method.Body.GetILProcessor(), generatedMethod, activityGetViewMethodDefinition);
                     }
                     else
@@ -86,6 +95,11 @@ namespace Polkovnik.DroidInjector.Fody
             ilProcessor.InsertBefore(targetInstruction, Instruction.Create(OpCodes.Ldarg_0));
 
             ilProcessor.Replace(callInjectorInstruction, Instruction.Create(OpCodes.Call, injectionMethod));
+        }
+
+        public override string ToString()
+        {
+            return $"{nameof(_definition)}: {_definition}, {nameof(_methodNameToCall)}: {_methodNameToCall}, {nameof(_methodToRemove)}: {_methodToRemove}, {nameof(_activityGetViewMethodImplementor)}: {_activityGetViewMethodImplementor}, {nameof(_methodIsParameterless)}: {_methodIsParameterless}";
         }
     }
 }

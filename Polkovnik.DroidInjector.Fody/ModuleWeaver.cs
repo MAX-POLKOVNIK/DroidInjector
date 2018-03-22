@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Xml.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using Polkovnik.DroidInjector.Fody.Log;
 
 namespace Polkovnik.DroidInjector.Fody
 {
@@ -75,26 +77,16 @@ namespace Polkovnik.DroidInjector.Fody
 
         public void Execute()
         {
-            LogInfo("STARTED");
-            var injector = new FodyInjector(ModuleDefinition, AssemblyResolver);
+            var logLevelAttribute = Config.Attributes().FirstOrDefault(x => x.Name == nameof(LogLevel));
+            var level = logLevelAttribute == null
+                ? LogLevel.Info
+                : Enum.TryParse<LogLevel>(logLevelAttribute.Value, true, out var parsed)
+                    ? parsed
+                    : LogLevel.Info;
 
-#if DEBUG
-            Logger.DebugEnabled = true;
-#endif
-            Logger.Log = LogInfo;
+            Logger.Init(level, LogInfo);
 
-            try
-            {
-                injector.Execute();
-            }
-            catch (FodyInjectorException e)
-            {
-                var message = $"FATAL ERROR: {e.Message}";
-                LogError(message);
-                throw new FodyInjectorException(message);
-            }
-
-            LogInfo("FINISHED");
+            new FodyInjector(ModuleDefinition, AssemblyResolver).Execute();
         }
 
         // Will be called when a request to cancel the build occurs. OPTIONAL

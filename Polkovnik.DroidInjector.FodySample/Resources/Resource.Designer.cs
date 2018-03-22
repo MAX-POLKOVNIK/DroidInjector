@@ -31,6 +31,60 @@ namespace Polkovnik.DroidInjector.FodySample
 		public partial class Attribute
 		{
 			
+			// aapt resource value: 0x7f010004
+			public const int fastScrollEnabled = 2130771972;
+			
+			// aapt resource value: 0x7f010007
+			public const int fastScrollHorizontalThumbDrawable = 2130771975;
+			
+			// aapt resource value: 0x7f010008
+			public const int fastScrollHorizontalTrackDrawable = 2130771976;
+			
+			// aapt resource value: 0x7f010005
+			public const int fastScrollVerticalThumbDrawable = 2130771973;
+			
+			// aapt resource value: 0x7f010006
+			public const int fastScrollVerticalTrackDrawable = 2130771974;
+			
+			// aapt resource value: 0x7f010010
+			public const int font = 2130771984;
+			
+			// aapt resource value: 0x7f010009
+			public const int fontProviderAuthority = 2130771977;
+			
+			// aapt resource value: 0x7f01000c
+			public const int fontProviderCerts = 2130771980;
+			
+			// aapt resource value: 0x7f01000d
+			public const int fontProviderFetchStrategy = 2130771981;
+			
+			// aapt resource value: 0x7f01000e
+			public const int fontProviderFetchTimeout = 2130771982;
+			
+			// aapt resource value: 0x7f01000a
+			public const int fontProviderPackage = 2130771978;
+			
+			// aapt resource value: 0x7f01000b
+			public const int fontProviderQuery = 2130771979;
+			
+			// aapt resource value: 0x7f01000f
+			public const int fontStyle = 2130771983;
+			
+			// aapt resource value: 0x7f010011
+			public const int fontWeight = 2130771985;
+			
+			// aapt resource value: 0x7f010000
+			public const int layoutManager = 2130771968;
+			
+			// aapt resource value: 0x7f010002
+			public const int reverseLayout = 2130771970;
+			
+			// aapt resource value: 0x7f010001
+			public const int spanCount = 2130771969;
+			
+			// aapt resource value: 0x7f010003
+			public const int stackFromEnd = 2130771971;
+			
 			static Attribute()
 			{
 				global::Android.Runtime.ResourceIdManager.UpdateIdValues();
@@ -41,29 +95,300 @@ namespace Polkovnik.DroidInjector.FodySample
 			}
 		}
 		
+		public partial class Boolean
+		{
+			
+			// aapt resource value: 0x7f080000
+			public const int abc_action_bar_embed_tabs = 2131230720;
+			
+			static Boolean()
+			{
+				global::Android.Runtime.ResourceIdManager.UpdateIdValues();
+			}
+			
+			private Boolean()
+			{
+			}
+		}
+		
+		public partial class Color
+		{
+			
+			// aapt resource value: 0x7f090000
+			public const int notification_action_color_filter = 2131296256;
+			
+			// aapt resource value: 0x7f090001
+			public const int notification_icon_bg_color = 2131296257;
+			
+			// aapt resource value: 0x7f090002
+			public const int ripple_material_light = 2131296258;
+			
+			// aapt resource value: 0x7f090003
+			public const int secondary_text_default_material_light = 2131296259;
+			
+			static Color()
+			{
+				global::Android.Runtime.ResourceIdManager.UpdateIdValues();
+			}
+			
+			private Color()
+			{
+			}
+		}
+		
+		public partial class Dimension
+		{
+			
+			// aapt resource value: 0x7f05000a
+			public const int compat_button_inset_horizontal_material = 2131034122;
+			
+			// aapt resource value: 0x7f05000b
+			public const int compat_button_inset_vertical_material = 2131034123;
+			
+			// aapt resource value: 0x7f05000c
+			public const int compat_button_padding_horizontal_material = 2131034124;
+			
+			// aapt resource value: 0x7f05000d
+			public const int compat_button_padding_vertical_material = 2131034125;
+			
+			// aapt resource value: 0x7f05000e
+			public const int compat_control_corner_material = 2131034126;
+			
+			// aapt resource value: 0x7f050000
+			public const int fastscroll_default_thickness = 2131034112;
+			
+			// aapt resource value: 0x7f050001
+			public const int fastscroll_margin = 2131034113;
+			
+			// aapt resource value: 0x7f050002
+			public const int fastscroll_minimum_range = 2131034114;
+			
+			// aapt resource value: 0x7f050003
+			public const int item_touch_helper_max_drag_scroll_per_frame = 2131034115;
+			
+			// aapt resource value: 0x7f050004
+			public const int item_touch_helper_swipe_escape_max_velocity = 2131034116;
+			
+			// aapt resource value: 0x7f050005
+			public const int item_touch_helper_swipe_escape_velocity = 2131034117;
+			
+			// aapt resource value: 0x7f05000f
+			public const int notification_action_icon_size = 2131034127;
+			
+			// aapt resource value: 0x7f050010
+			public const int notification_action_text_size = 2131034128;
+			
+			// aapt resource value: 0x7f050011
+			public const int notification_big_circle_margin = 2131034129;
+			
+			// aapt resource value: 0x7f050007
+			public const int notification_content_margin_start = 2131034119;
+			
+			// aapt resource value: 0x7f050012
+			public const int notification_large_icon_height = 2131034130;
+			
+			// aapt resource value: 0x7f050013
+			public const int notification_large_icon_width = 2131034131;
+			
+			// aapt resource value: 0x7f050008
+			public const int notification_main_column_padding_top = 2131034120;
+			
+			// aapt resource value: 0x7f050009
+			public const int notification_media_narrow_margin = 2131034121;
+			
+			// aapt resource value: 0x7f050014
+			public const int notification_right_icon_size = 2131034132;
+			
+			// aapt resource value: 0x7f050006
+			public const int notification_right_side_padding_top = 2131034118;
+			
+			// aapt resource value: 0x7f050015
+			public const int notification_small_icon_background_padding = 2131034133;
+			
+			// aapt resource value: 0x7f050016
+			public const int notification_small_icon_size_as_large = 2131034134;
+			
+			// aapt resource value: 0x7f050017
+			public const int notification_subtext_size = 2131034135;
+			
+			// aapt resource value: 0x7f050018
+			public const int notification_top_pad = 2131034136;
+			
+			// aapt resource value: 0x7f050019
+			public const int notification_top_pad_large_text = 2131034137;
+			
+			static Dimension()
+			{
+				global::Android.Runtime.ResourceIdManager.UpdateIdValues();
+			}
+			
+			private Dimension()
+			{
+			}
+		}
+		
+		public partial class Drawable
+		{
+			
+			// aapt resource value: 0x7f020000
+			public const int notification_action_background = 2130837504;
+			
+			// aapt resource value: 0x7f020001
+			public const int notification_bg = 2130837505;
+			
+			// aapt resource value: 0x7f020002
+			public const int notification_bg_low = 2130837506;
+			
+			// aapt resource value: 0x7f020003
+			public const int notification_bg_low_normal = 2130837507;
+			
+			// aapt resource value: 0x7f020004
+			public const int notification_bg_low_pressed = 2130837508;
+			
+			// aapt resource value: 0x7f020005
+			public const int notification_bg_normal = 2130837509;
+			
+			// aapt resource value: 0x7f020006
+			public const int notification_bg_normal_pressed = 2130837510;
+			
+			// aapt resource value: 0x7f020007
+			public const int notification_icon_background = 2130837511;
+			
+			// aapt resource value: 0x7f02000a
+			public const int notification_template_icon_bg = 2130837514;
+			
+			// aapt resource value: 0x7f02000b
+			public const int notification_template_icon_low_bg = 2130837515;
+			
+			// aapt resource value: 0x7f020008
+			public const int notification_tile_bg = 2130837512;
+			
+			// aapt resource value: 0x7f020009
+			public const int notify_panel_notification_icon_bg = 2130837513;
+			
+			static Drawable()
+			{
+				global::Android.Runtime.ResourceIdManager.UpdateIdValues();
+			}
+			
+			private Drawable()
+			{
+			}
+		}
+		
 		public partial class Id
 		{
 			
-			// aapt resource value: 0x7f060002
-			public const int action_0 = 2131099650;
+			// aapt resource value: 0x7f060020
+			public const int action_0 = 2131099680;
 			
-			// aapt resource value: 0x7f060003
-			public const int action_1 = 2131099651;
+			// aapt resource value: 0x7f060021
+			public const int action_1 = 2131099681;
 			
-			// aapt resource value: 0x7f060004
-			public const int action_2 = 2131099652;
+			// aapt resource value: 0x7f060022
+			public const int action_2 = 2131099682;
 			
-			// aapt resource value: 0x7f060005
-			public const int action_3 = 2131099653;
+			// aapt resource value: 0x7f060023
+			public const int action_3 = 2131099683;
+			
+			// aapt resource value: 0x7f060024
+			public const int action_4 = 2131099684;
+			
+			// aapt resource value: 0x7f060011
+			public const int action_container = 2131099665;
+			
+			// aapt resource value: 0x7f06001d
+			public const int action_divider = 2131099677;
+			
+			// aapt resource value: 0x7f060012
+			public const int action_image = 2131099666;
+			
+			// aapt resource value: 0x7f060013
+			public const int action_text = 2131099667;
+			
+			// aapt resource value: 0x7f06001e
+			public const int actions = 2131099678;
 			
 			// aapt resource value: 0x7f060006
-			public const int action_4 = 2131099654;
+			public const int async = 2131099654;
+			
+			// aapt resource value: 0x7f060007
+			public const int blocking = 2131099655;
+			
+			// aapt resource value: 0x7f06001c
+			public const int chronometer = 2131099676;
+			
+			// aapt resource value: 0x7f060008
+			public const int forever = 2131099656;
+			
+			// aapt resource value: 0x7f06000b
+			public const int frameLayoyt = 2131099659;
+			
+			// aapt resource value: 0x7f060015
+			public const int icon = 2131099669;
+			
+			// aapt resource value: 0x7f06001f
+			public const int icon_group = 2131099679;
+			
+			// aapt resource value: 0x7f060018
+			public const int info = 2131099672;
+			
+			// aapt resource value: 0x7f060009
+			public const int italic = 2131099657;
 			
 			// aapt resource value: 0x7f060000
-			public const int myButton = 2131099648;
+			public const int item_touch_helper_previous_elevation = 2131099648;
 			
 			// aapt resource value: 0x7f060001
-			public const int myEditText = 2131099649;
+			public const int line1 = 2131099649;
+			
+			// aapt resource value: 0x7f060002
+			public const int line3 = 2131099650;
+			
+			// aapt resource value: 0x7f06000e
+			public const int myButton = 2131099662;
+			
+			// aapt resource value: 0x7f06000f
+			public const int myEditText = 2131099663;
+			
+			// aapt resource value: 0x7f06000a
+			public const int normal = 2131099658;
+			
+			// aapt resource value: 0x7f06001a
+			public const int notification_background = 2131099674;
+			
+			// aapt resource value: 0x7f060016
+			public const int notification_main_column = 2131099670;
+			
+			// aapt resource value: 0x7f060014
+			public const int notification_main_column_container = 2131099668;
+			
+			// aapt resource value: 0x7f060010
+			public const int recyclerView = 2131099664;
+			
+			// aapt resource value: 0x7f060019
+			public const int right_icon = 2131099673;
+			
+			// aapt resource value: 0x7f060017
+			public const int right_side = 2131099671;
+			
+			// aapt resource value: 0x7f06000d
+			public const int subtitleTextView = 2131099661;
+			
+			// aapt resource value: 0x7f060003
+			public const int text = 2131099651;
+			
+			// aapt resource value: 0x7f060004
+			public const int text2 = 2131099652;
+			
+			// aapt resource value: 0x7f06001b
+			public const int time = 2131099675;
+			
+			// aapt resource value: 0x7f060005
+			public const int title = 2131099653;
+			
+			// aapt resource value: 0x7f06000c
+			public const int titleTextView = 2131099660;
 			
 			static Id()
 			{
@@ -75,11 +400,54 @@ namespace Polkovnik.DroidInjector.FodySample
 			}
 		}
 		
+		public partial class Integer
+		{
+			
+			// aapt resource value: 0x7f0b0000
+			public const int status_bar_notification_info_maxnum = 2131427328;
+			
+			static Integer()
+			{
+				global::Android.Runtime.ResourceIdManager.UpdateIdValues();
+			}
+			
+			private Integer()
+			{
+			}
+		}
+		
 		public partial class Layout
 		{
 			
-			// aapt resource value: 0x7f030000
-			public const int main = 2130903040;
+			// aapt resource value: 0x7f040000
+			public const int activity_second = 2130968576;
+			
+			// aapt resource value: 0x7f040001
+			public const int list_item = 2130968577;
+			
+			// aapt resource value: 0x7f040002
+			public const int main = 2130968578;
+			
+			// aapt resource value: 0x7f040003
+			public const int main_fragment = 2130968579;
+			
+			// aapt resource value: 0x7f040004
+			public const int notification_action = 2130968580;
+			
+			// aapt resource value: 0x7f040005
+			public const int notification_action_tombstone = 2130968581;
+			
+			// aapt resource value: 0x7f040006
+			public const int notification_template_custom_big = 2130968582;
+			
+			// aapt resource value: 0x7f040007
+			public const int notification_template_icon_group = 2130968583;
+			
+			// aapt resource value: 0x7f040008
+			public const int notification_template_part_chronometer = 2130968584;
+			
+			// aapt resource value: 0x7f040009
+			public const int notification_template_part_time = 2130968585;
 			
 			static Layout()
 			{
@@ -94,8 +462,8 @@ namespace Polkovnik.DroidInjector.FodySample
 		public partial class Menu
 		{
 			
-			// aapt resource value: 0x7f050000
-			public const int main = 2131034112;
+			// aapt resource value: 0x7f0c0000
+			public const int main = 2131492864;
 			
 			static Menu()
 			{
@@ -110,8 +478,8 @@ namespace Polkovnik.DroidInjector.FodySample
 		public partial class Mipmap
 		{
 			
-			// aapt resource value: 0x7f020000
-			public const int Icon = 2130837504;
+			// aapt resource value: 0x7f030000
+			public const int Icon = 2130903040;
 			
 			static Mipmap()
 			{
@@ -126,11 +494,14 @@ namespace Polkovnik.DroidInjector.FodySample
 		public partial class String
 		{
 			
-			// aapt resource value: 0x7f040001
-			public const int app_name = 2130968577;
+			// aapt resource value: 0x7f070002
+			public const int app_name = 2131165186;
 			
-			// aapt resource value: 0x7f040000
-			public const int hello = 2130968576;
+			// aapt resource value: 0x7f070001
+			public const int hello = 2131165185;
+			
+			// aapt resource value: 0x7f070000
+			public const int status_bar_notification_info_overflow = 2131165184;
 			
 			static String()
 			{
@@ -138,6 +509,139 @@ namespace Polkovnik.DroidInjector.FodySample
 			}
 			
 			private String()
+			{
+			}
+		}
+		
+		public partial class Style
+		{
+			
+			// aapt resource value: 0x7f0a0000
+			public const int TextAppearance_Compat_Notification = 2131361792;
+			
+			// aapt resource value: 0x7f0a0001
+			public const int TextAppearance_Compat_Notification_Info = 2131361793;
+			
+			// aapt resource value: 0x7f0a0006
+			public const int TextAppearance_Compat_Notification_Line2 = 2131361798;
+			
+			// aapt resource value: 0x7f0a0002
+			public const int TextAppearance_Compat_Notification_Time = 2131361794;
+			
+			// aapt resource value: 0x7f0a0003
+			public const int TextAppearance_Compat_Notification_Title = 2131361795;
+			
+			// aapt resource value: 0x7f0a0004
+			public const int Widget_Compat_NotificationActionContainer = 2131361796;
+			
+			// aapt resource value: 0x7f0a0005
+			public const int Widget_Compat_NotificationActionText = 2131361797;
+			
+			static Style()
+			{
+				global::Android.Runtime.ResourceIdManager.UpdateIdValues();
+			}
+			
+			private Style()
+			{
+			}
+		}
+		
+		public partial class Styleable
+		{
+			
+			public static int[] FontFamily = new int[] {
+					2130771977,
+					2130771978,
+					2130771979,
+					2130771980,
+					2130771981,
+					2130771982};
+			
+			// aapt resource value: 0
+			public const int FontFamily_fontProviderAuthority = 0;
+			
+			// aapt resource value: 3
+			public const int FontFamily_fontProviderCerts = 3;
+			
+			// aapt resource value: 4
+			public const int FontFamily_fontProviderFetchStrategy = 4;
+			
+			// aapt resource value: 5
+			public const int FontFamily_fontProviderFetchTimeout = 5;
+			
+			// aapt resource value: 1
+			public const int FontFamily_fontProviderPackage = 1;
+			
+			// aapt resource value: 2
+			public const int FontFamily_fontProviderQuery = 2;
+			
+			public static int[] FontFamilyFont = new int[] {
+					2130771983,
+					2130771984,
+					2130771985};
+			
+			// aapt resource value: 1
+			public const int FontFamilyFont_font = 1;
+			
+			// aapt resource value: 0
+			public const int FontFamilyFont_fontStyle = 0;
+			
+			// aapt resource value: 2
+			public const int FontFamilyFont_fontWeight = 2;
+			
+			public static int[] RecyclerView = new int[] {
+					16842948,
+					16842993,
+					2130771968,
+					2130771969,
+					2130771970,
+					2130771971,
+					2130771972,
+					2130771973,
+					2130771974,
+					2130771975,
+					2130771976};
+			
+			// aapt resource value: 1
+			public const int RecyclerView_android_descendantFocusability = 1;
+			
+			// aapt resource value: 0
+			public const int RecyclerView_android_orientation = 0;
+			
+			// aapt resource value: 6
+			public const int RecyclerView_fastScrollEnabled = 6;
+			
+			// aapt resource value: 9
+			public const int RecyclerView_fastScrollHorizontalThumbDrawable = 9;
+			
+			// aapt resource value: 10
+			public const int RecyclerView_fastScrollHorizontalTrackDrawable = 10;
+			
+			// aapt resource value: 7
+			public const int RecyclerView_fastScrollVerticalThumbDrawable = 7;
+			
+			// aapt resource value: 8
+			public const int RecyclerView_fastScrollVerticalTrackDrawable = 8;
+			
+			// aapt resource value: 2
+			public const int RecyclerView_layoutManager = 2;
+			
+			// aapt resource value: 4
+			public const int RecyclerView_reverseLayout = 4;
+			
+			// aapt resource value: 3
+			public const int RecyclerView_spanCount = 3;
+			
+			// aapt resource value: 5
+			public const int RecyclerView_stackFromEnd = 5;
+			
+			static Styleable()
+			{
+				global::Android.Runtime.ResourceIdManager.UpdateIdValues();
+			}
+			
+			private Styleable()
 			{
 			}
 		}
