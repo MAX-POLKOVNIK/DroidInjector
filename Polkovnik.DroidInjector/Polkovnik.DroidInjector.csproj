@@ -45,13 +45,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Internal\MethodSubscriber.cs" />
-    <Compile Include="Internal\MethodSubscriberFactory.cs" />
-    <Compile Include="Internal\ViewClickMethodSubscriber.cs" />
     <Compile Include="ViewEventAttribute.cs" />
     <Compile Include="InjectAttribute.cs" />
     <Compile Include="InjectorException.cs" />
-    <Compile Include="InjectExtensions.cs" />
     <Compile Include="MenuItemAttribute.cs" />
     <Compile Include="Injector.cs" />
     <Compile Include="ViewAttribute.cs" />
