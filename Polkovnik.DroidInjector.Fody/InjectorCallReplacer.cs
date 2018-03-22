@@ -34,6 +34,9 @@ namespace Polkovnik.DroidInjector.Fody
 
             foreach (var method in _definition.Methods)
             {
+                if (!method.HasBody)
+                    continue;
+
                 while (true)
                 {
                     var callInstuction = method.Body.Instructions.FirstOrDefault(x => x.OpCode == OpCodes.Call && IsMehodToRemove(x.Operand));
