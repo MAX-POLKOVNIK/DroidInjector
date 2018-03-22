@@ -1,6 +1,7 @@
 # DroidInjector
 
 Simple injection tool for Xamarin.Android inspired by Cheeseknife and Butterknife.
+[Check out speed comparsion](https://github.com/MAX-POLKOVNIK/DroidInjector/wiki/View-injection-speed-benchmark)
 
 ### Install 
 
