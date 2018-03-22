@@ -21,7 +21,7 @@ namespace Polkovnik.DroidInjector.Fody
             var backingField = _propertyDefinition.DeclaringType.Fields.FirstOrDefault(x => x.Name == backingFieldName);
 
             if (backingField == null)
-                throw new FodyInjectorException($"Property: {_propertyDefinition.FullName} hasn't setter and not auto-implemented.");
+                throw new WeavingException($"Property: {_propertyDefinition.FullName} hasn't setter and not auto-implemented.");
 
             backingField.Attributes = backingField.Attributes ^ FieldAttributes.InitOnly;
 

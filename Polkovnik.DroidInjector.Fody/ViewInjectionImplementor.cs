@@ -116,7 +116,7 @@ namespace Polkovnik.DroidInjector.Fody
             var field = _referencesAndDefinitionsProvider.ResourceIdClassType.Fields.FirstOrDefault(x => x.Name == constName);
 
             if (field == null)
-                throw new FodyInjectorException($"Can't find id for member {fieldDefinition.FullName}.");
+                throw new WeavingException($"Can't find id for member {fieldDefinition.FullName}.");
 
             return (int)field.Constant;
         }

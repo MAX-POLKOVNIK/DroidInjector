@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using Polkovnik.DroidInjector.Fody.Log;
 
 namespace Polkovnik.DroidInjector.Fody
 {
@@ -48,7 +49,7 @@ namespace Polkovnik.DroidInjector.Fody
                     if (_methodIsParameterless)
                     {
                         if (!_definition.IsActivity())
-                            throw new FodyInjectorException($"Call Injector.InjectViews() in not activity class \"{_definition.FullName}\". Please pass view as parameter");
+                            throw new WeavingException($"Call Injector.InjectViews() in not activity class \"{_definition.FullName}\". Please pass view as parameter");
 
                         ReplaceParameterlessMethodInstructions(callInstuction, method.Body.GetILProcessor(), generatedMethod, activityGetViewMethodDefinition);
                     }
