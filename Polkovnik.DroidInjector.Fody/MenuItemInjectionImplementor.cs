@@ -2,6 +2,7 @@
 using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using Polkovnik.DroidInjector.Fody.Log;
 
 namespace Polkovnik.DroidInjector.Fody
 {
@@ -23,6 +24,8 @@ namespace Polkovnik.DroidInjector.Fody
 
         public void Execute()
         {
+            Logger.LogExecute(this);
+
             var methodDefinition = new MethodDefinition(Consts.GeneratedMethodNames.InjectMenuItemsGeneratedMethodName, MethodAttributes.Private | MethodAttributes.HideBySig, _moduleDefinition.TypeSystem.Void);
             methodDefinition.Parameters.Add(new ParameterDefinition("menu", ParameterAttributes.None, _referencesAndDefinitionsProvider.AndroidMenuTypeReference));
 
@@ -100,6 +103,11 @@ namespace Polkovnik.DroidInjector.Fody
             }
 
             ilProcessor.Append(stfldInstruction);
+        }
+
+        public override string ToString()
+        {
+            return $"{nameof(_referencesAndDefinitionsProvider)}: {_referencesAndDefinitionsProvider}, {nameof(_moduleDefinition)}: {_moduleDefinition}, {nameof(_typeDefinition)}: {_typeDefinition}, {nameof(_memberDefinitions)}: {_memberDefinitions}";
         }
     }
 }

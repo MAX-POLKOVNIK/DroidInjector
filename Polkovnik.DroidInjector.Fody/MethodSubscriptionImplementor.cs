@@ -26,6 +26,8 @@ namespace Polkovnik.DroidInjector.Fody
 
         public void Execute()
         {
+            Logger.LogExecute(this);
+
             if (_methodsToSubscribe.Length == 0)
             {
                 Logger.Debug($"Nothing to subscribe in {_typeDefinition}");
@@ -190,6 +192,11 @@ namespace Polkovnik.DroidInjector.Fody
                 ilProcessor.InsertBefore(firstInstruction, newInstruction);
                 firstInstruction = newInstruction;
             }
+        }
+
+        public override string ToString()
+        {
+            return $"{nameof(_referencesAndDefinitionsProvider)}: {_referencesAndDefinitionsProvider}, {nameof(_moduleDefinition)}: {_moduleDefinition}, {nameof(_methodsToSubscribe)}: {_methodsToSubscribe}, {nameof(_typeDefinition)}: {_typeDefinition}";
         }
     }
 }

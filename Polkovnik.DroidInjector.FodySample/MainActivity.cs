@@ -13,6 +13,12 @@ namespace Polkovnik.DroidInjector.FodySample
     {
 #pragma warning disable 649
         [View] private Button _myButton;
+
+        [MenuItem(Resource.Id.action_0)] private IMenuItem menuItem;
+        [MenuItem(Resource.Id.action_1)] private IMenuItem menuItem1;
+        [MenuItem(Resource.Id.action_2)] private IMenuItem menuItem2;
+        [MenuItem(Resource.Id.action_3)] private IMenuItem menuItem3;
+        [MenuItem(Resource.Id.action_4)] private IMenuItem menuItem4;
 #pragma warning restore 649
 
         protected override void OnCreate(Bundle savedInstanceState)
@@ -41,7 +47,23 @@ namespace Polkovnik.DroidInjector.FodySample
 
             _myButton.Text = "That is working";
         }
-        
+
+        public override bool OnCreateOptionsMenu(IMenu menu)
+        {
+            MenuInflater.Inflate(Resource.Menu.main, menu);
+
+            Injector.InjectMenuItems(menu);
+
+            menuItem.SetTitle("TitleSET");
+            menuItem1.SetTitle("TitleSET");
+            menuItem2.SetTitle("TitleSET");
+            menuItem3.SetTitle("TitleSET");
+            menuItem4.SetTitle("TitleSET");
+
+
+            return true;
+        }
+
         [ViewEvent(Resource.Id.myEditText, typeof(EditText), nameof(EditText.TextChanged))]
         private void ButtonClick5(object sender, TextChangedEventArgs args)
         {

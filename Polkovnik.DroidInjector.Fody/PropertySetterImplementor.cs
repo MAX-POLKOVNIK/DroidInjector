@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using Polkovnik.DroidInjector.Fody.Log;
 
 namespace Polkovnik.DroidInjector.Fody
 {
@@ -17,6 +18,8 @@ namespace Polkovnik.DroidInjector.Fody
 
         public void Execute()
         {
+            Logger.LogExecute(this);
+
             var backingFieldName = GetBackingFieldNameForProperty(_propertyDefinition);
             var backingField = _propertyDefinition.DeclaringType.Fields.FirstOrDefault(x => x.Name == backingFieldName);
 
@@ -44,6 +47,11 @@ namespace Polkovnik.DroidInjector.Fody
         private static string GetBackingFieldNameForProperty(PropertyDefinition propertyDefinition)
         {
             return $"<{propertyDefinition.Name}>k__BackingField";
+        }
+
+        public override string ToString()
+        {
+            return $"{nameof(_propertyDefinition)}: {_propertyDefinition}, {nameof(_moduleDefinition)}: {_moduleDefinition}";
         }
     }
 }

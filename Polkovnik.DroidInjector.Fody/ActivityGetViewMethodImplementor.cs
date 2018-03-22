@@ -21,6 +21,8 @@ namespace Polkovnik.DroidInjector.Fody
         
         public MethodDefinition Execute()
         {
+            Logger.LogExecute(this);
+
             var method = _typeDefinition.Methods.FirstOrDefault(x => x.Name == GetViewGeneratedMethodName);
             if (method != null)
             {
@@ -52,6 +54,11 @@ namespace Polkovnik.DroidInjector.Fody
             ilProcessor.Emit(OpCodes.Ret);
 
             return methodDefinition;
+        }
+
+        public override string ToString()
+        {
+            return $"{nameof(_referencesAndDefinitionsProvider)}: {_referencesAndDefinitionsProvider}, {nameof(_typeDefinition)}: {_typeDefinition}";
         }
     }
 }
