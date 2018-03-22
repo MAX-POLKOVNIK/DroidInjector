@@ -2,16 +2,11 @@
 
 Simple injection tool for Xamarin.Android inspired by Cheeseknife and Butterknife.
 
-## Runtime injection via Reflection.
-
-It is slower than compile time injection but still fast.
-If you want to use compile time injection see section 'Compile time injection'.
-
 ### Install 
 
 Find package on Nuget or 
 
-`PM> Install-Package Polkovnik.DroidInjector -Version 0.1.1`
+`PM> Install-Package Polkovnik.DroidInjector.Fody -Version 0.1.4 `
 
 ### Usage
 
@@ -30,7 +25,9 @@ public class MainActivity : Activity
         // Set our view from the "main" layout resource
         SetContentView(Resource.Layout.main);
 
-        this.InjectViews();
+        // Choose one method below
+        this.InjectViews(); // Will inject views via Reflection (slow)
+        Injector.InjectViews(); // Will inject views without using Reflection (fast)
 
         _myButton.Text = "Text";
     }
@@ -48,7 +45,8 @@ public class MainFragment : Fragment
     {
         var view = inflater.Inflate(Resource.Layout.main, container, false);
         
-        this.InjectViews(view);
+        this.InjectViews(view);  // Will inject views via Reflection (slow)
+        Injector.InjectViews(view); // Will inject views without using Reflection (fast)
 
         return view;
     }
@@ -57,14 +55,7 @@ public class MainFragment : Fragment
 
 Fields and properties marked with `View` will be resolved at runtime with specified `Resource.Id`. 
 
-Extension method `InjectViews()` starts resolving views.
-
-
-### Experimental features
-
-Warning: these features can work wrong. I do not recommend use them.
-
-You must register your `Resource` and `Resource.Id` classes via `Injector.Instance.RegisterResourceClass<TResource, TResourceId>()` before use experimental features.
+Calling method `InjectViews()` starts resolving views.
 
 #### Mark views without specified Resource.Id.
 
@@ -111,6 +102,7 @@ public override bool OnCreateOptionsMenu(IMenu menu)
 {
     MenuInflater.Inflate(Resource.Menu.main, menu);
     this.InjectMenuItems(menu);
+    Injector.InjectMenuItems(menu);
 
     return base.OnCreateOptionsMenu(menu);
 }
@@ -126,11 +118,16 @@ private void CustomClick(object sender, EventArgs args)
 }
 ```
 
+Using compile time injection in `ViewEvent` attribute you should declare type of view. It is required for searching events at compile time. 
+```csharp
+[ViewEvent(Resource.Id.myEditText, typeof(EditText), nameof(EditText.TextChanged))]
+```
+
 Method signature must be same as event delegate signature, or you get InjectorException. 
 
 To invoke subscription just call `this.BindViewActions()`
 
-You can use exact event attributes. Now available only this one `ViewClickEvent`.
+You can use exact event attributes. Now available only this one `ViewClickEvent` via reflection injection. 
 If you use this attribute you can use parameterless method:
 
 ```csharp
@@ -140,36 +137,6 @@ private void Click()
     Toast.MakeText(this, "Click", ToastLength.Short).Show();
 }
 ```
-
-## Compile time injection
-
-It is better way to increase view injection.
-
-### Install 
-
-Find package on Nuget or 
-
-`PM> Install-Package Polkovnik.DroidInjector.Fody -Version 0.1.3 `
-
-Make sure you install Polkovnik.DroidInjector.**Fody** package. This package required for compile time injection.
-Project must contains `FodyWeavers.xml` file. 
-
-If you already using Fody plugins make sure `FodyWeavers.xml` contains all weavers.
-
-### Usage
-
-Almost same as above but there is some difference:
-
-1. To start injection call `Injector.InjectViews()`, `Injector.InjectMenuItems()`, `Injector.BindViewEvents()` instead of `this.InjectViews()`, `this.InjectMenuItems()`, `this.BindViewEvents()`
-
-    These methods will be replaced with generated methods for injecting in every type contains Polkovnik.DroidInjector attributes.
-    
-2. In `ViewEvent` attribute you should declare type of view. It is required for searching events at compile time. 
-    ```csharp
-    [ViewEvent(Resource.Id.myEditText, typeof(EditText), nameof(EditText.TextChanged))]
-    ```
-    
-3. `ViewClickEvent` attribute not supported in compile time yet. I'll add it soon.
 
 ## Future 
 At this moment you can't use DroidInjector in Android library project. Only in Android app project. 
