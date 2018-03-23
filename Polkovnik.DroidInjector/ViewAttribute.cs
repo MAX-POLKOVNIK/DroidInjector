@@ -20,6 +20,11 @@ namespace Polkovnik.DroidInjector
         {
         }
 
+        /// <summary>
+        /// View with <paramref name="resourceIdName"/> will be resolved at runtime.
+        /// </summary>
+        /// <param name="resourceIdName">Injected view's id field name.</param>
+        /// <param name="allowMissing">If true - injector will ignore missing view.</param>
         public ViewAttribute(string resourceIdName, bool allowMissing = false)
         {
         }

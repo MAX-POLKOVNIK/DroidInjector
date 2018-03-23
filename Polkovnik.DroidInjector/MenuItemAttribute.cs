@@ -20,6 +20,11 @@ namespace Polkovnik.DroidInjector
         {
         }
 
+        /// <summary>
+        /// MenuItem with <paramref name="resourceIdName"/> will be resolved at runtime.
+        /// </summary>
+        /// <param name="resourceIdName">Injected menuItem's id field name.</param>
+        /// <param name="allowMissing">If true - injector will ignore missing menuItem.</param>
         public MenuItemAttribute(string resourceIdName, bool allowMissing)
         {
         }

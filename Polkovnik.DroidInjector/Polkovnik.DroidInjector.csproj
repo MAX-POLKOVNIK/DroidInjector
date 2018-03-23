@@ -50,7 +50,6 @@
     <Compile Include="MenuItemAttribute.cs" />
     <Compile Include="Injector.cs" />
     <Compile Include="ViewAttribute.cs" />
-    <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
