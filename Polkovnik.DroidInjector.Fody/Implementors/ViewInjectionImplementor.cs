@@ -2,9 +2,10 @@
 using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using Polkovnik.DroidInjector.Fody.AttributesHolders;
 using Polkovnik.DroidInjector.Fody.Loggers;
 
-namespace Polkovnik.DroidInjector.Fody
+namespace Polkovnik.DroidInjector.Fody.Implementors
 {
     internal class ViewInjectionImplementor
     {
@@ -37,18 +38,22 @@ namespace Polkovnik.DroidInjector.Fody
             foreach (var memberDefinition in _memberDefinitions)
             {
                 var attribute = memberDefinition.CustomAttributes.First(x => x.AttributeType.FullName == Consts.InjectorAttributes.ViewAttributeTypeName);
-                var resourceId = (int)attribute.ConstructorArguments[0].Value;
+                var attributeHolder = new ViewAttributeHolder(attribute);
+                var resourceId = attributeHolder.ResourceId;
                 if (resourceId == 0)
                 {
-                    resourceId = GetResourceIdByName(memberDefinition);
+                    resourceId = Utils.GetResourceIdByName(memberDefinition.Name, memberDefinition.FullName, _referencesAndDefinitionsProvider.ResourceIdClassType);
                 }
-                var shouldThrowIfNull = !(bool)attribute.ConstructorArguments[1].Value;
+                
+                var getResourceIdOperation = memberDefinition.IsInAndroidClassLibrary()
+                    ? Instruction.Create(OpCodes.Ldsfld, Utils.GetResourceIdField(attributeHolder.ResourceIdName, _referencesAndDefinitionsProvider.ResourceIdClassType))
+                    : Instruction.Create(OpCodes.Ldc_I4, resourceId);
 
                 switch (memberDefinition)
                 {
                     case FieldReference fieldReference:
                         fieldReference = fieldReference.GetThisFieldReference();
-                        AddInjectViewInstructionsForField(ilProcessor, resourceId, fieldReference.FieldType, fieldReference, shouldThrowIfNull);
+                        AddInjectViewInstructionsForField(ilProcessor, getResourceIdOperation, fieldReference.FieldType, fieldReference, !attributeHolder.AllowMissing);
                         break;
                     case PropertyDefinition propertyDefinition:
                         var propertyHasSetter = propertyDefinition.SetMethod != null;
@@ -58,22 +63,22 @@ namespace Polkovnik.DroidInjector.Fody
                             propertySetterImplementor.Execute();
                         }
                         var propertySetMethodReference = propertyDefinition.SetMethod;
-                        AddInjectViewInstructionsForProperty(ilProcessor, resourceId, propertyDefinition.PropertyType, propertySetMethodReference, shouldThrowIfNull);
+                        AddInjectViewInstructionsForProperty(ilProcessor, getResourceIdOperation, propertyDefinition, propertySetMethodReference, !attributeHolder.AllowMissing);
                         break;
                 }
             }
 
             ilProcessor.Emit(OpCodes.Ret);
         }
-
-        private void AddInjectViewInstructionsForProperty(ILProcessor ilProcessor, int resourceId, TypeReference targetPropertyType, 
+        
+        private void AddInjectViewInstructionsForProperty(ILProcessor ilProcessor, Instruction getResourceIdInstruction, PropertyDefinition propertyDefinition, 
             MethodReference setterMethodDefinition, bool shouldThrowIfNull)
         {
             ilProcessor.Emit(OpCodes.Ldarg_0);
             ilProcessor.Emit(OpCodes.Ldarg_1);
-            ilProcessor.Emit(OpCodes.Ldc_I4, resourceId);
+            ilProcessor.Append(getResourceIdInstruction);
             ilProcessor.Emit(OpCodes.Callvirt, _referencesAndDefinitionsProvider.FindViewByIdMethodReference);
-            ilProcessor.Emit(OpCodes.Castclass, targetPropertyType);
+            ilProcessor.Emit(OpCodes.Castclass, propertyDefinition.PropertyType);
 
             var callInstruction = Instruction.Create(OpCodes.Call, setterMethodDefinition);
 
@@ -82,7 +87,7 @@ namespace Polkovnik.DroidInjector.Fody
                 ilProcessor.Emit(OpCodes.Dup);
                 ilProcessor.Emit(OpCodes.Brtrue_S, callInstruction);
                 ilProcessor.Emit(OpCodes.Pop);
-                ilProcessor.Emit(OpCodes.Ldstr, $"Can't find view with ID {resourceId}");
+                ilProcessor.Emit(OpCodes.Ldstr, $"Can't find view for {propertyDefinition.FullName}");
                 ilProcessor.Emit(OpCodes.Newobj, _referencesAndDefinitionsProvider.InjectorExceptionCtor);
                 ilProcessor.Emit(OpCodes.Throw);
             }
@@ -91,41 +96,30 @@ namespace Polkovnik.DroidInjector.Fody
             ilProcessor.Emit(OpCodes.Nop);
         }
 
-        private void AddInjectViewInstructionsForField(ILProcessor ilProcessor, int resourceId, TypeReference targetTypeReference, FieldReference fieldDefinition, 
+        private void AddInjectViewInstructionsForField(ILProcessor ilProcessor, Instruction getResourceIdInstruction, TypeReference targetTypeReference, FieldReference fieldReference, 
             bool shouldThrowIfNull)
         {
             ilProcessor.Emit(OpCodes.Ldarg_0);
             ilProcessor.Emit(OpCodes.Ldarg_1);
-            ilProcessor.Emit(OpCodes.Ldc_I4, resourceId);
+            ilProcessor.Append(getResourceIdInstruction);
             ilProcessor.Emit(OpCodes.Callvirt, _referencesAndDefinitionsProvider.FindViewByIdMethodReference);
             ilProcessor.Emit(OpCodes.Castclass, targetTypeReference);
 
-            var stfldInstruction = Instruction.Create(OpCodes.Stfld, fieldDefinition);
+            var stfldInstruction = Instruction.Create(OpCodes.Stfld, fieldReference);
 
             if (shouldThrowIfNull)
             {
                 ilProcessor.Emit(OpCodes.Dup);
                 ilProcessor.Emit(OpCodes.Brtrue_S, stfldInstruction);
                 ilProcessor.Emit(OpCodes.Pop);
-                ilProcessor.Emit(OpCodes.Ldstr, $"Can't find view with ID {resourceId}");
+                ilProcessor.Emit(OpCodes.Ldstr, $"Can't find view for {fieldReference.FullName}");
                 ilProcessor.Emit(OpCodes.Newobj, _referencesAndDefinitionsProvider.InjectorExceptionCtor);
                 ilProcessor.Emit(OpCodes.Throw);
             }
 
             ilProcessor.Append(stfldInstruction);
         }
-
-        private int GetResourceIdByName(IMemberDefinition fieldDefinition)
-        {
-            var constName = fieldDefinition.Name.Trim('_');
-            var field = _referencesAndDefinitionsProvider.ResourceIdClassType.Fields.FirstOrDefault(x => x.Name == constName);
-
-            if (field == null)
-                throw new WeavingException($"Can't find id for member {fieldDefinition.FullName}.");
-
-            return (int)field.Constant;
-        }
-
+        
         public override string ToString()
         {
             return $"{nameof(_referencesAndDefinitionsProvider)}: {_referencesAndDefinitionsProvider}, {nameof(_moduleDefinition)}: {_moduleDefinition}, {nameof(_memberDefinitions)}: {_memberDefinitions}, {nameof(_typeDefinition)}: {_typeDefinition}";

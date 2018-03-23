@@ -2,9 +2,10 @@
 using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using Polkovnik.DroidInjector.Fody.AttributesHolders;
 using Polkovnik.DroidInjector.Fody.Loggers;
 
-namespace Polkovnik.DroidInjector.Fody
+namespace Polkovnik.DroidInjector.Fody.Implementors
 {
     internal class MenuItemInjectionImplementor
     {
@@ -37,14 +38,19 @@ namespace Polkovnik.DroidInjector.Fody
             foreach (var memberDefinition in _memberDefinitions)
             {
                 var attribute = memberDefinition.CustomAttributes.First(x => x.AttributeType.FullName == Consts.InjectorAttributes.MenuItemAttributeTypeName);
-                var resourceId = (int)attribute.ConstructorArguments[0].Value;
-                var shouldThrowIfNull = !(bool) attribute.ConstructorArguments[1].Value;
+                var attributeHolder = new MenuItemAttributeHolder(attribute);
+
+                var resourceId = attributeHolder.ResourceId;
+                if (resourceId == 0)
+                {
+                    resourceId = Utils.GetResourceIdByName(memberDefinition.Name, memberDefinition.FullName, _referencesAndDefinitionsProvider.ResourceIdClassType);
+                }
 
                 switch (memberDefinition)
                 {
                     case FieldReference fieldReference:
                         fieldReference = fieldReference.GetThisFieldReference();
-                        AddInstructionsForField(ilProcessor, resourceId, fieldReference, shouldThrowIfNull);
+                        AddInstructionsForField(ilProcessor, resourceId, fieldReference, !attributeHolder.AllowMissing);
                         break;
                     case PropertyDefinition propertyDefinition:
                         var propertyHasSetter = propertyDefinition.SetMethod != null;
@@ -53,8 +59,8 @@ namespace Polkovnik.DroidInjector.Fody
                             var propertySetterImplementor = new PropertySetterImplementor(propertyDefinition, _moduleDefinition);
                             propertySetterImplementor.Execute();
                         }
-                        var propertySetMethodReference = propertyDefinition.SetMethod;//.GetThisMethodReference();
-                        AddForProperty(ilProcessor, resourceId, propertySetMethodReference, shouldThrowIfNull);
+                        var propertySetMethodReference = propertyDefinition.SetMethod;
+                        AddForProperty(ilProcessor, resourceId, propertySetMethodReference, !attributeHolder.AllowMissing);
                         break;
                 }
             }

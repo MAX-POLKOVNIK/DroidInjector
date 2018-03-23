@@ -17,5 +17,13 @@ namespace Polkovnik.DroidInjector
         public ViewAttribute(int resourceId = 0, bool allowMissing = false) : base(resourceId, allowMissing)
         {
         }
+
+        public ViewAttribute(string resourceIdName, bool allowMissing = false) : base(resourceIdName, allowMissing)
+        {
+        }
+
+        internal int ResourceId { get; set; }
+        internal bool AllowMissing { get; set; }
+        internal string ResourceIdName { get; set; }
     }
 }

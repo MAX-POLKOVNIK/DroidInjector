@@ -17,5 +17,9 @@ namespace Polkovnik.DroidInjector
         public MenuItemAttribute(int resourceId, bool allowMissing = false) : base(resourceId, allowMissing)
         {
         }
+
+        public MenuItemAttribute(string resourceIdName, bool allowMissing) : base(resourceIdName, allowMissing)
+        {
+        }
     }
 }

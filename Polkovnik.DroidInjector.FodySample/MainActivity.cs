@@ -8,6 +8,7 @@ using Android.Views;
 using CheeseBind;
 using Genetics;
 using Genetics.Attributes;
+using Polkovnik.DroidInjector.FodyClassLibrarySample;
 
 namespace Polkovnik.DroidInjector.FodySample
 {
@@ -15,7 +16,7 @@ namespace Polkovnik.DroidInjector.FodySample
     public class MainActivity : Activity
     {
 #pragma warning disable 649
-        //[BindView(Resource.Id.myButton)] [Splice(Resource.Id.myButton)] [View] private Button _myButton;
+        [BindView(Resource.Id.myButton)] [Splice(Resource.Id.myButton)] [View] private Button _myButton;
         //[BindView(Resource.Id.myEditText1)] [Splice(Resource.Id.myEditText1)] [View] private EditText myEditText1;
         //[BindView(Resource.Id.myEditText2)] [Splice(Resource.Id.myEditText2)] [View] private EditText myEditText2;
         //[BindView(Resource.Id.myEditText3)] [Splice(Resource.Id.myEditText3)] [View] private EditText myEditText3;
@@ -39,7 +40,7 @@ namespace Polkovnik.DroidInjector.FodySample
             stopwatch.Start();
 
             //DirectInjection();
-            //Injector.InjectViews();
+            Injector.InjectViews();
             //Geneticist.Splice(this);
             //Cheeseknife.Bind(this);
 
@@ -49,7 +50,7 @@ namespace Polkovnik.DroidInjector.FodySample
             Console.WriteLine($"TOTAL: {stopwatch.ElapsedMilliseconds} ms");
 
             //_myButton.Text = $"TOTAL: {stopwatch.ElapsedMilliseconds} ms";
-
+            _myButton.Click += (sender, args) => StartActivity(typeof(TestActivity));
             FragmentManager.BeginTransaction().Replace(Resource.Id.contentLayout, MySalesFragment.NewInstance())
                 .Commit();
         }

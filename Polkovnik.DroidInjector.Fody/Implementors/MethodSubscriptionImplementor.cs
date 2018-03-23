@@ -6,7 +6,7 @@ using Mono.Cecil.Cil;
 using Mono.Cecil.Rocks;
 using Polkovnik.DroidInjector.Fody.Loggers;
 
-namespace Polkovnik.DroidInjector.Fody
+namespace Polkovnik.DroidInjector.Fody.Implementors
 {
     internal class MethodSubscriptionImplementor
     {

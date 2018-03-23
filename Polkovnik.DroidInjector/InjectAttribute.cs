@@ -8,13 +8,12 @@ namespace Polkovnik.DroidInjector
     /// </summary>
     public abstract class InjectAttribute : Attribute
     {
-        protected InjectAttribute(int resourceId, bool allowMissing)
+        protected InjectAttribute(string resourceIdName, bool allowMissing)
         {
-            ResourceId = resourceId;
-            AllowMissing = allowMissing;
         }
 
-        internal int ResourceId { get; set; }
-        internal bool AllowMissing { get; set; }
+        protected InjectAttribute(int resourceId, bool allowMissing)
+        {
+        }
     }
 }

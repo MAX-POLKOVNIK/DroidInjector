@@ -2,6 +2,8 @@
 {
     internal class Consts
     {
+        public const string AndroidRuntimeResourceDesignerAttributeName = "Android.Runtime.ResourceDesignerAttribute";
+
         internal class InjectorAttributes
         {
             public const string ViewEventAttributeTypeName = "Polkovnik.DroidInjector.ViewEventAttribute";
