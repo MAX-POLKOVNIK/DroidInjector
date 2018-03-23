@@ -28,6 +28,8 @@ namespace Polkovnik.DroidInjector.FodySample
         //[BindView(Resource.Id.myEditText9)] [Splice(Resource.Id.myEditText9)] [View] private EditText myEditText9;
         //[BindView(Resource.Id.myEditText10)][Splice(Resource.Id.myEditText10)] [View] private EditText myEditText10;
         //[BindView(Resource.Id.myEditText11)] [Splice(Resource.Id.myEditText11)] [View] private EditText myEditText11;
+
+        [MenuItem(Resource.Id.action_0)] private IMenuItem item;
 #pragma warning restore 649
 
         protected override void OnCreate(Bundle savedInstanceState)
@@ -53,6 +55,13 @@ namespace Polkovnik.DroidInjector.FodySample
             _myButton.Click += (sender, args) => StartActivity(typeof(TestActivity));
             FragmentManager.BeginTransaction().Replace(Resource.Id.contentLayout, MySalesFragment.NewInstance())
                 .Commit();
+        }
+
+        public override bool OnCreateOptionsMenu(IMenu menu)
+        {
+            MenuInflater.Inflate(Resource.Menu.main, menu);
+            Injector.InjectMenuItems(menu);
+            return true;
         }
 
         private void InjectWrapper(string nane, Action action)

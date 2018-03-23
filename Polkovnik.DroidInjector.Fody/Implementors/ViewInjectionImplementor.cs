@@ -46,7 +46,7 @@ namespace Polkovnik.DroidInjector.Fody.Implementors
                 }
                 
                 var getResourceIdOperation = memberDefinition.IsInAndroidClassLibrary()
-                    ? Instruction.Create(OpCodes.Ldsfld, Utils.GetResourceIdField(attributeHolder.ResourceIdName, _referencesAndDefinitionsProvider.ResourceIdClassType))
+                    ? Instruction.Create(OpCodes.Ldsfld, Utils.GetResourceIdField(attributeHolder.ResourceIdName ?? memberDefinition.Name, _referencesAndDefinitionsProvider.ResourceIdClassType))
                     : Instruction.Create(OpCodes.Ldc_I4, resourceId);
 
                 switch (memberDefinition)
@@ -71,14 +71,14 @@ namespace Polkovnik.DroidInjector.Fody.Implementors
             ilProcessor.Emit(OpCodes.Ret);
         }
         
-        private void AddInjectViewInstructionsForProperty(ILProcessor ilProcessor, Instruction getResourceIdInstruction, PropertyDefinition propertyDefinition, 
+        private void AddInjectViewInstructionsForProperty(ILProcessor ilProcessor, Instruction getResourceIdInstruction, PropertyReference propertyReference, 
             MethodReference setterMethodDefinition, bool shouldThrowIfNull)
         {
             ilProcessor.Emit(OpCodes.Ldarg_0);
             ilProcessor.Emit(OpCodes.Ldarg_1);
             ilProcessor.Append(getResourceIdInstruction);
             ilProcessor.Emit(OpCodes.Callvirt, _referencesAndDefinitionsProvider.FindViewByIdMethodReference);
-            ilProcessor.Emit(OpCodes.Castclass, propertyDefinition.PropertyType);
+            ilProcessor.Emit(OpCodes.Castclass, propertyReference.PropertyType);
 
             var callInstruction = Instruction.Create(OpCodes.Call, setterMethodDefinition);
 
@@ -87,7 +87,7 @@ namespace Polkovnik.DroidInjector.Fody.Implementors
                 ilProcessor.Emit(OpCodes.Dup);
                 ilProcessor.Emit(OpCodes.Brtrue_S, callInstruction);
                 ilProcessor.Emit(OpCodes.Pop);
-                ilProcessor.Emit(OpCodes.Ldstr, $"Can't find view for {propertyDefinition.FullName}");
+                ilProcessor.Emit(OpCodes.Ldstr, $"Can't find view for {propertyReference.FullName}");
                 ilProcessor.Emit(OpCodes.Newobj, _referencesAndDefinitionsProvider.InjectorExceptionCtor);
                 ilProcessor.Emit(OpCodes.Throw);
             }

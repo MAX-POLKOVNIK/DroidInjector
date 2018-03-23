@@ -9,7 +9,7 @@ namespace Polkovnik.DroidInjector.FodyClassLibrarySample
     [Activity(Label = "TestActivity")]
     public class TestActivity : Activity
     {
-        [View(nameof(_myButtonC))] private View _myButtonC;
+        [View] private View _myButtonC { get; }
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -25,7 +25,7 @@ namespace Polkovnik.DroidInjector.FodyClassLibrarySample
 
         private void DirectInject(View view)
         {
-            _myButtonC = view.FindViewById(Resource.Id.myButtonC);
+            //_myButtonC = view.FindViewById(Resource.Id.myButtonC);
         }
     }
 }

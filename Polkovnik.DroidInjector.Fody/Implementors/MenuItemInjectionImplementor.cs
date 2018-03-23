@@ -46,11 +46,15 @@ namespace Polkovnik.DroidInjector.Fody.Implementors
                     resourceId = Utils.GetResourceIdByName(memberDefinition.Name, memberDefinition.FullName, _referencesAndDefinitionsProvider.ResourceIdClassType);
                 }
 
+                var getResourceIdOperation = memberDefinition.IsInAndroidClassLibrary()
+                    ? Instruction.Create(OpCodes.Ldsfld, Utils.GetResourceIdField(attributeHolder.ResourceIdName ?? memberDefinition.Name, _referencesAndDefinitionsProvider.ResourceIdClassType))
+                    : Instruction.Create(OpCodes.Ldc_I4, resourceId);
+
                 switch (memberDefinition)
                 {
                     case FieldReference fieldReference:
                         fieldReference = fieldReference.GetThisFieldReference();
-                        AddInstructionsForField(ilProcessor, resourceId, fieldReference, !attributeHolder.AllowMissing);
+                        AddInstructionsForField(ilProcessor, getResourceIdOperation, fieldReference, !attributeHolder.AllowMissing);
                         break;
                     case PropertyDefinition propertyDefinition:
                         var propertyHasSetter = propertyDefinition.SetMethod != null;
@@ -60,7 +64,7 @@ namespace Polkovnik.DroidInjector.Fody.Implementors
                             propertySetterImplementor.Execute();
                         }
                         var propertySetMethodReference = propertyDefinition.SetMethod;
-                        AddForProperty(ilProcessor, resourceId, propertySetMethodReference, !attributeHolder.AllowMissing);
+                        AddForProperty(ilProcessor, getResourceIdOperation, propertyDefinition, propertySetMethodReference, !attributeHolder.AllowMissing);
                         break;
                 }
             }
@@ -68,21 +72,22 @@ namespace Polkovnik.DroidInjector.Fody.Implementors
             ilProcessor.Emit(OpCodes.Ret);
         }
 
-        private void AddForProperty(ILProcessor ilProcessor, int resourceId, MethodReference propertyDefinitionSetMethod, bool shouldThrowIfNull)
+        private void AddForProperty(ILProcessor ilProcessor, Instruction getResourceIdInstruction, PropertyReference propertyReference,
+            MethodReference setterMethodDefinition, bool shouldThrowIfNull)
         {
             ilProcessor.Emit(OpCodes.Ldarg_0);
             ilProcessor.Emit(OpCodes.Ldarg_1);
-            ilProcessor.Emit(OpCodes.Ldc_I4, resourceId);
+            ilProcessor.Append(getResourceIdInstruction);
             ilProcessor.Emit(OpCodes.Callvirt, _referencesAndDefinitionsProvider.FindItemMethodReference);
 
-            var callInstruction = Instruction.Create(OpCodes.Call, propertyDefinitionSetMethod);
+            var callInstruction = Instruction.Create(OpCodes.Call, setterMethodDefinition);
 
             if (shouldThrowIfNull)
             {
                 ilProcessor.Emit(OpCodes.Dup);
                 ilProcessor.Emit(OpCodes.Brtrue_S, callInstruction);
                 ilProcessor.Emit(OpCodes.Pop);
-                ilProcessor.Emit(OpCodes.Ldstr, $"Can't find menu item with ID {resourceId}");
+                ilProcessor.Emit(OpCodes.Ldstr, $"Can't find view for {propertyReference.FullName}");
                 ilProcessor.Emit(OpCodes.Newobj, _referencesAndDefinitionsProvider.InjectorExceptionCtor);
                 ilProcessor.Emit(OpCodes.Throw);
             }
@@ -91,21 +96,21 @@ namespace Polkovnik.DroidInjector.Fody.Implementors
             ilProcessor.Emit(OpCodes.Nop);
         }
 
-        private void AddInstructionsForField(ILProcessor ilProcessor, int resourceId, FieldReference fieldDefinition, bool shouldThrowIfNull)
+        private void AddInstructionsForField(ILProcessor ilProcessor, Instruction getResourceIdInstruction, FieldReference fieldReference, bool shouldThrowIfNull)
         {
             ilProcessor.Emit(OpCodes.Ldarg_0);
             ilProcessor.Emit(OpCodes.Ldarg_1);
-            ilProcessor.Emit(OpCodes.Ldc_I4, resourceId);
+            ilProcessor.Append(getResourceIdInstruction);
             ilProcessor.Emit(OpCodes.Callvirt, _referencesAndDefinitionsProvider.FindItemMethodReference);
 
-            var stfldInstruction = Instruction.Create(OpCodes.Stfld, fieldDefinition);
+            var stfldInstruction = Instruction.Create(OpCodes.Stfld, fieldReference);
 
             if (shouldThrowIfNull)
             {
                 ilProcessor.Emit(OpCodes.Dup);
                 ilProcessor.Emit(OpCodes.Brtrue_S, stfldInstruction);
                 ilProcessor.Emit(OpCodes.Pop);
-                ilProcessor.Emit(OpCodes.Ldstr, $"Can't find menu item with ID {resourceId}");
+                ilProcessor.Emit(OpCodes.Ldstr, $"Can't find view for {fieldReference.FullName}");
                 ilProcessor.Emit(OpCodes.Newobj, _referencesAndDefinitionsProvider.InjectorExceptionCtor);
                 ilProcessor.Emit(OpCodes.Throw);
             }
