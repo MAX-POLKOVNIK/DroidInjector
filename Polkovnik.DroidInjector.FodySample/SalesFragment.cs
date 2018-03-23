@@ -21,13 +21,9 @@ internal abstract class SalesFragment<T> : Fragment where T : SalesFragment<T>, 
         var view = inflater.Inflate(Resource.Layout.main, container, false);
 
         Injector.InjectViews(view);
-        DirectInject(view);
+
+        _myButton.Text = "Generic works";
 
         return view;
-    }
-
-    private void DirectInject(View view)
-    {
-        _myButton = (Button)view.FindViewById(Resource.Id.myButton);
     }
 }

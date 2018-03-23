@@ -7,7 +7,7 @@
           android:layout_width="match_parent" 
           android:layout_height="wrap_content" 
           android:text="@string/hello" />
-  <EditText android:id="@+id/myEditText1"
+ <!--<EditText android:id="@+id/myEditText1"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:text="@string/hello" />
@@ -50,7 +50,7 @@
   <EditText android:id="@+id/myEditText11"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/hello" />
+            android:text="@string/hello" />-->
 
   <FrameLayout
     android:layout_width="match_parent"

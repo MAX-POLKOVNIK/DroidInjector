@@ -46,8 +46,17 @@ namespace Polkovnik.DroidInjector.Fody
 
                 switch (memberDefinition)
                 {
-                    case FieldDefinition fieldDefinition:
-                        AddInjectViewInstructionsForField(ilProcessor, resourceId, fieldDefinition.FieldType, fieldDefinition, shouldThrowIfNull);
+                    case FieldReference fieldReference:
+                        if (fieldReference.DeclaringType.GenericParameters.Any())
+                        {
+                            var declaringType = new GenericInstanceType(fieldReference.DeclaringType);
+                            foreach (var parameter in fieldReference.DeclaringType.GenericParameters)
+                            {
+                                declaringType.GenericArguments.Add(parameter);
+                            }
+                            fieldReference = new FieldReference(fieldReference.Name, fieldReference.FieldType, declaringType);
+                        }
+                        AddInjectViewInstructionsForField(ilProcessor, resourceId, fieldReference.FieldType, fieldReference, shouldThrowIfNull);
                         break;
                     case PropertyDefinition propertyDefinition:
                         var propertyHasSetter = propertyDefinition.SetMethod != null;
@@ -89,7 +98,7 @@ namespace Polkovnik.DroidInjector.Fody
             ilProcessor.Emit(OpCodes.Nop);
         }
 
-        private void AddInjectViewInstructionsForField(ILProcessor ilProcessor, int resourceId, TypeReference targetTypeReference, FieldDefinition fieldDefinition, 
+        private void AddInjectViewInstructionsForField(ILProcessor ilProcessor, int resourceId, TypeReference targetTypeReference, FieldReference fieldDefinition, 
             bool shouldThrowIfNull)
         {
             ilProcessor.Emit(OpCodes.Ldarg_0);

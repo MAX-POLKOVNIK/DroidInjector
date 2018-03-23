@@ -15,18 +15,18 @@ namespace Polkovnik.DroidInjector.FodySample
     public class MainActivity : Activity
     {
 #pragma warning disable 649
-        [BindView(Resource.Id.myButton)] [Splice(Resource.Id.myButton)] [View] private Button _myButton;
-        [BindView(Resource.Id.myEditText1)] [Splice(Resource.Id.myEditText1)] [View] private EditText myEditText1;
-        [BindView(Resource.Id.myEditText2)] [Splice(Resource.Id.myEditText2)] [View] private EditText myEditText2;
-        [BindView(Resource.Id.myEditText3)] [Splice(Resource.Id.myEditText3)] [View] private EditText myEditText3;
-        [BindView(Resource.Id.myEditText4)] [Splice(Resource.Id.myEditText4)] [View] private EditText myEditText4;
-        [BindView(Resource.Id.myEditText5)] [Splice(Resource.Id.myEditText5)] [View] private EditText myEditText5;
-        [BindView(Resource.Id.myEditText6)] [Splice(Resource.Id.myEditText6)] [View] private EditText myEditText6;
-        [BindView(Resource.Id.myEditText7)] [Splice(Resource.Id.myEditText7)] [View] private EditText myEditText7;
-        [BindView(Resource.Id.myEditText8)] [Splice(Resource.Id.myEditText8)] [View] private EditText myEditText8;
-        [BindView(Resource.Id.myEditText9)] [Splice(Resource.Id.myEditText9)] [View] private EditText myEditText9;
-        [BindView(Resource.Id.myEditText10)][Splice(Resource.Id.myEditText10)] [View] private EditText myEditText10;
-        [BindView(Resource.Id.myEditText11)] [Splice(Resource.Id.myEditText11)] [View] private EditText myEditText11;
+        //[BindView(Resource.Id.myButton)] [Splice(Resource.Id.myButton)] [View] private Button _myButton;
+        //[BindView(Resource.Id.myEditText1)] [Splice(Resource.Id.myEditText1)] [View] private EditText myEditText1;
+        //[BindView(Resource.Id.myEditText2)] [Splice(Resource.Id.myEditText2)] [View] private EditText myEditText2;
+        //[BindView(Resource.Id.myEditText3)] [Splice(Resource.Id.myEditText3)] [View] private EditText myEditText3;
+        //[BindView(Resource.Id.myEditText4)] [Splice(Resource.Id.myEditText4)] [View] private EditText myEditText4;
+        //[BindView(Resource.Id.myEditText5)] [Splice(Resource.Id.myEditText5)] [View] private EditText myEditText5;
+        //[BindView(Resource.Id.myEditText6)] [Splice(Resource.Id.myEditText6)] [View] private EditText myEditText6;
+        //[BindView(Resource.Id.myEditText7)] [Splice(Resource.Id.myEditText7)] [View] private EditText myEditText7;
+        //[BindView(Resource.Id.myEditText8)] [Splice(Resource.Id.myEditText8)] [View] private EditText myEditText8;
+        //[BindView(Resource.Id.myEditText9)] [Splice(Resource.Id.myEditText9)] [View] private EditText myEditText9;
+        //[BindView(Resource.Id.myEditText10)][Splice(Resource.Id.myEditText10)] [View] private EditText myEditText10;
+        //[BindView(Resource.Id.myEditText11)] [Splice(Resource.Id.myEditText11)] [View] private EditText myEditText11;
 #pragma warning restore 649
 
         protected override void OnCreate(Bundle savedInstanceState)
@@ -59,21 +59,21 @@ namespace Polkovnik.DroidInjector.FodySample
             action();
         }
 
-        private void DirectInjection()
-        {
-            _myButton = FindViewById<Button>(Resource.Id.myButton);
-            myEditText1 = FindViewById<EditText>(Resource.Id.myEditText1);
-            myEditText2 = FindViewById<EditText>(Resource.Id.myEditText2);
-            myEditText3 = FindViewById<EditText>(Resource.Id.myEditText3);
-            myEditText4 = FindViewById<EditText>(Resource.Id.myEditText4);
-            myEditText5 = FindViewById<EditText>(Resource.Id.myEditText5);
-            myEditText6 = FindViewById<EditText>(Resource.Id.myEditText6);
-            myEditText7 = FindViewById<EditText>(Resource.Id.myEditText7);
-            myEditText8 = FindViewById<EditText>(Resource.Id.myEditText8);
-            myEditText9 = FindViewById<EditText>(Resource.Id.myEditText9);
-            myEditText10 = FindViewById<EditText>(Resource.Id.myEditText10);
-            myEditText11 = FindViewById<EditText>(Resource.Id.myEditText11);
-        }
+        //private void DirectInjection()
+        //{
+        //    _myButton = FindViewById<Button>(Resource.Id.myButton);
+        //    myEditText1 = FindViewById<EditText>(Resource.Id.myEditText1);
+        //    myEditText2 = FindViewById<EditText>(Resource.Id.myEditText2);
+        //    myEditText3 = FindViewById<EditText>(Resource.Id.myEditText3);
+        //    myEditText4 = FindViewById<EditText>(Resource.Id.myEditText4);
+        //    myEditText5 = FindViewById<EditText>(Resource.Id.myEditText5);
+        //    myEditText6 = FindViewById<EditText>(Resource.Id.myEditText6);
+        //    myEditText7 = FindViewById<EditText>(Resource.Id.myEditText7);
+        //    myEditText8 = FindViewById<EditText>(Resource.Id.myEditText8);
+        //    myEditText9 = FindViewById<EditText>(Resource.Id.myEditText9);
+        //    myEditText10 = FindViewById<EditText>(Resource.Id.myEditText10);
+        //    myEditText11 = FindViewById<EditText>(Resource.Id.myEditText11);
+        //}
     }
 }
 
