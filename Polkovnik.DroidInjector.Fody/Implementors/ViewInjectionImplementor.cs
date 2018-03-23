@@ -9,15 +9,15 @@ namespace Polkovnik.DroidInjector.Fody.Implementors
 {
     internal class ViewInjectionImplementor
     {
-        private readonly ReferencesAndDefinitionsProvider _referencesAndDefinitionsProvider;
+        private readonly ReferencesProvider _referencesProvider;
         private readonly ModuleDefinition _moduleDefinition;
         private readonly IMemberDefinition[] _memberDefinitions;
         private readonly TypeDefinition _typeDefinition;
 
         public ViewInjectionImplementor(TypeDefinition typeDefinition, IMemberDefinition[] memberDefinitions, ModuleDefinition moduleDefinition, 
-            ReferencesAndDefinitionsProvider referencesAndDefinitionsProvider)
+            ReferencesProvider referencesProvider)
         {
-            _referencesAndDefinitionsProvider = referencesAndDefinitionsProvider ?? throw new ArgumentNullException(nameof(referencesAndDefinitionsProvider));
+            _referencesProvider = referencesProvider ?? throw new ArgumentNullException(nameof(referencesProvider));
             _moduleDefinition = moduleDefinition ?? throw new ArgumentNullException(nameof(moduleDefinition));
             _memberDefinitions = memberDefinitions ?? throw new ArgumentNullException(nameof(memberDefinitions));
             _typeDefinition = typeDefinition ?? throw new ArgumentNullException(nameof(typeDefinition));
@@ -28,7 +28,7 @@ namespace Polkovnik.DroidInjector.Fody.Implementors
             Logger.LogExecute(this);
 
             var methodDefinition = new MethodDefinition(Consts.GeneratedMethodNames.InjectViewsGeneratedMethodName, MethodAttributes.Private | MethodAttributes.HideBySig, _moduleDefinition.TypeSystem.Void);
-            methodDefinition.Parameters.Add(new ParameterDefinition("view", ParameterAttributes.None, _referencesAndDefinitionsProvider.AndroidViewTypeReference));
+            methodDefinition.Parameters.Add(new ParameterDefinition("view", ParameterAttributes.None, _referencesProvider.AndroidViewTypeReference));
             
             _typeDefinition.Methods.Add(methodDefinition);
 
@@ -42,11 +42,11 @@ namespace Polkovnik.DroidInjector.Fody.Implementors
                 var resourceId = attributeHolder.ResourceId;
                 if (resourceId == 0)
                 {
-                    resourceId = Utils.GetResourceIdByName(memberDefinition.Name, memberDefinition.FullName, _referencesAndDefinitionsProvider.ResourceIdClassType);
+                    resourceId = Utils.GetResourceIdByName(memberDefinition.Name, memberDefinition.FullName, _referencesProvider.ResourceIdClassType);
                 }
                 
                 var getResourceIdOperation = memberDefinition.IsInAndroidClassLibrary()
-                    ? Instruction.Create(OpCodes.Ldsfld, Utils.GetResourceIdField(attributeHolder.ResourceIdName ?? memberDefinition.Name, _referencesAndDefinitionsProvider.ResourceIdClassType))
+                    ? Instruction.Create(OpCodes.Ldsfld, Utils.GetResourceIdField(attributeHolder.ResourceIdName ?? memberDefinition.Name, _referencesProvider.ResourceIdClassType))
                     : Instruction.Create(OpCodes.Ldc_I4, resourceId);
 
                 switch (memberDefinition)
@@ -77,7 +77,7 @@ namespace Polkovnik.DroidInjector.Fody.Implementors
             ilProcessor.Emit(OpCodes.Ldarg_0);
             ilProcessor.Emit(OpCodes.Ldarg_1);
             ilProcessor.Append(getResourceIdInstruction);
-            ilProcessor.Emit(OpCodes.Callvirt, _referencesAndDefinitionsProvider.FindViewByIdMethodReference);
+            ilProcessor.Emit(OpCodes.Callvirt, _referencesProvider.FindViewByIdMethodReference);
             ilProcessor.Emit(OpCodes.Castclass, propertyReference.PropertyType);
 
             var callInstruction = Instruction.Create(OpCodes.Call, setterMethodDefinition);
@@ -88,7 +88,7 @@ namespace Polkovnik.DroidInjector.Fody.Implementors
                 ilProcessor.Emit(OpCodes.Brtrue_S, callInstruction);
                 ilProcessor.Emit(OpCodes.Pop);
                 ilProcessor.Emit(OpCodes.Ldstr, $"Can't find view for {propertyReference.FullName}");
-                ilProcessor.Emit(OpCodes.Newobj, _referencesAndDefinitionsProvider.InjectorExceptionCtor);
+                ilProcessor.Emit(OpCodes.Newobj, _referencesProvider.InjectorExceptionCtor);
                 ilProcessor.Emit(OpCodes.Throw);
             }
 
@@ -102,7 +102,7 @@ namespace Polkovnik.DroidInjector.Fody.Implementors
             ilProcessor.Emit(OpCodes.Ldarg_0);
             ilProcessor.Emit(OpCodes.Ldarg_1);
             ilProcessor.Append(getResourceIdInstruction);
-            ilProcessor.Emit(OpCodes.Callvirt, _referencesAndDefinitionsProvider.FindViewByIdMethodReference);
+            ilProcessor.Emit(OpCodes.Callvirt, _referencesProvider.FindViewByIdMethodReference);
             ilProcessor.Emit(OpCodes.Castclass, targetTypeReference);
 
             var stfldInstruction = Instruction.Create(OpCodes.Stfld, fieldReference);
@@ -113,7 +113,7 @@ namespace Polkovnik.DroidInjector.Fody.Implementors
                 ilProcessor.Emit(OpCodes.Brtrue_S, stfldInstruction);
                 ilProcessor.Emit(OpCodes.Pop);
                 ilProcessor.Emit(OpCodes.Ldstr, $"Can't find view for {fieldReference.FullName}");
-                ilProcessor.Emit(OpCodes.Newobj, _referencesAndDefinitionsProvider.InjectorExceptionCtor);
+                ilProcessor.Emit(OpCodes.Newobj, _referencesProvider.InjectorExceptionCtor);
                 ilProcessor.Emit(OpCodes.Throw);
             }
 
@@ -122,7 +122,7 @@ namespace Polkovnik.DroidInjector.Fody.Implementors
         
         public override string ToString()
         {
-            return $"{nameof(_referencesAndDefinitionsProvider)}: {_referencesAndDefinitionsProvider}, {nameof(_moduleDefinition)}: {_moduleDefinition}, {nameof(_memberDefinitions)}: {_memberDefinitions}, {nameof(_typeDefinition)}: {_typeDefinition}";
+            return $"{nameof(_referencesProvider)}: {_referencesProvider}, {nameof(_moduleDefinition)}: {_moduleDefinition}, {nameof(_memberDefinitions)}: {_memberDefinitions}, {nameof(_typeDefinition)}: {_typeDefinition}";
         }
     }
 }

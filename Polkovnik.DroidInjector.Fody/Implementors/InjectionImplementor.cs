@@ -7,15 +7,15 @@ using Polkovnik.DroidInjector.Fody.Loggers;
 
 namespace Polkovnik.DroidInjector.Fody.Implementors
 {
-    internal class MenuItemInjectionImplementor
+    internal abstract class InjectionImplementor
     {
         private readonly ReferencesProvider _referencesProvider;
         private readonly ModuleDefinition _moduleDefinition;
-        private readonly TypeDefinition _typeDefinition;
         private readonly IMemberDefinition[] _memberDefinitions;
+        private readonly TypeDefinition _typeDefinition;
 
-        public MenuItemInjectionImplementor(TypeDefinition typeDefinition, IMemberDefinition[] memberDefinitions, ModuleDefinition moduleDefinition,
-            ReferencesProvider referencesProvider)
+        protected InjectionImplementor(TypeDefinition typeDefinition, IMemberDefinition[] memberDefinitions,
+            ModuleDefinition moduleDefinition, ReferencesProvider referencesProvider)
         {
             _referencesProvider = referencesProvider ?? throw new ArgumentNullException(nameof(referencesProvider));
             _moduleDefinition = moduleDefinition ?? throw new ArgumentNullException(nameof(moduleDefinition));
@@ -23,12 +23,18 @@ namespace Polkovnik.DroidInjector.Fody.Implementors
             _typeDefinition = typeDefinition ?? throw new ArgumentNullException(nameof(typeDefinition));
         }
 
+        protected abstract string GeneratedMethodName { get; }
+        protected abstract TypeReference GeneratedMethodParameterTypeReference { get; }
+        protected abstract InjectAttributeHolder GetInjectHolder(CustomAttribute customAttribute);
+        protected abstract MethodReference FindMethodReference { get; }
+        protected abstract bool CastToTargetType { get; }
+
         public void Execute()
         {
             Logger.LogExecute(this);
 
-            var methodDefinition = new MethodDefinition(Consts.GeneratedMethodNames.InjectMenuItemsGeneratedMethodName, MethodAttributes.Private | MethodAttributes.HideBySig, _moduleDefinition.TypeSystem.Void);
-            methodDefinition.Parameters.Add(new ParameterDefinition("menu", ParameterAttributes.None, _referencesProvider.AndroidMenuTypeReference));
+            var methodDefinition = new MethodDefinition(GeneratedMethodName,MethodAttributes.Private | MethodAttributes.HideBySig, _moduleDefinition.TypeSystem.Void);
+            methodDefinition.Parameters.Add(new ParameterDefinition("p0", ParameterAttributes.None, GeneratedMethodParameterTypeReference));
 
             _typeDefinition.Methods.Add(methodDefinition);
 
@@ -38,7 +44,7 @@ namespace Polkovnik.DroidInjector.Fody.Implementors
             foreach (var memberDefinition in _memberDefinitions)
             {
                 var attribute = memberDefinition.CustomAttributes.First(x => x.AttributeType.FullName == Consts.InjectorAttributes.MenuItemAttributeTypeName);
-                var attributeHolder = new MenuItemAttributeHolder(attribute);
+                var attributeHolder = GetInjectHolder(attribute);
 
                 var resourceId = attributeHolder.ResourceId;
                 if (resourceId == 0)
@@ -54,7 +60,7 @@ namespace Polkovnik.DroidInjector.Fody.Implementors
                 {
                     case FieldReference fieldReference:
                         fieldReference = fieldReference.GetThisFieldReference();
-                        AddInstructionsForField(ilProcessor, getResourceIdOperation, fieldReference, !attributeHolder.AllowMissing);
+                        AddInstructionsForField(ilProcessor, getResourceIdOperation, fieldReference.FieldType, fieldReference, !attributeHolder.AllowMissing);
                         break;
                     case PropertyDefinition propertyDefinition:
                         var propertyHasSetter = propertyDefinition.SetMethod != null;
@@ -64,7 +70,7 @@ namespace Polkovnik.DroidInjector.Fody.Implementors
                             propertySetterImplementor.Execute();
                         }
                         var propertySetMethodReference = propertyDefinition.SetMethod;
-                        AddForProperty(ilProcessor, getResourceIdOperation, propertyDefinition, propertySetMethodReference, !attributeHolder.AllowMissing);
+                        AddInstructionsForProperty(ilProcessor, getResourceIdOperation, propertyDefinition, propertySetMethodReference, !attributeHolder.AllowMissing);
                         break;
                 }
             }
@@ -72,13 +78,18 @@ namespace Polkovnik.DroidInjector.Fody.Implementors
             ilProcessor.Emit(OpCodes.Ret);
         }
 
-        private void AddForProperty(ILProcessor ilProcessor, Instruction getResourceIdInstruction, PropertyReference propertyReference,
-            MethodReference setterMethodDefinition, bool shouldThrowIfNull)
+        private void AddInstructionsForProperty(ILProcessor ilProcessor, Instruction getResourceIdInstruction, PropertyReference propertyReference,
+                MethodReference setterMethodDefinition, bool shouldThrowIfNull)
         {
             ilProcessor.Emit(OpCodes.Ldarg_0);
             ilProcessor.Emit(OpCodes.Ldarg_1);
             ilProcessor.Append(getResourceIdInstruction);
-            ilProcessor.Emit(OpCodes.Callvirt, _referencesProvider.FindItemMethodReference);
+            ilProcessor.Emit(OpCodes.Callvirt, FindMethodReference);
+
+            if (CastToTargetType)
+            {
+                ilProcessor.Emit(OpCodes.Castclass, propertyReference.PropertyType);
+            }
 
             var callInstruction = Instruction.Create(OpCodes.Call, setterMethodDefinition);
 
@@ -96,13 +107,19 @@ namespace Polkovnik.DroidInjector.Fody.Implementors
             ilProcessor.Emit(OpCodes.Nop);
         }
 
-        private void AddInstructionsForField(ILProcessor ilProcessor, Instruction getResourceIdInstruction, FieldReference fieldReference, bool shouldThrowIfNull)
+        private void AddInstructionsForField(ILProcessor ilProcessor, Instruction getResourceIdInstruction,TypeReference targetTypeReference, 
+            FieldReference fieldReference, bool shouldThrowIfNull)
         {
             ilProcessor.Emit(OpCodes.Ldarg_0);
             ilProcessor.Emit(OpCodes.Ldarg_1);
             ilProcessor.Append(getResourceIdInstruction);
-            ilProcessor.Emit(OpCodes.Callvirt, _referencesProvider.FindItemMethodReference);
+            ilProcessor.Emit(OpCodes.Callvirt, FindMethodReference);
 
+            if (CastToTargetType)
+            {
+                ilProcessor.Emit(OpCodes.Castclass, targetTypeReference);
+            }
+            
             var stfldInstruction = Instruction.Create(OpCodes.Stfld, fieldReference);
 
             if (shouldThrowIfNull)
@@ -116,11 +133,6 @@ namespace Polkovnik.DroidInjector.Fody.Implementors
             }
 
             ilProcessor.Append(stfldInstruction);
-        }
-
-        public override string ToString()
-        {
-            return $"{nameof(_referencesProvider)}: {_referencesProvider}, {nameof(_moduleDefinition)}: {_moduleDefinition}, {nameof(_typeDefinition)}: {_typeDefinition}, {nameof(_memberDefinitions)}: {_memberDefinitions}";
         }
     }
 }

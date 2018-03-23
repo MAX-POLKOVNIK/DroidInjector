@@ -10,15 +10,15 @@ namespace Polkovnik.DroidInjector.Fody.Implementors
 {
     internal class MethodSubscriptionImplementor
     {
-        private readonly ReferencesAndDefinitionsProvider _referencesAndDefinitionsProvider;
+        private readonly ReferencesProvider _referencesProvider;
         private readonly ModuleDefinition _moduleDefinition;
         private readonly MethodDefinition[] _methodsToSubscribe;
         private readonly TypeDefinition _typeDefinition;
         
         public MethodSubscriptionImplementor(TypeDefinition typeDefinition, MethodDefinition[] methodsToSubscribe, ModuleDefinition moduleDefinition,
-            ReferencesAndDefinitionsProvider referencesAndDefinitionsProvider)
+            ReferencesProvider referencesProvider)
         {
-            _referencesAndDefinitionsProvider = referencesAndDefinitionsProvider ?? throw new ArgumentNullException(nameof(referencesAndDefinitionsProvider));
+            _referencesProvider = referencesProvider ?? throw new ArgumentNullException(nameof(referencesProvider));
             _moduleDefinition = moduleDefinition ?? throw new ArgumentNullException(nameof(moduleDefinition));
             _methodsToSubscribe = methodsToSubscribe ?? throw new ArgumentNullException(nameof(methodsToSubscribe));
             _typeDefinition = typeDefinition ?? throw new ArgumentNullException(nameof(typeDefinition));
@@ -35,9 +35,9 @@ namespace Polkovnik.DroidInjector.Fody.Implementors
             }
 
             var subscriptionsInitMethod = new MethodDefinition(Consts.GeneratedMethodNames.BindViewEventsGeneratedMethodName, MethodAttributes.Private | MethodAttributes.HideBySig, _moduleDefinition.TypeSystem.Void);
-            subscriptionsInitMethod.Parameters.Add(new ParameterDefinition("view", ParameterAttributes.None, _referencesAndDefinitionsProvider.AndroidViewTypeReference));
+            subscriptionsInitMethod.Parameters.Add(new ParameterDefinition("view", ParameterAttributes.None, _referencesProvider.AndroidViewTypeReference));
             
-            subscriptionsInitMethod.Body.Variables.Add(new VariableDefinition(_referencesAndDefinitionsProvider.AndroidViewTypeReference));
+            subscriptionsInitMethod.Body.Variables.Add(new VariableDefinition(_referencesProvider.AndroidViewTypeReference));
             subscriptionsInitMethod.Body.Variables.Add(new VariableDefinition(_moduleDefinition.TypeSystem.Boolean));
 
             Logger.Debug($"Add subscription init method {subscriptionsInitMethod} into {_typeDefinition}");
@@ -81,7 +81,7 @@ namespace Polkovnik.DroidInjector.Fody.Implementors
                     shouldThrowExceptionIfNull = shouldThrowExceptionIfNull || !(bool)attributeArguments[argsLength == 4 ? 3 : 2].Value;
 
                     var eventName = (string)attributeArguments[argsLength == 4 ? 2 : 1].Value;
-                    var viewType = argsLength == 4 ? (TypeReference)attributeArguments[1].Value : _referencesAndDefinitionsProvider.AndroidViewTypeReference;
+                    var viewType = argsLength == 4 ? (TypeReference)attributeArguments[1].Value : _referencesProvider.AndroidViewTypeReference;
 
                     var baseType = viewType;
                     EventDefinition eventDefinition = null;
@@ -162,7 +162,7 @@ namespace Polkovnik.DroidInjector.Fody.Implementors
             if (shouldThrowExceptionIfNull)
             {
                 InsertBefore(ref li, Instruction.Create(OpCodes.Throw));
-                InsertBefore(ref li, Instruction.Create(OpCodes.Newobj, _referencesAndDefinitionsProvider.InjectorExceptionCtor));
+                InsertBefore(ref li, Instruction.Create(OpCodes.Newobj, _referencesProvider.InjectorExceptionCtor));
                 InsertBefore(ref li, Instruction.Create(OpCodes.Ldstr, $"Can't find view with ID {resourceId}"));
             }
             else
@@ -180,7 +180,7 @@ namespace Polkovnik.DroidInjector.Fody.Implementors
             InsertBefore(ref li, Instruction.Create(OpCodes.Ldloc_0));
 
             InsertBefore(ref li, Instruction.Create(OpCodes.Stloc_0));
-            InsertBefore(ref li, Instruction.Create(OpCodes.Callvirt, _referencesAndDefinitionsProvider.FindViewByIdMethodReference));
+            InsertBefore(ref li, Instruction.Create(OpCodes.Callvirt, _referencesProvider.FindViewByIdMethodReference));
             InsertBefore(ref li, Instruction.Create(OpCodes.Ldc_I4, resourceId));
             InsertBefore(ref li, Instruction.Create(OpCodes.Ldarg_1));
             InsertBefore(ref li, Instruction.Create(OpCodes.Nop));
@@ -196,7 +196,7 @@ namespace Polkovnik.DroidInjector.Fody.Implementors
 
         public override string ToString()
         {
-            return $"{nameof(_referencesAndDefinitionsProvider)}: {_referencesAndDefinitionsProvider}, {nameof(_moduleDefinition)}: {_moduleDefinition}, {nameof(_methodsToSubscribe)}: {_methodsToSubscribe}, {nameof(_typeDefinition)}: {_typeDefinition}";
+            return $"{nameof(_referencesProvider)}: {_referencesProvider}, {nameof(_moduleDefinition)}: {_moduleDefinition}, {nameof(_methodsToSubscribe)}: {_methodsToSubscribe}, {nameof(_typeDefinition)}: {_typeDefinition}";
         }
     }
 }

@@ -58,6 +58,7 @@
     <Compile Include="AttributesHolders\ViewAttributeHolder.cs" />
     <Compile Include="Consts.cs" />
     <Compile Include="FodyInjector.cs" />
+    <Compile Include="Implementors\InjectionImplementor.cs" />
     <Compile Include="WeavingException.cs" />
     <Compile Include="Harvesters\Harvester.cs" />
     <Compile Include="Harvesters\MenuItemHarvester.cs" />
@@ -72,7 +73,7 @@
     <Compile Include="ModuleWeaver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Implementors\PropertySetterImplementor.cs" />
-    <Compile Include="ReferencesAndDefinitionsProvider.cs" />
+    <Compile Include="ReferencesProvider.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="Implementors\ViewInjectionImplementor.cs" />
   </ItemGroup>
