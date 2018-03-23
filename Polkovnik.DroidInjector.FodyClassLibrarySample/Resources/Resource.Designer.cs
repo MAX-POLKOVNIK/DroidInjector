@@ -44,7 +44,7 @@ namespace Polkovnik.DroidInjector.FodyClassLibrarySample
 			public static int contentLayout = 2130903041;
 			
 			// aapt resource value: 0x7f030000
-			public static int myButtonC = 2130903040;
+			public static int myButton = 2130903040;
 			
 			static Id()
 			{

@@ -9,7 +9,7 @@ namespace Polkovnik.DroidInjector.FodyClassLibrarySample
     [Activity(Label = "TestActivity")]
     public class TestActivity : Activity
     {
-        [View] private View _myButtonC { get; }
+        [View] private Button _myButton { get; }
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -20,7 +20,7 @@ namespace Polkovnik.DroidInjector.FodyClassLibrarySample
             Injector.InjectViews();
             //DirectInject(null);
 
-            _myButtonC.SetBackgroundColor(Color.AliceBlue);
+            _myButton.SetBackgroundColor(Color.AliceBlue);
         }
 
         private void DirectInject(View view)

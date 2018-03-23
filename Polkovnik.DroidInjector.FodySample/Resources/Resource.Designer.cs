@@ -27,7 +27,7 @@ namespace Polkovnik.DroidInjector.FodySample
 		public static void UpdateIdValues()
 		{
 			global::Polkovnik.DroidInjector.FodyClassLibrarySample.Resource.Id.contentLayout = global::Polkovnik.DroidInjector.FodySample.Resource.Id.contentLayout;
-			global::Polkovnik.DroidInjector.FodyClassLibrarySample.Resource.Id.myButtonC = global::Polkovnik.DroidInjector.FodySample.Resource.Id.myButtonC;
+			global::Polkovnik.DroidInjector.FodyClassLibrarySample.Resource.Id.myButton = global::Polkovnik.DroidInjector.FodySample.Resource.Id.myButton;
 			global::Polkovnik.DroidInjector.FodyClassLibrarySample.Resource.Layout.screen_test = global::Polkovnik.DroidInjector.FodySample.Resource.Layout.screen_test;
 		}
 		
@@ -282,20 +282,20 @@ namespace Polkovnik.DroidInjector.FodySample
 		public partial class Id
 		{
 			
+			// aapt resource value: 0x7f060020
+			public const int action_0 = 2131099680;
+			
 			// aapt resource value: 0x7f060021
-			public const int action_0 = 2131099681;
+			public const int action_1 = 2131099681;
 			
 			// aapt resource value: 0x7f060022
-			public const int action_1 = 2131099682;
+			public const int action_2 = 2131099682;
 			
 			// aapt resource value: 0x7f060023
-			public const int action_2 = 2131099683;
+			public const int action_3 = 2131099683;
 			
 			// aapt resource value: 0x7f060024
-			public const int action_3 = 2131099684;
-			
-			// aapt resource value: 0x7f060025
-			public const int action_4 = 2131099685;
+			public const int action_4 = 2131099684;
 			
 			// aapt resource value: 0x7f060011
 			public const int action_container = 2131099665;
@@ -353,9 +353,6 @@ namespace Polkovnik.DroidInjector.FodySample
 			
 			// aapt resource value: 0x7f06000e
 			public const int myButton = 2131099662;
-			
-			// aapt resource value: 0x7f060020
-			public const int myButtonC = 2131099680;
 			
 			// aapt resource value: 0x7f06000a
 			public const int normal = 2131099658;
