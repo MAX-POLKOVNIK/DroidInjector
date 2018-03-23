@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Polkovnik.DroidInjector
 {
@@ -7,6 +8,7 @@ namespace Polkovnik.DroidInjector
     /// View will be resolved at runtime.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
+    [SuppressMessage("ReSharper", "UnusedParameter.Local")]
     public sealed class ViewAttribute : Attribute
     {
         /// <summary>
