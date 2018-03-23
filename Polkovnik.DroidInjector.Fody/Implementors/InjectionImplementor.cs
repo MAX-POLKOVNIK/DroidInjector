@@ -25,6 +25,7 @@ namespace Polkovnik.DroidInjector.Fody.Implementors
 
         protected abstract string GeneratedMethodName { get; }
         protected abstract TypeReference GeneratedMethodParameterTypeReference { get; }
+        protected abstract string AttributeTypeName { get; }
         protected abstract InjectAttributeHolder GetInjectHolder(CustomAttribute customAttribute);
         protected abstract MethodReference FindMethodReference { get; }
         protected abstract bool CastToTargetType { get; }
@@ -43,7 +44,7 @@ namespace Polkovnik.DroidInjector.Fody.Implementors
 
             foreach (var memberDefinition in _memberDefinitions)
             {
-                var attribute = memberDefinition.CustomAttributes.First(x => x.AttributeType.FullName == Consts.InjectorAttributes.MenuItemAttributeTypeName);
+                var attribute = memberDefinition.CustomAttributes.First(x => x.AttributeType.FullName == AttributeTypeName);
                 var attributeHolder = GetInjectHolder(attribute);
 
                 var resourceId = attributeHolder.ResourceId;
@@ -81,34 +82,19 @@ namespace Polkovnik.DroidInjector.Fody.Implementors
         private void AddInstructionsForProperty(ILProcessor ilProcessor, Instruction getResourceIdInstruction, PropertyReference propertyReference,
                 MethodReference setterMethodDefinition, bool shouldThrowIfNull)
         {
-            ilProcessor.Emit(OpCodes.Ldarg_0);
-            ilProcessor.Emit(OpCodes.Ldarg_1);
-            ilProcessor.Append(getResourceIdInstruction);
-            ilProcessor.Emit(OpCodes.Callvirt, FindMethodReference);
-
-            if (CastToTargetType)
-            {
-                ilProcessor.Emit(OpCodes.Castclass, propertyReference.PropertyType);
-            }
-
-            var callInstruction = Instruction.Create(OpCodes.Call, setterMethodDefinition);
-
-            if (shouldThrowIfNull)
-            {
-                ilProcessor.Emit(OpCodes.Dup);
-                ilProcessor.Emit(OpCodes.Brtrue_S, callInstruction);
-                ilProcessor.Emit(OpCodes.Pop);
-                ilProcessor.Emit(OpCodes.Ldstr, $"Can't find view for {propertyReference.FullName}");
-                ilProcessor.Emit(OpCodes.Newobj, _referencesProvider.InjectorExceptionCtor);
-                ilProcessor.Emit(OpCodes.Throw);
-            }
-
-            ilProcessor.Append(callInstruction);
-            ilProcessor.Emit(OpCodes.Nop);
+            AddInstructions(ilProcessor, getResourceIdInstruction, propertyReference.PropertyType, Instruction.Create(OpCodes.Call, setterMethodDefinition),
+                shouldThrowIfNull, $"Can't find view for {propertyReference.FullName}", true);
         }
 
-        private void AddInstructionsForField(ILProcessor ilProcessor, Instruction getResourceIdInstruction,TypeReference targetTypeReference, 
+        private void AddInstructionsForField(ILProcessor ilProcessor, Instruction getResourceIdInstruction, TypeReference targetTypeReference, 
             FieldReference fieldReference, bool shouldThrowIfNull)
+        {
+            AddInstructions(ilProcessor, getResourceIdInstruction, targetTypeReference, Instruction.Create(OpCodes.Stfld, fieldReference),
+                shouldThrowIfNull, $"Can't find view for {fieldReference.FullName}", false);
+        }
+
+        private void AddInstructions(ILProcessor ilProcessor, Instruction getResourceIdInstruction, TypeReference castTypeReference, Instruction storeObjectInstruction,
+            bool shouldThrowIfNull, string exceptionMessage, bool addNopToEnd)
         {
             ilProcessor.Emit(OpCodes.Ldarg_0);
             ilProcessor.Emit(OpCodes.Ldarg_1);
@@ -117,22 +103,30 @@ namespace Polkovnik.DroidInjector.Fody.Implementors
 
             if (CastToTargetType)
             {
-                ilProcessor.Emit(OpCodes.Castclass, targetTypeReference);
+                ilProcessor.Emit(OpCodes.Castclass, castTypeReference);
             }
-            
-            var stfldInstruction = Instruction.Create(OpCodes.Stfld, fieldReference);
 
             if (shouldThrowIfNull)
             {
                 ilProcessor.Emit(OpCodes.Dup);
-                ilProcessor.Emit(OpCodes.Brtrue_S, stfldInstruction);
+                ilProcessor.Emit(OpCodes.Brtrue_S, storeObjectInstruction);
                 ilProcessor.Emit(OpCodes.Pop);
-                ilProcessor.Emit(OpCodes.Ldstr, $"Can't find view for {fieldReference.FullName}");
+                ilProcessor.Emit(OpCodes.Ldstr, exceptionMessage);
                 ilProcessor.Emit(OpCodes.Newobj, _referencesProvider.InjectorExceptionCtor);
                 ilProcessor.Emit(OpCodes.Throw);
             }
 
-            ilProcessor.Append(stfldInstruction);
+            ilProcessor.Append(storeObjectInstruction);
+
+            if (addNopToEnd)
+            {
+                ilProcessor.Emit(OpCodes.Nop);
+            }
+        }
+
+        public override string ToString()
+        {
+            return $"{nameof(_referencesProvider)}: {_referencesProvider}, {nameof(_moduleDefinition)}: {_moduleDefinition}, {nameof(_memberDefinitions)}: {_memberDefinitions}, {nameof(_typeDefinition)}: {_typeDefinition}";
         }
     }
 }

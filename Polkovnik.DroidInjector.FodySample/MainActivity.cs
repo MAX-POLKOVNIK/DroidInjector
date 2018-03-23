@@ -53,6 +53,7 @@ namespace Polkovnik.DroidInjector.FodySample
             Console.WriteLine($"TOTAL: {stopwatch.ElapsedMilliseconds} ms");
 
             //_myButton.Text = $"TOTAL: {stopwatch.ElapsedMilliseconds} ms";
+            
             _myButton.Click += (sender, args) => StartActivity(typeof(TestActivity));
             FragmentManager.BeginTransaction().Replace(Resource.Id.contentLayout, MySalesFragment.NewInstance())
                 .Commit();
@@ -62,6 +63,8 @@ namespace Polkovnik.DroidInjector.FodySample
         {
             MenuInflater.Inflate(Resource.Menu.main, menu);
             Injector.InjectMenuItems(menu);
+
+            item.SetTitle("INJECTD");
             return true;
         }
 
@@ -70,11 +73,11 @@ namespace Polkovnik.DroidInjector.FodySample
             action();
         }
 
-        //[ViewEvent(Resource.Id.myButton, typeof(View), nameof(View.Click))]
-        //private void ButtonClick(object sender, EventArgs eventArgs)
-        //{
-        //    Toast.MakeText(this, "Clicked", ToastLength.Short).Show();
-        //}
+        [ViewEvent(Resource.Id.myButton, typeof(View), nameof(View.Click))]
+        private void ButtonClick(object sender, EventArgs eventArgs)
+        {
+            Toast.MakeText(this, "Clicked", ToastLength.Short).Show();
+        }
 
         //private void DirectInjection()
         //{

@@ -1,126 +1,24 @@
 ﻿using System;
-using System.Linq;
 using Mono.Cecil;
-using Mono.Cecil.Cil;
 using Polkovnik.DroidInjector.Fody.AttributesHolders;
-using Polkovnik.DroidInjector.Fody.Loggers;
 
 namespace Polkovnik.DroidInjector.Fody.Implementors
 {
-    internal class MenuItemInjectionImplementor
+    internal class MenuItemInjectionImplementor : InjectionImplementor
     {
         private readonly ReferencesProvider _referencesProvider;
-        private readonly ModuleDefinition _moduleDefinition;
-        private readonly TypeDefinition _typeDefinition;
-        private readonly IMemberDefinition[] _memberDefinitions;
 
         public MenuItemInjectionImplementor(TypeDefinition typeDefinition, IMemberDefinition[] memberDefinitions, ModuleDefinition moduleDefinition,
-            ReferencesProvider referencesProvider)
+            ReferencesProvider referencesProvider) : base(typeDefinition, memberDefinitions, moduleDefinition, referencesProvider)
         {
             _referencesProvider = referencesProvider ?? throw new ArgumentNullException(nameof(referencesProvider));
-            _moduleDefinition = moduleDefinition ?? throw new ArgumentNullException(nameof(moduleDefinition));
-            _memberDefinitions = memberDefinitions ?? throw new ArgumentNullException(nameof(memberDefinitions));
-            _typeDefinition = typeDefinition ?? throw new ArgumentNullException(nameof(typeDefinition));
         }
 
-        public void Execute()
-        {
-            Logger.LogExecute(this);
-
-            var methodDefinition = new MethodDefinition(Consts.GeneratedMethodNames.InjectMenuItemsGeneratedMethodName, MethodAttributes.Private | MethodAttributes.HideBySig, _moduleDefinition.TypeSystem.Void);
-            methodDefinition.Parameters.Add(new ParameterDefinition("menu", ParameterAttributes.None, _referencesProvider.AndroidMenuTypeReference));
-
-            _typeDefinition.Methods.Add(methodDefinition);
-
-            var ilProcessor = methodDefinition.Body.GetILProcessor();
-            ilProcessor.Emit(OpCodes.Nop);
-
-            foreach (var memberDefinition in _memberDefinitions)
-            {
-                var attribute = memberDefinition.CustomAttributes.First(x => x.AttributeType.FullName == Consts.InjectorAttributes.MenuItemAttributeTypeName);
-                var attributeHolder = new MenuItemAttributeHolder(attribute);
-
-                var resourceId = attributeHolder.ResourceId;
-                if (resourceId == 0)
-                {
-                    resourceId = Utils.GetResourceIdByName(memberDefinition.Name, memberDefinition.FullName, _referencesProvider.ResourceIdClassType);
-                }
-
-                var getResourceIdOperation = memberDefinition.IsInAndroidClassLibrary()
-                    ? Instruction.Create(OpCodes.Ldsfld, Utils.GetResourceIdField(attributeHolder.ResourceIdName ?? memberDefinition.Name, _referencesProvider.ResourceIdClassType))
-                    : Instruction.Create(OpCodes.Ldc_I4, resourceId);
-
-                switch (memberDefinition)
-                {
-                    case FieldReference fieldReference:
-                        fieldReference = fieldReference.GetThisFieldReference();
-                        AddInstructionsForField(ilProcessor, getResourceIdOperation, fieldReference, !attributeHolder.AllowMissing);
-                        break;
-                    case PropertyDefinition propertyDefinition:
-                        var propertyHasSetter = propertyDefinition.SetMethod != null;
-                        if (!propertyHasSetter)
-                        {
-                            var propertySetterImplementor = new PropertySetterImplementor(propertyDefinition, _moduleDefinition);
-                            propertySetterImplementor.Execute();
-                        }
-                        var propertySetMethodReference = propertyDefinition.SetMethod;
-                        AddForProperty(ilProcessor, getResourceIdOperation, propertyDefinition, propertySetMethodReference, !attributeHolder.AllowMissing);
-                        break;
-                }
-            }
-
-            ilProcessor.Emit(OpCodes.Ret);
-        }
-
-        private void AddForProperty(ILProcessor ilProcessor, Instruction getResourceIdInstruction, PropertyReference propertyReference,
-            MethodReference setterMethodDefinition, bool shouldThrowIfNull)
-        {
-            ilProcessor.Emit(OpCodes.Ldarg_0);
-            ilProcessor.Emit(OpCodes.Ldarg_1);
-            ilProcessor.Append(getResourceIdInstruction);
-            ilProcessor.Emit(OpCodes.Callvirt, _referencesProvider.FindItemMethodReference);
-
-            var callInstruction = Instruction.Create(OpCodes.Call, setterMethodDefinition);
-
-            if (shouldThrowIfNull)
-            {
-                ilProcessor.Emit(OpCodes.Dup);
-                ilProcessor.Emit(OpCodes.Brtrue_S, callInstruction);
-                ilProcessor.Emit(OpCodes.Pop);
-                ilProcessor.Emit(OpCodes.Ldstr, $"Can't find view for {propertyReference.FullName}");
-                ilProcessor.Emit(OpCodes.Newobj, _referencesProvider.InjectorExceptionCtor);
-                ilProcessor.Emit(OpCodes.Throw);
-            }
-
-            ilProcessor.Append(callInstruction);
-            ilProcessor.Emit(OpCodes.Nop);
-        }
-
-        private void AddInstructionsForField(ILProcessor ilProcessor, Instruction getResourceIdInstruction, FieldReference fieldReference, bool shouldThrowIfNull)
-        {
-            ilProcessor.Emit(OpCodes.Ldarg_0);
-            ilProcessor.Emit(OpCodes.Ldarg_1);
-            ilProcessor.Append(getResourceIdInstruction);
-            ilProcessor.Emit(OpCodes.Callvirt, _referencesProvider.FindItemMethodReference);
-
-            var stfldInstruction = Instruction.Create(OpCodes.Stfld, fieldReference);
-
-            if (shouldThrowIfNull)
-            {
-                ilProcessor.Emit(OpCodes.Dup);
-                ilProcessor.Emit(OpCodes.Brtrue_S, stfldInstruction);
-                ilProcessor.Emit(OpCodes.Pop);
-                ilProcessor.Emit(OpCodes.Ldstr, $"Can't find view for {fieldReference.FullName}");
-                ilProcessor.Emit(OpCodes.Newobj, _referencesProvider.InjectorExceptionCtor);
-                ilProcessor.Emit(OpCodes.Throw);
-            }
-
-            ilProcessor.Append(stfldInstruction);
-        }
-
-        public override string ToString()
-        {
-            return $"{nameof(_referencesProvider)}: {_referencesProvider}, {nameof(_moduleDefinition)}: {_moduleDefinition}, {nameof(_typeDefinition)}: {_typeDefinition}, {nameof(_memberDefinitions)}: {_memberDefinitions}";
-        }
+        protected override string GeneratedMethodName => Consts.GeneratedMethodNames.InjectMenuItemsGeneratedMethodName;
+        protected override TypeReference GeneratedMethodParameterTypeReference => _referencesProvider.AndroidMenuTypeReference;
+        protected override string AttributeTypeName => Consts.InjectorAttributes.MenuItemAttributeTypeName;
+        protected override InjectAttributeHolder GetInjectHolder(CustomAttribute customAttribute) => new MenuItemAttributeHolder(customAttribute);
+        protected override MethodReference FindMethodReference => _referencesProvider.FindItemMethodReference;
+        protected override bool CastToTargetType => true;
     }
 }
