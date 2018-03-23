@@ -47,15 +47,7 @@ namespace Polkovnik.DroidInjector.Fody
                 switch (memberDefinition)
                 {
                     case FieldReference fieldReference:
-                        if (fieldReference.DeclaringType.GenericParameters.Any())
-                        {
-                            var declaringType = new GenericInstanceType(fieldReference.DeclaringType);
-                            foreach (var parameter in fieldReference.DeclaringType.GenericParameters)
-                            {
-                                declaringType.GenericArguments.Add(parameter);
-                            }
-                            fieldReference = new FieldReference(fieldReference.Name, fieldReference.FieldType, declaringType);
-                        }
+                        fieldReference = fieldReference.GetThisFieldReference();
                         AddInjectViewInstructionsForField(ilProcessor, resourceId, fieldReference.FieldType, fieldReference, shouldThrowIfNull);
                         break;
                     case PropertyDefinition propertyDefinition:
@@ -65,7 +57,8 @@ namespace Polkovnik.DroidInjector.Fody
                             var propertySetterImplementor = new PropertySetterImplementor(propertyDefinition, _moduleDefinition);
                             propertySetterImplementor.Execute();
                         }
-                        AddInjectViewInstructionsForProperty(ilProcessor, resourceId, propertyDefinition.PropertyType, propertyDefinition.SetMethod, shouldThrowIfNull);
+                        var propertySetMethodReference = propertyDefinition.SetMethod;
+                        AddInjectViewInstructionsForProperty(ilProcessor, resourceId, propertyDefinition.PropertyType, propertySetMethodReference, shouldThrowIfNull);
                         break;
                 }
             }

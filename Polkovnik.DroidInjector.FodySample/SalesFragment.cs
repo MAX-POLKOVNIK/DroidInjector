@@ -22,8 +22,11 @@ internal abstract class SalesFragment<T> : Fragment where T : SalesFragment<T>, 
 
         Injector.InjectViews(view);
 
-        _myButton.Text = "Generic works";
-
+        myButton.Text = "Generic works";
+        
         return view;
     }
+
+    [View] private Button myButton { get; }
+
 }

@@ -1,4 +1,5 @@
-﻿using Mono.Cecil;
+﻿using System.Linq;
+using Mono.Cecil;
 
 namespace Polkovnik.DroidInjector.Fody
 {
@@ -19,6 +20,20 @@ namespace Polkovnik.DroidInjector.Fody
             }
 
             return false;
+        }
+
+        public static FieldReference GetThisFieldReference(this FieldReference fieldReference)
+        {
+            if (!fieldReference.DeclaringType.GenericParameters.Any())
+                return fieldReference;
+
+            var declaringType = new GenericInstanceType(fieldReference.DeclaringType);
+            foreach (var parameter in fieldReference.DeclaringType.GenericParameters)
+            {
+                declaringType.GenericArguments.Add(parameter);
+            }
+            
+            return new FieldReference(fieldReference.Name, fieldReference.FieldType, declaringType);
         }
     }
 }

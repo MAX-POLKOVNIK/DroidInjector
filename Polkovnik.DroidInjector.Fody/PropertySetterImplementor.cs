@@ -21,12 +21,10 @@ namespace Polkovnik.DroidInjector.Fody
             Logger.LogExecute(this);
 
             var backingFieldName = GetBackingFieldNameForProperty(_propertyDefinition);
-            var backingField = _propertyDefinition.DeclaringType.Fields.FirstOrDefault(x => x.Name == backingFieldName);
+            var backingField = _propertyDefinition.DeclaringType.Fields.FirstOrDefault(x => x.Name == backingFieldName).GetThisFieldReference();
 
             if (backingField == null)
                 throw new WeavingException($"Property: {_propertyDefinition.FullName} hasn't setter and not auto-implemented.");
-
-            backingField.Attributes = backingField.Attributes ^ FieldAttributes.InitOnly;
 
             var setterMethod = new MethodDefinition($"set_{_propertyDefinition.Name}",
                 MethodAttributes.Private | MethodAttributes.HideBySig | MethodAttributes.SpecialName, _moduleDefinition.TypeSystem.Void);
