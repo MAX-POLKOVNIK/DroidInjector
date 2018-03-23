@@ -8,6 +8,7 @@ using Android.Views;
 using CheeseBind;
 using Genetics;
 using Genetics.Attributes;
+using Polkovnik.DroidInjector.FodyClassLibrarySample;
 
 namespace Polkovnik.DroidInjector.FodySample
 {
@@ -15,7 +16,7 @@ namespace Polkovnik.DroidInjector.FodySample
     public class MainActivity : Activity
     {
 #pragma warning disable 649
-        //[BindView(Resource.Id.myButton)] [Splice(Resource.Id.myButton)] [View] private Button _myButton;
+        [BindView(Resource.Id.myButton)] [Splice(Resource.Id.myButton)] [View] private Button _myButton;
         //[BindView(Resource.Id.myEditText1)] [Splice(Resource.Id.myEditText1)] [View] private EditText myEditText1;
         //[BindView(Resource.Id.myEditText2)] [Splice(Resource.Id.myEditText2)] [View] private EditText myEditText2;
         //[BindView(Resource.Id.myEditText3)] [Splice(Resource.Id.myEditText3)] [View] private EditText myEditText3;
@@ -27,6 +28,8 @@ namespace Polkovnik.DroidInjector.FodySample
         //[BindView(Resource.Id.myEditText9)] [Splice(Resource.Id.myEditText9)] [View] private EditText myEditText9;
         //[BindView(Resource.Id.myEditText10)][Splice(Resource.Id.myEditText10)] [View] private EditText myEditText10;
         //[BindView(Resource.Id.myEditText11)] [Splice(Resource.Id.myEditText11)] [View] private EditText myEditText11;
+
+        [MenuItem(Resource.Id.action_0)] private IMenuItem item;
 #pragma warning restore 649
 
         protected override void OnCreate(Bundle savedInstanceState)
@@ -39,7 +42,8 @@ namespace Polkovnik.DroidInjector.FodySample
             stopwatch.Start();
 
             //DirectInjection();
-            //Injector.InjectViews();
+            Injector.InjectViews();
+            Injector.BindViewEvents();
             //Geneticist.Splice(this);
             //Cheeseknife.Bind(this);
 
@@ -49,15 +53,28 @@ namespace Polkovnik.DroidInjector.FodySample
             Console.WriteLine($"TOTAL: {stopwatch.ElapsedMilliseconds} ms");
 
             //_myButton.Text = $"TOTAL: {stopwatch.ElapsedMilliseconds} ms";
-
+            _myButton.Click += (sender, args) => StartActivity(typeof(TestActivity));
             FragmentManager.BeginTransaction().Replace(Resource.Id.contentLayout, MySalesFragment.NewInstance())
                 .Commit();
+        }
+
+        public override bool OnCreateOptionsMenu(IMenu menu)
+        {
+            MenuInflater.Inflate(Resource.Menu.main, menu);
+            Injector.InjectMenuItems(menu);
+            return true;
         }
 
         private void InjectWrapper(string nane, Action action)
         {
             action();
         }
+
+        //[ViewEvent(Resource.Id.myButton, typeof(View), nameof(View.Click))]
+        //private void ButtonClick(object sender, EventArgs eventArgs)
+        //{
+        //    Toast.MakeText(this, "Clicked", ToastLength.Short).Show();
+        //}
 
         //private void DirectInjection()
         //{

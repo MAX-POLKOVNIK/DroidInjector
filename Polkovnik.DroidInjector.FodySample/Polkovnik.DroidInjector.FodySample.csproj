@@ -128,6 +128,10 @@
     <AndroidResource Include="Resources\menu\main.xml" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Polkovnik.DroidInjector.FodyClassLibrarySample\Polkovnik.DroidInjector.FodyClassLibrarySample.csproj">
+      <Project>{3f39d2c3-cb81-4e3c-b41c-3198c22f7726}</Project>
+      <Name>Polkovnik.DroidInjector.FodyClassLibrarySample</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Polkovnik.DroidInjector\Polkovnik.DroidInjector.csproj">
       <Project>{edfc7537-0636-473a-9b58-dd7f22a29e53}</Project>
       <Name>Polkovnik.DroidInjector</Name>

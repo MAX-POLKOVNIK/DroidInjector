@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Polkovnik.DroidInjector
 {
@@ -8,26 +9,11 @@ namespace Polkovnik.DroidInjector
     /// Subscribes to view events at runtime. 
     /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
-    public class ViewEventAttribute : InjectAttribute
+    [SuppressMessage("ReSharper", "UnusedParameter.Local")]
+    public class ViewEventAttribute : Attribute
     {
-        /// <summary>
-        /// Subscribes to view events at runtime. 
-        /// </summary>
-        /// <param name="resourceId">Id of view that has event to subscribe.</param>
-        /// <param name="eventName">Event to subscribe.</param>
-        /// <param name="allowMissing">If true - injector will ignore view missing.</param>
-        public ViewEventAttribute(int resourceId, string eventName, bool allowMissing = false) : base(resourceId, allowMissing)
+        public ViewEventAttribute(int resourceId, Type viewType, string eventName, bool allowMissing = false)
         {
-            EventName = eventName;
         }
-
-        public ViewEventAttribute(int resourceId, Type viewType, string eventName, bool allowMissing = false) : this(resourceId,
-            eventName, allowMissing)
-        {
-            ViewType = viewType;
-        }
-
-        internal Type ViewType { get; }
-        internal string EventName { get; }
     }
 }

@@ -2,9 +2,10 @@
 using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using Polkovnik.DroidInjector.Fody.AttributesHolders;
 using Polkovnik.DroidInjector.Fody.Loggers;
 
-namespace Polkovnik.DroidInjector.Fody
+namespace Polkovnik.DroidInjector.Fody.Implementors
 {
     internal class MenuItemInjectionImplementor
     {
@@ -37,14 +38,23 @@ namespace Polkovnik.DroidInjector.Fody
             foreach (var memberDefinition in _memberDefinitions)
             {
                 var attribute = memberDefinition.CustomAttributes.First(x => x.AttributeType.FullName == Consts.InjectorAttributes.MenuItemAttributeTypeName);
-                var resourceId = (int)attribute.ConstructorArguments[0].Value;
-                var shouldThrowIfNull = !(bool) attribute.ConstructorArguments[1].Value;
+                var attributeHolder = new MenuItemAttributeHolder(attribute);
+
+                var resourceId = attributeHolder.ResourceId;
+                if (resourceId == 0)
+                {
+                    resourceId = Utils.GetResourceIdByName(memberDefinition.Name, memberDefinition.FullName, _referencesAndDefinitionsProvider.ResourceIdClassType);
+                }
+
+                var getResourceIdOperation = memberDefinition.IsInAndroidClassLibrary()
+                    ? Instruction.Create(OpCodes.Ldsfld, Utils.GetResourceIdField(attributeHolder.ResourceIdName ?? memberDefinition.Name, _referencesAndDefinitionsProvider.ResourceIdClassType))
+                    : Instruction.Create(OpCodes.Ldc_I4, resourceId);
 
                 switch (memberDefinition)
                 {
                     case FieldReference fieldReference:
                         fieldReference = fieldReference.GetThisFieldReference();
-                        AddInstructionsForField(ilProcessor, resourceId, fieldReference, shouldThrowIfNull);
+                        AddInstructionsForField(ilProcessor, getResourceIdOperation, fieldReference, !attributeHolder.AllowMissing);
                         break;
                     case PropertyDefinition propertyDefinition:
                         var propertyHasSetter = propertyDefinition.SetMethod != null;
@@ -53,8 +63,8 @@ namespace Polkovnik.DroidInjector.Fody
                             var propertySetterImplementor = new PropertySetterImplementor(propertyDefinition, _moduleDefinition);
                             propertySetterImplementor.Execute();
                         }
-                        var propertySetMethodReference = propertyDefinition.SetMethod;//.GetThisMethodReference();
-                        AddForProperty(ilProcessor, resourceId, propertySetMethodReference, shouldThrowIfNull);
+                        var propertySetMethodReference = propertyDefinition.SetMethod;
+                        AddForProperty(ilProcessor, getResourceIdOperation, propertyDefinition, propertySetMethodReference, !attributeHolder.AllowMissing);
                         break;
                 }
             }
@@ -62,21 +72,22 @@ namespace Polkovnik.DroidInjector.Fody
             ilProcessor.Emit(OpCodes.Ret);
         }
 
-        private void AddForProperty(ILProcessor ilProcessor, int resourceId, MethodReference propertyDefinitionSetMethod, bool shouldThrowIfNull)
+        private void AddForProperty(ILProcessor ilProcessor, Instruction getResourceIdInstruction, PropertyReference propertyReference,
+            MethodReference setterMethodDefinition, bool shouldThrowIfNull)
         {
             ilProcessor.Emit(OpCodes.Ldarg_0);
             ilProcessor.Emit(OpCodes.Ldarg_1);
-            ilProcessor.Emit(OpCodes.Ldc_I4, resourceId);
+            ilProcessor.Append(getResourceIdInstruction);
             ilProcessor.Emit(OpCodes.Callvirt, _referencesAndDefinitionsProvider.FindItemMethodReference);
 
-            var callInstruction = Instruction.Create(OpCodes.Call, propertyDefinitionSetMethod);
+            var callInstruction = Instruction.Create(OpCodes.Call, setterMethodDefinition);
 
             if (shouldThrowIfNull)
             {
                 ilProcessor.Emit(OpCodes.Dup);
                 ilProcessor.Emit(OpCodes.Brtrue_S, callInstruction);
                 ilProcessor.Emit(OpCodes.Pop);
-                ilProcessor.Emit(OpCodes.Ldstr, $"Can't find menu item with ID {resourceId}");
+                ilProcessor.Emit(OpCodes.Ldstr, $"Can't find view for {propertyReference.FullName}");
                 ilProcessor.Emit(OpCodes.Newobj, _referencesAndDefinitionsProvider.InjectorExceptionCtor);
                 ilProcessor.Emit(OpCodes.Throw);
             }
@@ -85,21 +96,21 @@ namespace Polkovnik.DroidInjector.Fody
             ilProcessor.Emit(OpCodes.Nop);
         }
 
-        private void AddInstructionsForField(ILProcessor ilProcessor, int resourceId, FieldReference fieldDefinition, bool shouldThrowIfNull)
+        private void AddInstructionsForField(ILProcessor ilProcessor, Instruction getResourceIdInstruction, FieldReference fieldReference, bool shouldThrowIfNull)
         {
             ilProcessor.Emit(OpCodes.Ldarg_0);
             ilProcessor.Emit(OpCodes.Ldarg_1);
-            ilProcessor.Emit(OpCodes.Ldc_I4, resourceId);
+            ilProcessor.Append(getResourceIdInstruction);
             ilProcessor.Emit(OpCodes.Callvirt, _referencesAndDefinitionsProvider.FindItemMethodReference);
 
-            var stfldInstruction = Instruction.Create(OpCodes.Stfld, fieldDefinition);
+            var stfldInstruction = Instruction.Create(OpCodes.Stfld, fieldReference);
 
             if (shouldThrowIfNull)
             {
                 ilProcessor.Emit(OpCodes.Dup);
                 ilProcessor.Emit(OpCodes.Brtrue_S, stfldInstruction);
                 ilProcessor.Emit(OpCodes.Pop);
-                ilProcessor.Emit(OpCodes.Ldstr, $"Can't find menu item with ID {resourceId}");
+                ilProcessor.Emit(OpCodes.Ldstr, $"Can't find view for {fieldReference.FullName}");
                 ilProcessor.Emit(OpCodes.Newobj, _referencesAndDefinitionsProvider.InjectorExceptionCtor);
                 ilProcessor.Emit(OpCodes.Throw);
             }

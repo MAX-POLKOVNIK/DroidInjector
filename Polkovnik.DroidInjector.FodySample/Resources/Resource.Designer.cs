@@ -26,6 +26,9 @@ namespace Polkovnik.DroidInjector.FodySample
 		
 		public static void UpdateIdValues()
 		{
+			global::Polkovnik.DroidInjector.FodyClassLibrarySample.Resource.Id.contentLayout = global::Polkovnik.DroidInjector.FodySample.Resource.Id.contentLayout;
+			global::Polkovnik.DroidInjector.FodyClassLibrarySample.Resource.Id.myButton = global::Polkovnik.DroidInjector.FodySample.Resource.Id.myButton;
+			global::Polkovnik.DroidInjector.FodyClassLibrarySample.Resource.Layout.screen_test = global::Polkovnik.DroidInjector.FodySample.Resource.Layout.screen_test;
 		}
 		
 		public partial class Attribute
@@ -448,6 +451,9 @@ namespace Polkovnik.DroidInjector.FodySample
 			
 			// aapt resource value: 0x7f040009
 			public const int notification_template_part_time = 2130968585;
+			
+			// aapt resource value: 0x7f04000a
+			public const int screen_test = 2130968586;
 			
 			static Layout()
 			{
