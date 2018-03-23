@@ -43,6 +43,7 @@ namespace Polkovnik.DroidInjector.FodySample
 
             //DirectInjection();
             Injector.InjectViews();
+            Injector.BindViewEvents();
             //Geneticist.Splice(this);
             //Cheeseknife.Bind(this);
 
@@ -68,6 +69,12 @@ namespace Polkovnik.DroidInjector.FodySample
         {
             action();
         }
+
+        //[ViewEvent(Resource.Id.myButton, typeof(View), nameof(View.Click))]
+        //private void ButtonClick(object sender, EventArgs eventArgs)
+        //{
+        //    Toast.MakeText(this, "Clicked", ToastLength.Short).Show();
+        //}
 
         //private void DirectInjection()
         //{
