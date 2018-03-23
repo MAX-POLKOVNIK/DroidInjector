@@ -2,7 +2,7 @@
 using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using Polkovnik.DroidInjector.Fody.Log;
+using Polkovnik.DroidInjector.Fody.Loggers;
 
 namespace Polkovnik.DroidInjector.Fody
 {
@@ -42,8 +42,9 @@ namespace Polkovnik.DroidInjector.Fody
 
                 switch (memberDefinition)
                 {
-                    case FieldDefinition fieldDefinition:
-                        AddInstructionsForField(ilProcessor, resourceId, fieldDefinition, shouldThrowIfNull);
+                    case FieldReference fieldReference:
+                        fieldReference = fieldReference.GetThisFieldReference();
+                        AddInstructionsForField(ilProcessor, resourceId, fieldReference, shouldThrowIfNull);
                         break;
                     case PropertyDefinition propertyDefinition:
                         var propertyHasSetter = propertyDefinition.SetMethod != null;
@@ -52,7 +53,8 @@ namespace Polkovnik.DroidInjector.Fody
                             var propertySetterImplementor = new PropertySetterImplementor(propertyDefinition, _moduleDefinition);
                             propertySetterImplementor.Execute();
                         }
-                        AddForProperty(ilProcessor, resourceId, propertyDefinition.SetMethod, shouldThrowIfNull);
+                        var propertySetMethodReference = propertyDefinition.SetMethod;//.GetThisMethodReference();
+                        AddForProperty(ilProcessor, resourceId, propertySetMethodReference, shouldThrowIfNull);
                         break;
                 }
             }

@@ -2,7 +2,7 @@
 using System.Linq;
 using Mono.Cecil;
 using Polkovnik.DroidInjector.Fody.Harvesters;
-using Polkovnik.DroidInjector.Fody.Log;
+using Polkovnik.DroidInjector.Fody.Loggers;
 
 namespace Polkovnik.DroidInjector.Fody
 {

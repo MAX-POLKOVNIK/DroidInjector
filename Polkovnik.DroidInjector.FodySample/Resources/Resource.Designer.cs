@@ -318,6 +318,9 @@ namespace Polkovnik.DroidInjector.FodySample
 			// aapt resource value: 0x7f06001c
 			public const int chronometer = 2131099676;
 			
+			// aapt resource value: 0x7f06000f
+			public const int contentLayout = 2131099663;
+			
 			// aapt resource value: 0x7f060008
 			public const int forever = 2131099656;
 			
@@ -347,9 +350,6 @@ namespace Polkovnik.DroidInjector.FodySample
 			
 			// aapt resource value: 0x7f06000e
 			public const int myButton = 2131099662;
-			
-			// aapt resource value: 0x7f06000f
-			public const int myEditText = 2131099663;
 			
 			// aapt resource value: 0x7f06000a
 			public const int normal = 2131099658;

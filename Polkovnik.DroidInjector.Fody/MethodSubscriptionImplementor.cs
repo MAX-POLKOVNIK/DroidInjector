@@ -4,7 +4,7 @@ using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Mono.Cecil.Rocks;
-using Polkovnik.DroidInjector.Fody.Log;
+using Polkovnik.DroidInjector.Fody.Loggers;
 
 namespace Polkovnik.DroidInjector.Fody
 {

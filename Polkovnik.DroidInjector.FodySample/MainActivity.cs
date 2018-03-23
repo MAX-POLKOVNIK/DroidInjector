@@ -5,6 +5,9 @@ using Android.Widget;
 using Android.OS;
 using Android.Text;
 using Android.Views;
+using CheeseBind;
+using Genetics;
+using Genetics.Attributes;
 
 namespace Polkovnik.DroidInjector.FodySample
 {
@@ -12,13 +15,18 @@ namespace Polkovnik.DroidInjector.FodySample
     public class MainActivity : Activity
     {
 #pragma warning disable 649
-        [View] private Button _myButton;
-
-        [MenuItem(Resource.Id.action_0)] private IMenuItem menuItem;
-        [MenuItem(Resource.Id.action_1)] private IMenuItem menuItem1;
-        [MenuItem(Resource.Id.action_2)] private IMenuItem menuItem2;
-        [MenuItem(Resource.Id.action_3)] private IMenuItem menuItem3;
-        [MenuItem(Resource.Id.action_4)] private IMenuItem menuItem4;
+        //[BindView(Resource.Id.myButton)] [Splice(Resource.Id.myButton)] [View] private Button _myButton;
+        //[BindView(Resource.Id.myEditText1)] [Splice(Resource.Id.myEditText1)] [View] private EditText myEditText1;
+        //[BindView(Resource.Id.myEditText2)] [Splice(Resource.Id.myEditText2)] [View] private EditText myEditText2;
+        //[BindView(Resource.Id.myEditText3)] [Splice(Resource.Id.myEditText3)] [View] private EditText myEditText3;
+        //[BindView(Resource.Id.myEditText4)] [Splice(Resource.Id.myEditText4)] [View] private EditText myEditText4;
+        //[BindView(Resource.Id.myEditText5)] [Splice(Resource.Id.myEditText5)] [View] private EditText myEditText5;
+        //[BindView(Resource.Id.myEditText6)] [Splice(Resource.Id.myEditText6)] [View] private EditText myEditText6;
+        //[BindView(Resource.Id.myEditText7)] [Splice(Resource.Id.myEditText7)] [View] private EditText myEditText7;
+        //[BindView(Resource.Id.myEditText8)] [Splice(Resource.Id.myEditText8)] [View] private EditText myEditText8;
+        //[BindView(Resource.Id.myEditText9)] [Splice(Resource.Id.myEditText9)] [View] private EditText myEditText9;
+        //[BindView(Resource.Id.myEditText10)][Splice(Resource.Id.myEditText10)] [View] private EditText myEditText10;
+        //[BindView(Resource.Id.myEditText11)] [Splice(Resource.Id.myEditText11)] [View] private EditText myEditText11;
 #pragma warning restore 649
 
         protected override void OnCreate(Bundle savedInstanceState)
@@ -26,61 +34,46 @@ namespace Polkovnik.DroidInjector.FodySample
             base.OnCreate(savedInstanceState);
             
             SetContentView(Resource.Layout.main);
-
-            try
-            {
-                Injector.InjectViews();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
             
             var stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            Injector.BindViewEvents();
+            //DirectInjection();
+            //Injector.InjectViews();
+            //Geneticist.Splice(this);
+            //Cheeseknife.Bind(this);
+
+            //InjectWrapper("1", Injector.InjectViews);
 
             stopwatch.Stop();
-            Console.WriteLine($"TOTAL: {stopwatch.ElapsedMilliseconds}");
+            Console.WriteLine($"TOTAL: {stopwatch.ElapsedMilliseconds} ms");
 
-            _myButton.Text = "That is working";
+            //_myButton.Text = $"TOTAL: {stopwatch.ElapsedMilliseconds} ms";
+
+            FragmentManager.BeginTransaction().Replace(Resource.Id.contentLayout, MySalesFragment.NewInstance())
+                .Commit();
         }
 
-        public override bool OnCreateOptionsMenu(IMenu menu)
+        private void InjectWrapper(string nane, Action action)
         {
-            MenuInflater.Inflate(Resource.Menu.main, menu);
-
-            Injector.InjectMenuItems(menu);
-
-            menuItem.SetTitle("TitleSET");
-            menuItem1.SetTitle("TitleSET");
-            menuItem2.SetTitle("TitleSET");
-            menuItem3.SetTitle("TitleSET");
-            menuItem4.SetTitle("TitleSET");
-
-
-            return true;
+            action();
         }
 
-        [ViewEvent(Resource.Id.myEditText, typeof(EditText), nameof(EditText.TextChanged))]
-        private void ButtonClick5(object sender, TextChangedEventArgs args)
-        {
-            Toast.MakeText(this, args.Text.ToString(), ToastLength.Short).Show();
-        }
-
-        [ViewEvent(Resource.Id.myButton, typeof(Button), nameof(View.Click))]
-        private void ButtonClick5(object sender, EventArgs args)
-        {
-            StartActivity(typeof(SecondActivity));
-        }
-
-        [ViewEvent(Resource.Id.myButton, typeof(Button), nameof(View.Click))]
-        private void ButtonClick6(object sender, EventArgs args)
-        {
-            Toast.MakeText(this, "6", ToastLength.Short).Show();
-        }
+        //private void DirectInjection()
+        //{
+        //    _myButton = FindViewById<Button>(Resource.Id.myButton);
+        //    myEditText1 = FindViewById<EditText>(Resource.Id.myEditText1);
+        //    myEditText2 = FindViewById<EditText>(Resource.Id.myEditText2);
+        //    myEditText3 = FindViewById<EditText>(Resource.Id.myEditText3);
+        //    myEditText4 = FindViewById<EditText>(Resource.Id.myEditText4);
+        //    myEditText5 = FindViewById<EditText>(Resource.Id.myEditText5);
+        //    myEditText6 = FindViewById<EditText>(Resource.Id.myEditText6);
+        //    myEditText7 = FindViewById<EditText>(Resource.Id.myEditText7);
+        //    myEditText8 = FindViewById<EditText>(Resource.Id.myEditText8);
+        //    myEditText9 = FindViewById<EditText>(Resource.Id.myEditText9);
+        //    myEditText10 = FindViewById<EditText>(Resource.Id.myEditText10);
+        //    myEditText11 = FindViewById<EditText>(Resource.Id.myEditText11);
+        //}
     }
 }
 

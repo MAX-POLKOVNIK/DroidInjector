@@ -2,7 +2,7 @@
 using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using Polkovnik.DroidInjector.Fody.Log;
+using Polkovnik.DroidInjector.Fody.Loggers;
 
 namespace Polkovnik.DroidInjector.Fody
 {
@@ -46,8 +46,9 @@ namespace Polkovnik.DroidInjector.Fody
 
                 switch (memberDefinition)
                 {
-                    case FieldDefinition fieldDefinition:
-                        AddInjectViewInstructionsForField(ilProcessor, resourceId, fieldDefinition.FieldType, fieldDefinition, shouldThrowIfNull);
+                    case FieldReference fieldReference:
+                        fieldReference = fieldReference.GetThisFieldReference();
+                        AddInjectViewInstructionsForField(ilProcessor, resourceId, fieldReference.FieldType, fieldReference, shouldThrowIfNull);
                         break;
                     case PropertyDefinition propertyDefinition:
                         var propertyHasSetter = propertyDefinition.SetMethod != null;
@@ -56,7 +57,8 @@ namespace Polkovnik.DroidInjector.Fody
                             var propertySetterImplementor = new PropertySetterImplementor(propertyDefinition, _moduleDefinition);
                             propertySetterImplementor.Execute();
                         }
-                        AddInjectViewInstructionsForProperty(ilProcessor, resourceId, propertyDefinition.PropertyType, propertyDefinition.SetMethod, shouldThrowIfNull);
+                        var propertySetMethodReference = propertyDefinition.SetMethod;
+                        AddInjectViewInstructionsForProperty(ilProcessor, resourceId, propertyDefinition.PropertyType, propertySetMethodReference, shouldThrowIfNull);
                         break;
                 }
             }
@@ -89,7 +91,7 @@ namespace Polkovnik.DroidInjector.Fody
             ilProcessor.Emit(OpCodes.Nop);
         }
 
-        private void AddInjectViewInstructionsForField(ILProcessor ilProcessor, int resourceId, TypeReference targetTypeReference, FieldDefinition fieldDefinition, 
+        private void AddInjectViewInstructionsForField(ILProcessor ilProcessor, int resourceId, TypeReference targetTypeReference, FieldReference fieldDefinition, 
             bool shouldThrowIfNull)
         {
             ilProcessor.Emit(OpCodes.Ldarg_0);

@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>Polkovnik.DroidInjector.Fody</id>
-    <version>0.1.4</version>
+    <version>0.1.4.1</version>
     <authors>MAX-POLKOVNIK</authors>
     <owners>MAX-POLKOVNIK</owners>
     <licenseUrl>https://github.com/MAX-POLKOVNIK/DroidInjector/blob/master/LICENSE</licenseUrl>
