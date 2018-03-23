@@ -60,9 +60,9 @@
     <Compile Include="Harvesters\MenuItemHarvester.cs" />
     <Compile Include="Harvesters\ViewHarvester.cs" />
     <Compile Include="InjectorCallReplacer.cs" />
-    <Compile Include="Log\Logger.cs" />
+    <Compile Include="Loggers\Logger.cs" />
     <Compile Include="Harvesters\ViewEventHarvester.cs" />
-    <Compile Include="Log\LogLevel.cs" />
+    <Compile Include="Loggers\LogLevel.cs" />
     <Compile Include="MenuItemInjectionImplementor.cs" />
     <Compile Include="MethodSubscriptionImplementor.cs" />
     <Compile Include="MethodSubscriptionInfo.cs" />

@@ -43,12 +43,15 @@ namespace Polkovnik.DroidInjector.FodySample
             //Geneticist.Splice(this);
             //Cheeseknife.Bind(this);
 
-            InjectWrapper("1", Injector.InjectViews);
+            //InjectWrapper("1", Injector.InjectViews);
 
             stopwatch.Stop();
             Console.WriteLine($"TOTAL: {stopwatch.ElapsedMilliseconds} ms");
 
-            _myButton.Text = $"TOTAL: {stopwatch.ElapsedMilliseconds} ms";
+            //_myButton.Text = $"TOTAL: {stopwatch.ElapsedMilliseconds} ms";
+
+            FragmentManager.BeginTransaction().Replace(Resource.Id.contentLayout, MySalesFragment.NewInstance())
+                .Commit();
         }
 
         private void InjectWrapper(string nane, Action action)
