@@ -36,10 +36,12 @@ namespace Polkovnik.DroidInjector.Fody.Implementors
 
             var methodDefinition = new MethodDefinition(GeneratedMethodName,MethodAttributes.Private | MethodAttributes.HideBySig, _moduleDefinition.TypeSystem.Void);
             methodDefinition.Parameters.Add(new ParameterDefinition("p0", ParameterAttributes.None, GeneratedMethodParameterTypeReference));
+            methodDefinition.Body.Variables.Add(new VariableDefinition(_typeDefinition.Module.TypeSystem.Object));
 
             _typeDefinition.Methods.Add(methodDefinition);
 
             var ilProcessor = methodDefinition.Body.GetILProcessor();
+            
             ilProcessor.Emit(OpCodes.Nop);
 
             foreach (var memberDefinition in _memberDefinitions)
@@ -83,45 +85,62 @@ namespace Polkovnik.DroidInjector.Fody.Implementors
                 MethodReference setterMethodDefinition, bool shouldThrowIfNull)
         {
             AddInstructions(ilProcessor, getResourceIdInstruction, propertyReference.PropertyType, Instruction.Create(OpCodes.Call, setterMethodDefinition),
-                shouldThrowIfNull, $"Can't find view for {propertyReference.FullName}", true);
+                shouldThrowIfNull, $"Can't find view for {propertyReference.FullName}", GetCastExceptionMessage(propertyReference, propertyReference.PropertyType));
         }
 
         private void AddInstructionsForField(ILProcessor ilProcessor, Instruction getResourceIdInstruction, TypeReference targetTypeReference, 
             FieldReference fieldReference, bool shouldThrowIfNull)
         {
             AddInstructions(ilProcessor, getResourceIdInstruction, targetTypeReference, Instruction.Create(OpCodes.Stfld, fieldReference),
-                shouldThrowIfNull, $"Can't find view for {fieldReference.FullName}", false);
+                shouldThrowIfNull, $"Can't find view for {fieldReference.FullName}", GetCastExceptionMessage(fieldReference, targetTypeReference));
+        }
+
+        private static string GetCastExceptionMessage(MemberReference memberReference, MemberReference castTypeReference)
+        {
+            return $"Resolved view for {memberReference.DeclaringType.FullName}.{memberReference.Name} is not {castTypeReference.FullName}. Check if type specified correctly";
         }
 
         private void AddInstructions(ILProcessor ilProcessor, Instruction getResourceIdInstruction, TypeReference castTypeReference, Instruction storeObjectInstruction,
-            bool shouldThrowIfNull, string exceptionMessage, bool addNopToEnd)
+            bool shouldThrowIfNull, string exceptionMessageIfNull, string exceptionMessageIfCastInvalid)
         {
-            ilProcessor.Emit(OpCodes.Ldarg_0);
             ilProcessor.Emit(OpCodes.Ldarg_1);
             ilProcessor.Append(getResourceIdInstruction);
             ilProcessor.Emit(OpCodes.Callvirt, FindMethodReference);
+            ilProcessor.Emit(OpCodes.Stloc_0);
+            ilProcessor.Emit(OpCodes.Ldloc_0);
 
-            if (CastToTargetType)
-            {
-                ilProcessor.Emit(OpCodes.Castclass, castTypeReference);
-            }
+            var nopForIsInstanceInstruction = Instruction.Create(OpCodes.Nop);
+            var endNopInstruction = Instruction.Create(OpCodes.Nop);
 
             if (shouldThrowIfNull)
             {
-                ilProcessor.Emit(OpCodes.Dup);
-                ilProcessor.Emit(OpCodes.Brtrue_S, storeObjectInstruction);
-                ilProcessor.Emit(OpCodes.Pop);
-                ilProcessor.Emit(OpCodes.Ldstr, exceptionMessage);
+                ilProcessor.Emit(OpCodes.Brtrue_S, nopForIsInstanceInstruction);
+                ilProcessor.Emit(OpCodes.Ldstr, exceptionMessageIfNull);
                 ilProcessor.Emit(OpCodes.Newobj, _referencesProvider.InjectorExceptionCtor);
                 ilProcessor.Emit(OpCodes.Throw);
             }
-
-            ilProcessor.Append(storeObjectInstruction);
-
-            if (addNopToEnd)
+            else
             {
-                ilProcessor.Emit(OpCodes.Nop);
+                ilProcessor.Emit(OpCodes.Brfalse_S, endNopInstruction);
             }
+
+            ilProcessor.Append(nopForIsInstanceInstruction);
+            ilProcessor.Emit(OpCodes.Ldloc_0);
+            ilProcessor.Emit(OpCodes.Isinst, castTypeReference);
+
+            var nopAssignIstruction = Instruction.Create(OpCodes.Nop);
+
+            ilProcessor.Emit(OpCodes.Brtrue_S, nopAssignIstruction);
+            ilProcessor.Emit(OpCodes.Ldstr, exceptionMessageIfCastInvalid);
+            ilProcessor.Emit(OpCodes.Newobj, _referencesProvider.InjectorExceptionCtor);
+            ilProcessor.Emit(OpCodes.Throw);
+
+            ilProcessor.Append(nopAssignIstruction);
+            ilProcessor.Emit(OpCodes.Ldarg_0);
+            ilProcessor.Emit(OpCodes.Ldloc_0);
+            ilProcessor.Append(storeObjectInstruction);
+            ilProcessor.Append(endNopInstruction);
+            
         }
 
         public override string ToString()

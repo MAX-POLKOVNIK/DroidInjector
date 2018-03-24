@@ -16,7 +16,8 @@ namespace Polkovnik.DroidInjector.FodySample
     public class MainActivity : Activity
     {
 #pragma warning disable 649
-        [BindView(Resource.Id.myButton)] [Splice(Resource.Id.myButton)] [View] private Button _myButton;
+        [BindView(Resource.Id.myButton)] [Splice(Resource.Id.myButton)] [View] private TextView _myButton;
+        [BindView(Resource.Id.myButton)] [Splice(Resource.Id.myButton)] [View(Resource.Id.myButton, allowMissing:true)] private Button _myButton2 { get; set; }
         //[BindView(Resource.Id.myEditText1)] [Splice(Resource.Id.myEditText1)] [View] private EditText myEditText1;
         //[BindView(Resource.Id.myEditText2)] [Splice(Resource.Id.myEditText2)] [View] private EditText myEditText2;
         //[BindView(Resource.Id.myEditText3)] [Splice(Resource.Id.myEditText3)] [View] private EditText myEditText3;
@@ -38,47 +39,24 @@ namespace Polkovnik.DroidInjector.FodySample
             
             SetContentView(Resource.Layout.main);
             
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
-
             //DirectInjection();
             Injector.InjectViews();
-            Injector.BindViewEvents();
             //Geneticist.Splice(this);
             //Cheeseknife.Bind(this);
 
             //InjectWrapper("1", Injector.InjectViews);
 
-            stopwatch.Stop();
-            Console.WriteLine($"TOTAL: {stopwatch.ElapsedMilliseconds} ms");
+            //InjectWrapper(Window.DecorView);
 
             //_myButton.Text = $"TOTAL: {stopwatch.ElapsedMilliseconds} ms";
-            
+
+            _myButton.Text = "s";
+            _myButton2?.SetText("s2", TextView.BufferType.Normal);
             _myButton.Click += (sender, args) => StartActivity(typeof(TestActivity));
             FragmentManager.BeginTransaction().Replace(Resource.Id.contentLayout, MySalesFragment.NewInstance())
                 .Commit();
         }
-
-        public override bool OnCreateOptionsMenu(IMenu menu)
-        {
-            MenuInflater.Inflate(Resource.Menu.main, menu);
-            Injector.InjectMenuItems(menu);
-
-            item.SetTitle("INJECTD");
-            return true;
-        }
-
-        private void InjectWrapper(string nane, Action action)
-        {
-            action();
-        }
-
-        [ViewEvent(Resource.Id.myButton, typeof(View), nameof(View.Click))]
-        private void ButtonClick(object sender, EventArgs eventArgs)
-        {
-            Toast.MakeText(this, "Clicked", ToastLength.Short).Show();
-        }
-
+        
         //private void DirectInjection()
         //{
         //    _myButton = FindViewById<Button>(Resource.Id.myButton);
