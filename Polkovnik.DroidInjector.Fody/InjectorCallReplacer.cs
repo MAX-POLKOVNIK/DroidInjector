@@ -83,12 +83,12 @@ namespace Polkovnik.DroidInjector.Fody
         {
             var targetInstruction = callInjectorInstruction;
 
-            while (targetInstruction.Previous.OpCode.Name.StartsWith("call"))
+            while (targetInstruction.Previous != null && targetInstruction.Previous.OpCode.Name.StartsWith("call"))
             {
                 targetInstruction = targetInstruction.Previous;
             }
 
-            while (targetInstruction.Previous.OpCode.Name.StartsWith("ld"))
+            while (targetInstruction.Previous != null && targetInstruction.Previous.OpCode.Name.StartsWith("ld"))
             {
                 targetInstruction = targetInstruction.Previous;
             }

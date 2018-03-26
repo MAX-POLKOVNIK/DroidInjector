@@ -90,6 +90,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SalesFragment.cs" />
     <Compile Include="SecondActivity.cs" />
+    <Compile Include="StocktakeViewHolder.cs" />
     <Compile Include="ViewHolder.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -104,6 +105,9 @@
       <SubType>Designer</SubType>
     </AndroidResource>
     <AndroidResource Include="Resources\layout\activity_second.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+    <AndroidResource Include="Resources\layout\adapter_stocktake_store_list_element_layout.xml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>
