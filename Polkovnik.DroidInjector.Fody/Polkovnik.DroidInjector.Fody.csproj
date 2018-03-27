@@ -52,6 +52,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Harvesters\MemberInfoHarvestQuery.cs" />
+    <Compile Include="Harvesters\MemberInfoHarvester.cs" />
+    <Compile Include="Harvesters\MenuItemHarvestQuery.cs" />
+    <Compile Include="Harvesters\ViewEventHarvestQuery.cs" />
+    <Compile Include="Harvesters\ViewHarvestQuery.cs" />
     <Compile Include="Implementors\ActivityGetViewMethodImplementor.cs" />
     <Compile Include="AttributesHolders\InjectAttributeHolder.cs" />
     <Compile Include="AttributesHolders\MenuItemAttributeHolder.cs" />
@@ -60,12 +65,8 @@
     <Compile Include="FodyInjector.cs" />
     <Compile Include="Implementors\InjectionImplementor.cs" />
     <Compile Include="WeavingException.cs" />
-    <Compile Include="Harvesters\Harvester.cs" />
-    <Compile Include="Harvesters\MenuItemHarvester.cs" />
-    <Compile Include="Harvesters\ViewHarvester.cs" />
     <Compile Include="InjectorCallReplacer.cs" />
     <Compile Include="Loggers\Logger.cs" />
-    <Compile Include="Harvesters\ViewEventHarvester.cs" />
     <Compile Include="Loggers\LogLevel.cs" />
     <Compile Include="Implementors\MenuItemInjectionImplementor.cs" />
     <Compile Include="Implementors\MethodSubscriptionImplementor.cs" />
