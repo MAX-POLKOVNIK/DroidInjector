@@ -31,7 +31,6 @@ public class MainActivity : Activity
         // Set our view from the "main" layout resource
         SetContentView(Resource.Layout.main);
 
-        // Choose one method below
         Injector.InjectViews(); // Will inject views
 
         //... do something with views
