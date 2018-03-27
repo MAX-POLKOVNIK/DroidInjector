@@ -95,12 +95,12 @@ Injector can find menu items from `Menu`. You must mark field or property with `
 [MenuItem(Resource.Id.action_add)] private IMenuItem _addMenuItem 
 ```
 
-To resolve marked field call `this.InjectMenuItems()` with `menu` argument:
+To resolve marked field call `Injector.InjectMenuItems()` with `menu` argument:
 ```csharp
 public override bool OnCreateOptionsMenu(IMenu menu)
 {
     MenuInflater.Inflate(Resource.Menu.main, menu);
-    this.InjectMenuItems(menu);
+    
     Injector.InjectMenuItems(menu);
 
     return base.OnCreateOptionsMenu(menu);
