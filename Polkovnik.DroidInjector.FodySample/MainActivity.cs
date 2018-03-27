@@ -54,7 +54,7 @@ namespace Polkovnik.DroidInjector.FodySample
 
             _myButton.Text = "s";
             _myButton2?.SetText("s2", TextView.BufferType.Normal);
-            _myButton.Click += (sender, args) => StartActivity(typeof(TestActivity));
+            _myButton.Click += (sender, args) => StartActivity(typeof(SecondActivity));
             FragmentManager.BeginTransaction().Replace(Resource.Id.contentLayout, MySalesFragment.NewInstance())
                 .Commit();
         }

@@ -58,7 +58,9 @@ namespace Polkovnik.DroidInjector.Fody
                     }
                     else
                     {
-                        ReplaceMethodCallInsructions(callInstuction, method.Body.GetILProcessor(), generatedMethod);
+                        var variable = new VariableDefinition(method.DeclaringType.Module.TypeSystem.Object);
+                        method.Body.Variables.Add(variable);
+                        ReplaceMethodCallInsructions(callInstuction, method.Body.GetILProcessor(), generatedMethod, variable);
                     }
                 }
             }
@@ -79,25 +81,15 @@ namespace Polkovnik.DroidInjector.Fody
         /// <param name="callInjectorInstruction">Instruction with calling Polkovnik.DroidInjector.Injector::XXX(View).</param>
         /// <param name="ilProcessor">Method body's ILProcessor.</param>
         /// <param name="injectionMethod">Activty's generated method for injecting.</param>
-        private static void ReplaceMethodCallInsructions(Instruction callInjectorInstruction, ILProcessor ilProcessor, MethodReference injectionMethod)
+        /// <param name="temporaryVariable"></param>
+        private static void ReplaceMethodCallInsructions(Instruction callInjectorInstruction, ILProcessor ilProcessor, MethodReference injectionMethod, VariableDefinition temporaryVariable)
         {
-            var targetInstruction = callInjectorInstruction;
-
-            while (targetInstruction.Previous != null && targetInstruction.Previous.OpCode.Name.StartsWith("call"))
-            {
-                targetInstruction = targetInstruction.Previous;
-            }
-
-            while (targetInstruction.Previous != null && targetInstruction.Previous.OpCode.Name.StartsWith("ld"))
-            {
-                targetInstruction = targetInstruction.Previous;
-            }
-
-            ilProcessor.InsertBefore(targetInstruction, Instruction.Create(OpCodes.Ldarg_0));
-
+            ilProcessor.InsertBefore(callInjectorInstruction, Instruction.Create(OpCodes.Stloc_S, temporaryVariable));
+            ilProcessor.InsertBefore(callInjectorInstruction, Instruction.Create(OpCodes.Ldarg_0));
+            ilProcessor.InsertBefore(callInjectorInstruction, Instruction.Create(OpCodes.Ldloc_S, temporaryVariable));
             ilProcessor.Replace(callInjectorInstruction, Instruction.Create(OpCodes.Call, injectionMethod));
         }
-
+        
         public override string ToString()
         {
             return $"{nameof(_definition)}: {_definition}, {nameof(_methodNameToCall)}: {_methodNameToCall}, {nameof(_methodToRemove)}: {_methodToRemove}, {nameof(_activityGetViewMethodImplementor)}: {_activityGetViewMethodImplementor}, {nameof(_methodIsParameterless)}: {_methodIsParameterless}";
