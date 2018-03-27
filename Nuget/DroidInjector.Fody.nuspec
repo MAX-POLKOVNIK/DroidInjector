@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>Polkovnik.DroidInjector.Fody</id>
-    <version>0.1.4.1</version>
+    <version>0.2</version>
     <authors>MAX-POLKOVNIK</authors>
     <owners>MAX-POLKOVNIK</owners>
     <licenseUrl>https://github.com/MAX-POLKOVNIK/DroidInjector/blob/master/LICENSE</licenseUrl>
@@ -10,7 +10,7 @@
     <iconUrl>https://github.com/MAX-POLKOVNIK/DroidInjector/raw/master/Icons/Logo_64x64.png</iconUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>Simple injector for Xamarin Android at compile time.</description>
-    <releaseNotes>Fixed bugs</releaseNotes>
+    <releaseNotes>Added support for Android Class Library projects. Removed reflection injection.</releaseNotes>
     <copyright>Copyright 2018</copyright>
     <tags>Android View Injection</tags>
     <dependencies>

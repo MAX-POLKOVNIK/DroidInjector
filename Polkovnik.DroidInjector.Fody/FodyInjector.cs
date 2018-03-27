@@ -2,6 +2,7 @@
 using System.Linq;
 using Mono.Cecil;
 using Polkovnik.DroidInjector.Fody.Harvesters;
+using Polkovnik.DroidInjector.Fody.Implementors;
 using Polkovnik.DroidInjector.Fody.Loggers;
 
 namespace Polkovnik.DroidInjector.Fody
@@ -10,7 +11,7 @@ namespace Polkovnik.DroidInjector.Fody
     {
         private readonly IAssemblyResolver _assemblyResolver;
         private readonly ModuleDefinition _moduleDefinition;
-        private ReferencesAndDefinitionsProvider _referencesAndDefinitionsProvider;
+        private ReferencesProvider _referencesProvider;
         
         public FodyInjector(ModuleDefinition moduleDefinition, IAssemblyResolver assemblyResolver)
         {
@@ -26,24 +27,24 @@ namespace Polkovnik.DroidInjector.Fody
                 return;
             }
 
-            _referencesAndDefinitionsProvider = new ReferencesAndDefinitionsProvider(_moduleDefinition, _assemblyResolver);
+            _referencesProvider = new ReferencesProvider(_moduleDefinition, _assemblyResolver);
 
             var viewHarvester = new ViewHarvester(_moduleDefinition);
             var requiredToInject = viewHarvester.Harvest();
             
             foreach (var type in requiredToInject)
             {
-                var viewInjectionImplementor = new ViewInjectionImplementor(type.Key, type.Value, _moduleDefinition, _referencesAndDefinitionsProvider);
+                var viewInjectionImplementor = new ViewInjectionImplementor(type.Key, type.Value, _moduleDefinition, _referencesProvider);
                 viewInjectionImplementor.Execute();
 
-                var activityGetViewMethodImplementor = new ActivityGetViewMethodImplementor(type.Key, _referencesAndDefinitionsProvider);
+                var activityGetViewMethodImplementor = new ActivityGetViewMethodImplementor(type.Key, _referencesProvider);
 
                 var injectorCallReplacer = new InjectorCallReplacer(type.Key, Consts.GeneratedMethodNames.InjectViewsGeneratedMethodName, 
-                    _referencesAndDefinitionsProvider.ActivityInjectViewsMethodDefinition, activityGetViewMethodImplementor);
+                    _referencesProvider.ActivityInjectViewsMethodDefinition, activityGetViewMethodImplementor);
                 injectorCallReplacer.Execute();
 
                 injectorCallReplacer = new InjectorCallReplacer(type.Key, Consts.GeneratedMethodNames.InjectViewsGeneratedMethodName, 
-                    _referencesAndDefinitionsProvider.InjectViewsMethodReference, activityGetViewMethodImplementor);
+                    _referencesProvider.InjectViewsMethodReference, activityGetViewMethodImplementor);
                 injectorCallReplacer.Execute();
             }
 
@@ -52,13 +53,13 @@ namespace Polkovnik.DroidInjector.Fody
 
             foreach (var type in requiredToInject)
             {
-                var menuItemInjectionImplementor = new MenuItemInjectionImplementor(type.Key, type.Value, _moduleDefinition, _referencesAndDefinitionsProvider);
+                var menuItemInjectionImplementor = new MenuItemInjectionImplementor(type.Key, type.Value, _moduleDefinition, _referencesProvider);
                 menuItemInjectionImplementor.Execute();
 
-                var activityGetViewMethodImplementor = new ActivityGetViewMethodImplementor(type.Key, _referencesAndDefinitionsProvider);
+                var activityGetViewMethodImplementor = new ActivityGetViewMethodImplementor(type.Key, _referencesProvider);
 
                 var injectorCallReplacer = new InjectorCallReplacer(type.Key, Consts.GeneratedMethodNames.InjectMenuItemsGeneratedMethodName,
-                    _referencesAndDefinitionsProvider.InjectMenuItemsMethodDefinition, activityGetViewMethodImplementor);
+                    _referencesProvider.InjectMenuItemsMethodDefinition, activityGetViewMethodImplementor);
                 injectorCallReplacer.Execute();
             }
 
@@ -68,19 +69,19 @@ namespace Polkovnik.DroidInjector.Fody
             foreach (var type in requiredToSubscribe)
             {
                 var methodSubscriptionImplementor = new MethodSubscriptionImplementor(type.Key, type.Value.Cast<MethodDefinition>().ToArray(), _moduleDefinition,
-                    _referencesAndDefinitionsProvider);
+                    _referencesProvider);
 
                 methodSubscriptionImplementor.Execute();
 
-                var activityGetViewMethodImplementor = new ActivityGetViewMethodImplementor(type.Key, _referencesAndDefinitionsProvider);
+                var activityGetViewMethodImplementor = new ActivityGetViewMethodImplementor(type.Key, _referencesProvider);
 
                 var injectorCallReplacer = new InjectorCallReplacer(type.Key, Consts.GeneratedMethodNames.BindViewEventsGeneratedMethodName, 
-                    _referencesAndDefinitionsProvider.ActivityBindViewEventsMethodDefinition,
+                    _referencesProvider.ActivityBindViewEventsMethodDefinition,
                     activityGetViewMethodImplementor);
                 injectorCallReplacer.Execute();
 
                 injectorCallReplacer = new InjectorCallReplacer(type.Key, Consts.GeneratedMethodNames.BindViewEventsGeneratedMethodName, 
-                    _referencesAndDefinitionsProvider.BindViewEventsMethodDefinition, activityGetViewMethodImplementor);
+                    _referencesProvider.BindViewEventsMethodDefinition, activityGetViewMethodImplementor);
                 injectorCallReplacer.Execute();
             }
         }

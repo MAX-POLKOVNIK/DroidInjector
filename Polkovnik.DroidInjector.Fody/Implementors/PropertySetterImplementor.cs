@@ -3,7 +3,7 @@ using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Polkovnik.DroidInjector.Fody.Loggers;
 
-namespace Polkovnik.DroidInjector.Fody
+namespace Polkovnik.DroidInjector.Fody.Implementors
 {
     internal class PropertySetterImplementor
     {

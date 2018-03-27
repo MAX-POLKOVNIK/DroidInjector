@@ -3,12 +3,12 @@ using Mono.Cecil;
 
 namespace Polkovnik.DroidInjector.Fody
 {
-    internal class ReferencesAndDefinitionsProvider
+    internal class ReferencesProvider
     {
         private readonly ModuleDefinition _moduleDefinition;
         private readonly IAssemblyResolver _assemblyResolver;
 
-        public ReferencesAndDefinitionsProvider(ModuleDefinition moduleDefinition, IAssemblyResolver assemblyResolver)
+        public ReferencesProvider(ModuleDefinition moduleDefinition, IAssemblyResolver assemblyResolver)
         {
             _moduleDefinition = moduleDefinition;
             _assemblyResolver = assemblyResolver;
@@ -49,7 +49,7 @@ namespace Polkovnik.DroidInjector.Fody
             ResourceIdClassType = resourceClassType.NestedTypes.First(x => x.Name == "Id");
         }
 
-        public MethodDefinition InjectMenuItemsMethodDefinition { get; set; }
+        public MethodDefinition InjectMenuItemsMethodDefinition { get; private set; }
         public TypeReference AndroidViewTypeReference { get; private set; }
         public MethodReference FindViewByIdMethodReference { get; private set; }
         public MethodDefinition ActivityInjectViewsMethodDefinition { get; private set; }

@@ -8,6 +8,7 @@ using Android.Views;
 using CheeseBind;
 using Genetics;
 using Genetics.Attributes;
+using Polkovnik.DroidInjector.FodyClassLibrarySample;
 
 namespace Polkovnik.DroidInjector.FodySample
 {
@@ -15,7 +16,8 @@ namespace Polkovnik.DroidInjector.FodySample
     public class MainActivity : Activity
     {
 #pragma warning disable 649
-        //[BindView(Resource.Id.myButton)] [Splice(Resource.Id.myButton)] [View] private Button _myButton;
+        [BindView(Resource.Id.myButton)] [Splice(Resource.Id.myButton)] [View] private TextView _myButton;
+        [BindView(Resource.Id.myButton)] [Splice(Resource.Id.myButton)] [View(Resource.Id.myButton, allowMissing:true)] private Button _myButton2 { get; set; }
         //[BindView(Resource.Id.myEditText1)] [Splice(Resource.Id.myEditText1)] [View] private EditText myEditText1;
         //[BindView(Resource.Id.myEditText2)] [Splice(Resource.Id.myEditText2)] [View] private EditText myEditText2;
         //[BindView(Resource.Id.myEditText3)] [Splice(Resource.Id.myEditText3)] [View] private EditText myEditText3;
@@ -27,6 +29,8 @@ namespace Polkovnik.DroidInjector.FodySample
         //[BindView(Resource.Id.myEditText9)] [Splice(Resource.Id.myEditText9)] [View] private EditText myEditText9;
         //[BindView(Resource.Id.myEditText10)][Splice(Resource.Id.myEditText10)] [View] private EditText myEditText10;
         //[BindView(Resource.Id.myEditText11)] [Splice(Resource.Id.myEditText11)] [View] private EditText myEditText11;
+
+        [MenuItem(Resource.Id.action_0)] private IMenuItem item;
 #pragma warning restore 649
 
         protected override void OnCreate(Bundle savedInstanceState)
@@ -34,31 +38,27 @@ namespace Polkovnik.DroidInjector.FodySample
             base.OnCreate(savedInstanceState);
             
             SetContentView(Resource.Layout.main);
-            
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
+
+            StocktakeStoreViewHolder.Create(null, null, this);
 
             //DirectInjection();
-            //Injector.InjectViews();
+            Injector.InjectViews();
             //Geneticist.Splice(this);
             //Cheeseknife.Bind(this);
 
             //InjectWrapper("1", Injector.InjectViews);
 
-            stopwatch.Stop();
-            Console.WriteLine($"TOTAL: {stopwatch.ElapsedMilliseconds} ms");
+            //InjectWrapper(Window.DecorView);
 
             //_myButton.Text = $"TOTAL: {stopwatch.ElapsedMilliseconds} ms";
 
+            _myButton.Text = "s";
+            _myButton2?.SetText("s2", TextView.BufferType.Normal);
+            _myButton.Click += (sender, args) => StartActivity(typeof(SecondActivity));
             FragmentManager.BeginTransaction().Replace(Resource.Id.contentLayout, MySalesFragment.NewInstance())
                 .Commit();
         }
-
-        private void InjectWrapper(string nane, Action action)
-        {
-            action();
-        }
-
+        
         //private void DirectInjection()
         //{
         //    _myButton = FindViewById<Button>(Resource.Id.myButton);
