@@ -2,18 +2,19 @@
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Polkovnik.DroidInjector.Fody.Loggers;
+using TypeSystem = Fody.TypeSystem;
 
 namespace Polkovnik.DroidInjector.Fody.Implementors
 {
     internal class PropertySetterImplementor
     {
         private readonly PropertyDefinition _propertyDefinition;
-        private readonly ModuleDefinition _moduleDefinition;
+        private readonly TypeSystem _typeSystem;
 
-        public PropertySetterImplementor(PropertyDefinition propertyDefinition, ModuleDefinition moduleDefinition)
+        public PropertySetterImplementor(PropertyDefinition propertyDefinition, TypeSystem typeSystem)
         {
             _propertyDefinition = propertyDefinition;
-            _moduleDefinition = moduleDefinition;
+            _typeSystem = typeSystem;
         }
 
         public void Execute()
@@ -27,7 +28,7 @@ namespace Polkovnik.DroidInjector.Fody.Implementors
                 throw new WeavingException($"Property: {_propertyDefinition.FullName} hasn't setter and not auto-implemented.");
 
             var setterMethod = new MethodDefinition($"set_{_propertyDefinition.Name}",
-                MethodAttributes.Private | MethodAttributes.HideBySig | MethodAttributes.SpecialName, _moduleDefinition.TypeSystem.Void);
+                MethodAttributes.Private | MethodAttributes.HideBySig | MethodAttributes.SpecialName, _typeSystem.VoidReference);
 
             setterMethod.Parameters.Add(new ParameterDefinition(_propertyDefinition.PropertyType));
 
@@ -49,7 +50,7 @@ namespace Polkovnik.DroidInjector.Fody.Implementors
 
         public override string ToString()
         {
-            return $"{nameof(_propertyDefinition)}: {_propertyDefinition}, {nameof(_moduleDefinition)}: {_moduleDefinition}";
+            return $"{nameof(_propertyDefinition)}: {_propertyDefinition}, {nameof(_typeSystem)}: {_typeSystem}";
         }
     }
 }

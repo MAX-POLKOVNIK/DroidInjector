@@ -30,17 +30,20 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Mono.Cecil, Version=0.10.0.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e, processorArchitecture=MSIL">
-      <HintPath>..\packages\Mono.Cecil.0.10.0-beta7\lib\net40\Mono.Cecil.dll</HintPath>
+    <Reference Include="FodyHelpers, Version=3.1.3.0, Culture=neutral, PublicKeyToken=1ca091877d12ca03, processorArchitecture=MSIL">
+      <HintPath>..\packages\FodyHelpers.3.1.3\lib\net46\FodyHelpers.dll</HintPath>
     </Reference>
-    <Reference Include="Mono.Cecil.Mdb, Version=0.10.0.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e, processorArchitecture=MSIL">
-      <HintPath>..\packages\Mono.Cecil.0.10.0-beta7\lib\net40\Mono.Cecil.Mdb.dll</HintPath>
+    <Reference Include="Mono.Cecil, Version=0.10.0.0, Culture=neutral, PublicKeyToken=1ca091877d12ca03, processorArchitecture=MSIL">
+      <HintPath>..\packages\FodyHelpers.3.1.3\lib\net46\Mono.Cecil.dll</HintPath>
     </Reference>
-    <Reference Include="Mono.Cecil.Pdb, Version=0.10.0.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e, processorArchitecture=MSIL">
-      <HintPath>..\packages\Mono.Cecil.0.10.0-beta7\lib\net40\Mono.Cecil.Pdb.dll</HintPath>
+    <Reference Include="Mono.Cecil.Mdb, Version=0.10.0.0, Culture=neutral, PublicKeyToken=1ca091877d12ca03, processorArchitecture=MSIL">
+      <HintPath>..\packages\FodyHelpers.3.1.3\lib\net46\Mono.Cecil.Mdb.dll</HintPath>
     </Reference>
-    <Reference Include="Mono.Cecil.Rocks, Version=0.10.0.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e, processorArchitecture=MSIL">
-      <HintPath>..\packages\Mono.Cecil.0.10.0-beta7\lib\net40\Mono.Cecil.Rocks.dll</HintPath>
+    <Reference Include="Mono.Cecil.Pdb, Version=0.10.0.0, Culture=neutral, PublicKeyToken=1ca091877d12ca03, processorArchitecture=MSIL">
+      <HintPath>..\packages\FodyHelpers.3.1.3\lib\net46\Mono.Cecil.Pdb.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil.Rocks, Version=0.10.0.0, Culture=neutral, PublicKeyToken=1ca091877d12ca03, processorArchitecture=MSIL">
+      <HintPath>..\packages\FodyHelpers.3.1.3\lib\net46\Mono.Cecil.Rocks.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -52,6 +55,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Harvesters\MemberInfoHarvestQuery.cs" />
+    <Compile Include="Harvesters\MemberInfoHarvester.cs" />
+    <Compile Include="Harvesters\MenuItemHarvestQuery.cs" />
+    <Compile Include="Harvesters\ViewEventHarvestQuery.cs" />
+    <Compile Include="Harvesters\ViewHarvestQuery.cs" />
     <Compile Include="Implementors\ActivityGetViewMethodImplementor.cs" />
     <Compile Include="AttributesHolders\InjectAttributeHolder.cs" />
     <Compile Include="AttributesHolders\MenuItemAttributeHolder.cs" />
@@ -60,12 +68,8 @@
     <Compile Include="FodyInjector.cs" />
     <Compile Include="Implementors\InjectionImplementor.cs" />
     <Compile Include="WeavingException.cs" />
-    <Compile Include="Harvesters\Harvester.cs" />
-    <Compile Include="Harvesters\MenuItemHarvester.cs" />
-    <Compile Include="Harvesters\ViewHarvester.cs" />
     <Compile Include="InjectorCallReplacer.cs" />
     <Compile Include="Loggers\Logger.cs" />
-    <Compile Include="Harvesters\ViewEventHarvester.cs" />
     <Compile Include="Loggers\LogLevel.cs" />
     <Compile Include="Implementors\MenuItemInjectionImplementor.cs" />
     <Compile Include="Implementors\MethodSubscriptionImplementor.cs" />

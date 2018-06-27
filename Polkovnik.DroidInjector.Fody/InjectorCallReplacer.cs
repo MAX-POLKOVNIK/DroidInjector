@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using Fody;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Polkovnik.DroidInjector.Fody.Implementors;
@@ -12,14 +14,17 @@ namespace Polkovnik.DroidInjector.Fody
         private readonly string _methodNameToCall;
         private readonly MethodDefinition _methodToRemove;
         private readonly ActivityGetViewMethodImplementor _activityGetViewMethodImplementor;
+        private readonly BaseModuleWeaver _baseModuleWeaver;
         private readonly bool _methodIsParameterless;
 
-        public InjectorCallReplacer(TypeDefinition definition, string methodNameToCall, MethodDefinition methodToRemove, ActivityGetViewMethodImplementor activityGetViewMethodImplementor)
+        public InjectorCallReplacer(TypeDefinition definition, string methodNameToCall, MethodDefinition methodToRemove, ActivityGetViewMethodImplementor activityGetViewMethodImplementor,
+            BaseModuleWeaver baseModuleWeaver)
         {
             _definition = definition;
             _methodNameToCall = methodNameToCall;
             _methodToRemove = methodToRemove;
             _activityGetViewMethodImplementor = activityGetViewMethodImplementor;
+            _baseModuleWeaver = baseModuleWeaver ?? throw new ArgumentNullException(nameof(baseModuleWeaver));
             _methodIsParameterless = !methodToRemove.HasParameters;
         }
 
@@ -58,7 +63,7 @@ namespace Polkovnik.DroidInjector.Fody
                     }
                     else
                     {
-                        var variable = new VariableDefinition(method.DeclaringType.Module.TypeSystem.Object);
+                        var variable = new VariableDefinition(_baseModuleWeaver.TypeSystem.ObjectReference);
                         method.Body.Variables.Add(variable);
                         ReplaceMethodCallInsructions(callInstuction, method.Body.GetILProcessor(), generatedMethod, variable);
                     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Fody;
 using Mono.Cecil;
 using Polkovnik.DroidInjector.Fody.Harvesters;
 using Polkovnik.DroidInjector.Fody.Implementors;
@@ -9,13 +10,13 @@ namespace Polkovnik.DroidInjector.Fody
 {
     internal class FodyInjector
     {
-        private readonly IAssemblyResolver _assemblyResolver;
+        private readonly BaseModuleWeaver _baseModuleWeaver;
         private readonly ModuleDefinition _moduleDefinition;
         private ReferencesProvider _referencesProvider;
         
-        public FodyInjector(ModuleDefinition moduleDefinition, IAssemblyResolver assemblyResolver)
+        public FodyInjector(ModuleDefinition moduleDefinition, BaseModuleWeaver baseModuleWeaver)
         {
-            _assemblyResolver = assemblyResolver ?? throw new ArgumentNullException(nameof(assemblyResolver));
+            _baseModuleWeaver = baseModuleWeaver ?? throw new ArgumentNullException(nameof(baseModuleWeaver));
             _moduleDefinition = moduleDefinition ?? throw new ArgumentNullException(nameof(moduleDefinition));
         }
         
@@ -27,49 +28,53 @@ namespace Polkovnik.DroidInjector.Fody
                 return;
             }
 
-            _referencesProvider = new ReferencesProvider(_moduleDefinition, _assemblyResolver);
+            _referencesProvider = new ReferencesProvider(_moduleDefinition, _baseModuleWeaver);
 
-            var viewHarvester = new ViewHarvester(_moduleDefinition);
-            var requiredToInject = viewHarvester.Harvest();
-            
-            foreach (var type in requiredToInject)
+            var viewHarvestQuery = new ViewHarvestQuery();
+            var menuItemHarvestQuery = new MenuItemHarvestQuery();
+            var viewEventHarvestQuery = new ViewEventHarvestQuery();
+
+            var queries = new MemberInfoHarvestQuery[] { viewHarvestQuery, menuItemHarvestQuery, viewEventHarvestQuery };
+            var newHarvester = new MemberInfoHarvester(_moduleDefinition, queries);
+            newHarvester.Execute();
+
+            foreach (var query in queries)
             {
-                var viewInjectionImplementor = new ViewInjectionImplementor(type.Key, type.Value, _moduleDefinition, _referencesProvider);
+                Logger.Debug($"QUERY: {query} harvested: {query.QueryResult.Keys.Count}");
+            }
+            
+            foreach (var type in viewHarvestQuery.QueryResult)
+            {
+                var viewInjectionImplementor = new ViewInjectionImplementor(type.Key, type.Value, _moduleDefinition, _referencesProvider, _baseModuleWeaver);
                 viewInjectionImplementor.Execute();
 
                 var activityGetViewMethodImplementor = new ActivityGetViewMethodImplementor(type.Key, _referencesProvider);
 
                 var injectorCallReplacer = new InjectorCallReplacer(type.Key, Consts.GeneratedMethodNames.InjectViewsGeneratedMethodName, 
-                    _referencesProvider.ActivityInjectViewsMethodDefinition, activityGetViewMethodImplementor);
+                    _referencesProvider.ActivityInjectViewsMethodDefinition, activityGetViewMethodImplementor, _baseModuleWeaver);
                 injectorCallReplacer.Execute();
 
                 injectorCallReplacer = new InjectorCallReplacer(type.Key, Consts.GeneratedMethodNames.InjectViewsGeneratedMethodName, 
-                    _referencesProvider.InjectViewsMethodReference, activityGetViewMethodImplementor);
+                    _referencesProvider.InjectViewsMethodReference, activityGetViewMethodImplementor, _baseModuleWeaver);
                 injectorCallReplacer.Execute();
             }
-
-            var menuItemsHarvester = new MenuItemHarvester(_moduleDefinition);
-            requiredToInject = menuItemsHarvester.Harvest();
-
-            foreach (var type in requiredToInject)
+            
+            foreach (var type in menuItemHarvestQuery.QueryResult)
             {
-                var menuItemInjectionImplementor = new MenuItemInjectionImplementor(type.Key, type.Value, _moduleDefinition, _referencesProvider);
+                var menuItemInjectionImplementor = new MenuItemInjectionImplementor(type.Key, type.Value, _moduleDefinition, _referencesProvider, _baseModuleWeaver);
                 menuItemInjectionImplementor.Execute();
 
                 var activityGetViewMethodImplementor = new ActivityGetViewMethodImplementor(type.Key, _referencesProvider);
 
                 var injectorCallReplacer = new InjectorCallReplacer(type.Key, Consts.GeneratedMethodNames.InjectMenuItemsGeneratedMethodName,
-                    _referencesProvider.InjectMenuItemsMethodDefinition, activityGetViewMethodImplementor);
+                    _referencesProvider.InjectMenuItemsMethodDefinition, activityGetViewMethodImplementor, _baseModuleWeaver);
                 injectorCallReplacer.Execute();
             }
-
-            var subscriptionHarverster = new ViewEventHarvester(_moduleDefinition);
-            var requiredToSubscribe = subscriptionHarverster.Harvest();
-
-            foreach (var type in requiredToSubscribe)
+            
+            foreach (var type in viewEventHarvestQuery.QueryResult)
             {
                 var methodSubscriptionImplementor = new MethodSubscriptionImplementor(type.Key, type.Value.Cast<MethodDefinition>().ToArray(), _moduleDefinition,
-                    _referencesProvider);
+                    _referencesProvider, _baseModuleWeaver);
 
                 methodSubscriptionImplementor.Execute();
 
@@ -77,11 +82,11 @@ namespace Polkovnik.DroidInjector.Fody
 
                 var injectorCallReplacer = new InjectorCallReplacer(type.Key, Consts.GeneratedMethodNames.BindViewEventsGeneratedMethodName, 
                     _referencesProvider.ActivityBindViewEventsMethodDefinition,
-                    activityGetViewMethodImplementor);
+                    activityGetViewMethodImplementor, _baseModuleWeaver);
                 injectorCallReplacer.Execute();
 
                 injectorCallReplacer = new InjectorCallReplacer(type.Key, Consts.GeneratedMethodNames.BindViewEventsGeneratedMethodName, 
-                    _referencesProvider.BindViewEventsMethodDefinition, activityGetViewMethodImplementor);
+                    _referencesProvider.BindViewEventsMethodDefinition, activityGetViewMethodImplementor, _baseModuleWeaver);
                 injectorCallReplacer.Execute();
             }
         }

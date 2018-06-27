@@ -1,4 +1,5 @@
 ﻿using System;
+using Fody;
 using Mono.Cecil;
 using Polkovnik.DroidInjector.Fody.AttributesHolders;
 
@@ -9,7 +10,7 @@ namespace Polkovnik.DroidInjector.Fody.Implementors
         private readonly ReferencesProvider _referencesProvider;
 
         public MenuItemInjectionImplementor(TypeDefinition typeDefinition, IMemberDefinition[] memberDefinitions, ModuleDefinition moduleDefinition,
-            ReferencesProvider referencesProvider) : base(typeDefinition, memberDefinitions, moduleDefinition, referencesProvider)
+            ReferencesProvider referencesProvider, BaseModuleWeaver baseModuleWeaver) : base(typeDefinition, memberDefinitions, moduleDefinition, referencesProvider, baseModuleWeaver)
         {
             _referencesProvider = referencesProvider ?? throw new ArgumentNullException(nameof(referencesProvider));
         }
