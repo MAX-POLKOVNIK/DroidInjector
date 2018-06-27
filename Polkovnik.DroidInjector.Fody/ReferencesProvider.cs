@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using Fody;
 using Mono.Cecil;
 
 namespace Polkovnik.DroidInjector.Fody
@@ -6,20 +8,24 @@ namespace Polkovnik.DroidInjector.Fody
     internal class ReferencesProvider
     {
         private readonly ModuleDefinition _moduleDefinition;
-        private readonly IAssemblyResolver _assemblyResolver;
+        private readonly BaseModuleWeaver _baseModuleWeaver;
 
-        public ReferencesProvider(ModuleDefinition moduleDefinition, IAssemblyResolver assemblyResolver)
+        public ReferencesProvider(ModuleDefinition moduleDefinition, BaseModuleWeaver baseModuleWeaver)
         {
-            _moduleDefinition = moduleDefinition;
-            _assemblyResolver = assemblyResolver;
+            _moduleDefinition = moduleDefinition ?? throw new ArgumentNullException(nameof(moduleDefinition));
+            _baseModuleWeaver = baseModuleWeaver ?? throw new ArgumentNullException(nameof(baseModuleWeaver));
 
             FindRequiredTypesAndMethods();
         }
 
         private void FindRequiredTypesAndMethods()
         {
-            var assemblyNameReference = _moduleDefinition.AssemblyReferences.FirstOrDefault(x => x.Name == "Mono.Android") ?? throw new WeavingException("Unable to find Mono.Android");
-            var monoAndroidAssembly = _assemblyResolver.Resolve(assemblyNameReference);
+            if (_moduleDefinition.AssemblyReferences.FirstOrDefault(x => x.Name == "Mono.Android") == null)
+            {
+                throw new WeavingException("Unable to find Mono.Android");
+            }
+
+            var monoAndroidAssembly = _baseModuleWeaver.ResolveAssembly("Mono.Android");
             
             var androidViewTypeDefinition = monoAndroidAssembly.MainModule.GetType("Android.Views.View");
             AndroidViewTypeReference = _moduleDefinition.ImportReference(androidViewTypeDefinition);
@@ -32,8 +38,12 @@ namespace Polkovnik.DroidInjector.Fody
             AndroidMenuTypeReference = _moduleDefinition.ImportReference(menuTypeDefinition);
             FindItemMethodReference = _moduleDefinition.ImportReference(menuTypeDefinition.Methods.First(x => x.Name == "FindItem"));
             
-            assemblyNameReference = _moduleDefinition.AssemblyReferences.FirstOrDefault(x => x.Name == "Polkovnik.DroidInjector") ?? throw new WeavingException("Unable to find Polkovnik.DroidInjector");
-            var droidInjectorAssembly = _assemblyResolver.Resolve(assemblyNameReference);
+            if (_moduleDefinition.AssemblyReferences.FirstOrDefault(x => x.Name == "Polkovnik.DroidInjector") == null)
+            {
+                throw new WeavingException("Unable to find Polkovnik.DroidInjector");
+            }
+
+            var droidInjectorAssembly = _baseModuleWeaver.ResolveAssembly("Polkovnik.DroidInjector");
 
             var injectorTypeDefinition = droidInjectorAssembly.MainModule.GetType("Polkovnik.DroidInjector.Injector");
             ActivityInjectViewsMethodDefinition = injectorTypeDefinition.Methods.First(x => x.Name == "InjectViews" && x.Parameters.Count == 0);

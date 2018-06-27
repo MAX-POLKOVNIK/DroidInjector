@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Fody;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Mono.Cecil.Rocks;
@@ -10,14 +11,16 @@ namespace Polkovnik.DroidInjector.Fody.Implementors
 {
     internal class MethodSubscriptionImplementor
     {
+        private readonly BaseModuleWeaver _baseModuleWeaver;
         private readonly ReferencesProvider _referencesProvider;
         private readonly ModuleDefinition _moduleDefinition;
         private readonly MethodDefinition[] _methodsToSubscribe;
         private readonly TypeDefinition _typeDefinition;
         
         public MethodSubscriptionImplementor(TypeDefinition typeDefinition, MethodDefinition[] methodsToSubscribe, ModuleDefinition moduleDefinition,
-            ReferencesProvider referencesProvider)
+            ReferencesProvider referencesProvider, BaseModuleWeaver baseModuleWeaver)
         {
+            _baseModuleWeaver = baseModuleWeaver;
             _referencesProvider = referencesProvider ?? throw new ArgumentNullException(nameof(referencesProvider));
             _moduleDefinition = moduleDefinition ?? throw new ArgumentNullException(nameof(moduleDefinition));
             _methodsToSubscribe = methodsToSubscribe ?? throw new ArgumentNullException(nameof(methodsToSubscribe));
@@ -34,11 +37,11 @@ namespace Polkovnik.DroidInjector.Fody.Implementors
                 return;
             }
 
-            var subscriptionsInitMethod = new MethodDefinition(Consts.GeneratedMethodNames.BindViewEventsGeneratedMethodName, MethodAttributes.Private | MethodAttributes.HideBySig, _moduleDefinition.TypeSystem.Void);
+            var subscriptionsInitMethod = new MethodDefinition(Consts.GeneratedMethodNames.BindViewEventsGeneratedMethodName, MethodAttributes.Private | MethodAttributes.HideBySig, _baseModuleWeaver.TypeSystem.VoidReference);
             subscriptionsInitMethod.Parameters.Add(new ParameterDefinition("view", ParameterAttributes.None, _referencesProvider.AndroidViewTypeReference));
             
             subscriptionsInitMethod.Body.Variables.Add(new VariableDefinition(_referencesProvider.AndroidViewTypeReference));
-            subscriptionsInitMethod.Body.Variables.Add(new VariableDefinition(_moduleDefinition.TypeSystem.Boolean));
+            subscriptionsInitMethod.Body.Variables.Add(new VariableDefinition(_baseModuleWeaver.TypeSystem.BooleanReference));
 
             Logger.Debug($"Add subscription init method {subscriptionsInitMethod} into {_typeDefinition}");
 

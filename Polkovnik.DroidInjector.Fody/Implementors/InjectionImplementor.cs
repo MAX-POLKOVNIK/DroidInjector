@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Fody;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Polkovnik.DroidInjector.Fody.AttributesHolders;
@@ -11,12 +12,14 @@ namespace Polkovnik.DroidInjector.Fody.Implementors
     {
         private readonly ReferencesProvider _referencesProvider;
         private readonly ModuleDefinition _moduleDefinition;
+        private readonly BaseModuleWeaver _baseModuleWeaver;
         private readonly IMemberDefinition[] _memberDefinitions;
         private readonly TypeDefinition _typeDefinition;
 
         protected InjectionImplementor(TypeDefinition typeDefinition, IMemberDefinition[] memberDefinitions,
-            ModuleDefinition moduleDefinition, ReferencesProvider referencesProvider)
+            ModuleDefinition moduleDefinition, ReferencesProvider referencesProvider, BaseModuleWeaver baseModuleWeaver)
         {
+            _baseModuleWeaver = baseModuleWeaver ?? throw new ArgumentNullException(nameof(baseModuleWeaver));
             _referencesProvider = referencesProvider ?? throw new ArgumentNullException(nameof(referencesProvider));
             _moduleDefinition = moduleDefinition ?? throw new ArgumentNullException(nameof(moduleDefinition));
             _memberDefinitions = memberDefinitions ?? throw new ArgumentNullException(nameof(memberDefinitions));
@@ -34,9 +37,9 @@ namespace Polkovnik.DroidInjector.Fody.Implementors
         {
             Logger.LogExecute(this);
 
-            var methodDefinition = new MethodDefinition(GeneratedMethodName,MethodAttributes.Private | MethodAttributes.HideBySig, _moduleDefinition.TypeSystem.Void);
+            var methodDefinition = new MethodDefinition(GeneratedMethodName,MethodAttributes.Private | MethodAttributes.HideBySig, _baseModuleWeaver.TypeSystem.VoidReference);
             methodDefinition.Parameters.Add(new ParameterDefinition("p0", ParameterAttributes.None, GeneratedMethodParameterTypeReference));
-            methodDefinition.Body.Variables.Add(new VariableDefinition(_typeDefinition.Module.TypeSystem.Object));
+            methodDefinition.Body.Variables.Add(new VariableDefinition(_baseModuleWeaver.TypeSystem.ObjectReference));
 
             _typeDefinition.Methods.Add(methodDefinition);
 
@@ -69,7 +72,7 @@ namespace Polkovnik.DroidInjector.Fody.Implementors
                         var propertyHasSetter = propertyDefinition.SetMethod != null;
                         if (!propertyHasSetter)
                         {
-                            var propertySetterImplementor = new PropertySetterImplementor(propertyDefinition, _moduleDefinition);
+                            var propertySetterImplementor = new PropertySetterImplementor(propertyDefinition, _baseModuleWeaver.TypeSystem);
                             propertySetterImplementor.Execute();
                         }
                         var propertySetMethodReference = propertyDefinition.SetMethod;
