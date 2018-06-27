@@ -107,7 +107,7 @@ public override bool OnCreateOptionsMenu(IMenu menu)
 }
 ```
 
-#### View events injection
+#### ~~View events injection~~ [Deprecated. It will be removed in next release]
 You can mark methods to subscribe to view event like that:
 ```csharp
 [ViewEvent(Resource.Id.myEditText, typeof(EditText), nameof(EditText.TextChanged))]
