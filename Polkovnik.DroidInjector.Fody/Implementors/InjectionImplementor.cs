@@ -58,9 +58,21 @@ namespace Polkovnik.DroidInjector.Fody.Implementors
                     resourceId = Utils.GetResourceIdByName(memberDefinition.Name, memberDefinition.FullName, _referencesProvider.ResourceIdClassType);
                 }
 
-                var getResourceIdOperation = memberDefinition.IsInAndroidClassLibrary()
-                    ? Instruction.Create(OpCodes.Ldsfld, Utils.GetResourceIdField(attributeHolder.ResourceIdName ?? memberDefinition.Name, _referencesProvider.ResourceIdClassType))
-                    : Instruction.Create(OpCodes.Ldc_I4, resourceId);
+                Instruction getResourceIdOperation;
+                if (memberDefinition.IsInAndroidClassLibrary())
+                {
+                    var resourceIdField = Utils.GetResourceIdField(attributeHolder.ResourceIdName ?? memberDefinition.Name, _referencesProvider.ResourceIdClassType);
+
+                    if (resourceIdField == null)
+                        throw new WeavingException($"Can't find id = {attributeHolder.ResourceIdName ?? memberDefinition.Name}");
+
+                    getResourceIdOperation = Instruction.Create(OpCodes.Ldsfld, resourceIdField);
+                    
+                }
+                else
+                {
+                    getResourceIdOperation = Instruction.Create(OpCodes.Ldc_I4, resourceId);
+                }
 
                 switch (memberDefinition)
                 {

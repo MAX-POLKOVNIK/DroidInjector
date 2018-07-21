@@ -47,7 +47,7 @@ namespace Polkovnik.DroidInjector.Fody
 
             var injectorTypeDefinition = droidInjectorAssembly.MainModule.GetType("Polkovnik.DroidInjector.Injector");
             ActivityInjectViewsMethodDefinition = injectorTypeDefinition.Methods.First(x => x.Name == "InjectViews" && x.Parameters.Count == 0);
-            InjectViewsMethodReference = injectorTypeDefinition.Methods.First(x => x.Name == "InjectViews" && x.Parameters.Count == 1);
+            InjectViewsMethodDefinition = injectorTypeDefinition.Methods.First(x => x.Name == "InjectViews" && x.Parameters.Count == 1);
             InjectMenuItemsMethodDefinition = injectorTypeDefinition.Methods.First(x => x.Name == "InjectMenuItems");
 
             var injectorExceptionType = droidInjectorAssembly.MainModule.GetType("Polkovnik.DroidInjector.InjectorException");
@@ -61,7 +61,7 @@ namespace Polkovnik.DroidInjector.Fody
         public TypeReference AndroidViewTypeReference { get; private set; }
         public MethodReference FindViewByIdMethodReference { get; private set; }
         public MethodDefinition ActivityInjectViewsMethodDefinition { get; private set; }
-        public MethodDefinition InjectViewsMethodReference { get; private set; }
+        public MethodDefinition InjectViewsMethodDefinition { get; private set; }
         public MethodReference ActivityFindViewByIdMethodReference { get; private set; }
         public TypeDefinition ResourceIdClassType { get; private set; }
         public MethodReference InjectorExceptionCtor { get; private set; }

@@ -1,7 +1,7 @@
-﻿using Android.App;
+﻿using System;
+using Android.App;
 using Android.Graphics;
 using Android.OS;
-using Android.Views;
 using Android.Widget;
 
 namespace Polkovnik.DroidInjector.FodyClassLibrarySample
@@ -18,8 +18,14 @@ namespace Polkovnik.DroidInjector.FodyClassLibrarySample
             SetContentView(Resource.Layout.screen_test);
 
             Injector.InjectViews();
+            Do(Injector.InjectViews);
 
             _myButton.SetBackgroundColor(Color.AliceBlue);
+        }
+
+        private void Do(Action action)
+        {
+            action();
         }
     }
 }

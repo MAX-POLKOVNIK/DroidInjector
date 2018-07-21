@@ -2,6 +2,7 @@
 using System.Linq;
 using Fody;
 using Mono.Cecil;
+using Mono.Cecil.Cil;
 using Polkovnik.DroidInjector.Fody.Harvesters;
 using Polkovnik.DroidInjector.Fody.Implementors;
 using Polkovnik.DroidInjector.Fody.Loggers;
@@ -41,7 +42,16 @@ namespace Polkovnik.DroidInjector.Fody
             {
                 Logger.Debug($"QUERY: {query} harvested: {query.QueryResult.Keys.Count}");
             }
-            
+
+            var injectorCallsHarvester = new InjectorCallsHarverster(_moduleDefinition);
+            var harvestedInstructions = injectorCallsHarvester.Execute();
+
+            foreach (var harvestedInstruction in harvestedInstructions)
+            {
+                if (harvestedInstruction.Instruction.OpCode != OpCodes.Call)
+                    throw new WeavingException($"Injector.InjectViews must be called. You can't pass it as delegate. {harvestedInstruction.MethodDefinition}");
+            }
+
             foreach (var type in viewHarvestQuery.QueryResult)
             {
                 var viewInjectionImplementor = new ViewInjectionImplementor(type.Key, type.Value, _moduleDefinition, _referencesProvider, _baseModuleWeaver);
@@ -54,7 +64,7 @@ namespace Polkovnik.DroidInjector.Fody
                 injectorCallReplacer.Execute();
 
                 injectorCallReplacer = new InjectorCallReplacer(type.Key, Consts.GeneratedMethodNames.InjectViewsGeneratedMethodName, 
-                    _referencesProvider.InjectViewsMethodReference, activityGetViewMethodImplementor, _baseModuleWeaver);
+                    _referencesProvider.InjectViewsMethodDefinition, activityGetViewMethodImplementor, _baseModuleWeaver);
                 injectorCallReplacer.Execute();
             }
             

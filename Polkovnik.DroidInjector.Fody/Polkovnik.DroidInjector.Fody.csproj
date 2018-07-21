@@ -55,6 +55,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Harvesters\InjectorCallsHarverster.cs" />
     <Compile Include="Harvesters\MemberInfoHarvestQuery.cs" />
     <Compile Include="Harvesters\MemberInfoHarvester.cs" />
     <Compile Include="Harvesters\MenuItemHarvestQuery.cs" />
@@ -66,7 +67,6 @@
     <Compile Include="Consts.cs" />
     <Compile Include="FodyInjector.cs" />
     <Compile Include="Implementors\InjectionImplementor.cs" />
-    <Compile Include="WeavingException.cs" />
     <Compile Include="InjectorCallReplacer.cs" />
     <Compile Include="Loggers\Logger.cs" />
     <Compile Include="Loggers\LogLevel.cs" />
@@ -78,6 +78,7 @@
     <Compile Include="ReferencesProvider.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="Implementors\ViewInjectionImplementor.cs" />
+    <Compile Include="WeavingException.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
