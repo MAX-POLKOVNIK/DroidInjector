@@ -17,7 +17,7 @@ namespace Polkovnik.DroidInjector.FodySample
     {
 #pragma warning disable 649
         [BindView(Resource.Id.myButton)] [Splice(Resource.Id.myButton)] [View] private TextView _myButton;
-        [BindView(Resource.Id.myButton)] [Splice(Resource.Id.myButton)] [View(Resource.Id.myButton, allowMissing:true)] private Button _myButton2 { get; set; }
+        [BindView(Resource.Id.myButton)] [Splice(Resource.Id.myButton)] [View(Resource.Id.myButton, allowMissing: true)] private Button _myButton2 { get; set; }
         //[BindView(Resource.Id.myEditText1)] [Splice(Resource.Id.myEditText1)] [View] private EditText myEditText1;
         //[BindView(Resource.Id.myEditText2)] [Splice(Resource.Id.myEditText2)] [View] private EditText myEditText2;
         //[BindView(Resource.Id.myEditText3)] [Splice(Resource.Id.myEditText3)] [View] private EditText myEditText3;
@@ -36,7 +36,7 @@ namespace Polkovnik.DroidInjector.FodySample
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-            
+
             SetContentView(Resource.Layout.main);
 
             StocktakeStoreViewHolder.Create(null, null, this);

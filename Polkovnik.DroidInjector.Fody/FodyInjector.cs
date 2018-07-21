@@ -32,9 +32,8 @@ namespace Polkovnik.DroidInjector.Fody
 
             var viewHarvestQuery = new ViewHarvestQuery();
             var menuItemHarvestQuery = new MenuItemHarvestQuery();
-            var viewEventHarvestQuery = new ViewEventHarvestQuery();
 
-            var queries = new MemberInfoHarvestQuery[] { viewHarvestQuery, menuItemHarvestQuery, viewEventHarvestQuery };
+            var queries = new MemberInfoHarvestQuery[] { viewHarvestQuery, menuItemHarvestQuery };
             var newHarvester = new MemberInfoHarvester(_moduleDefinition, queries);
             newHarvester.Execute();
 
@@ -68,25 +67,6 @@ namespace Polkovnik.DroidInjector.Fody
 
                 var injectorCallReplacer = new InjectorCallReplacer(type.Key, Consts.GeneratedMethodNames.InjectMenuItemsGeneratedMethodName,
                     _referencesProvider.InjectMenuItemsMethodDefinition, activityGetViewMethodImplementor, _baseModuleWeaver);
-                injectorCallReplacer.Execute();
-            }
-            
-            foreach (var type in viewEventHarvestQuery.QueryResult)
-            {
-                var methodSubscriptionImplementor = new MethodSubscriptionImplementor(type.Key, type.Value.Cast<MethodDefinition>().ToArray(), _moduleDefinition,
-                    _referencesProvider, _baseModuleWeaver);
-
-                methodSubscriptionImplementor.Execute();
-
-                var activityGetViewMethodImplementor = new ActivityGetViewMethodImplementor(type.Key, _referencesProvider);
-
-                var injectorCallReplacer = new InjectorCallReplacer(type.Key, Consts.GeneratedMethodNames.BindViewEventsGeneratedMethodName, 
-                    _referencesProvider.ActivityBindViewEventsMethodDefinition,
-                    activityGetViewMethodImplementor, _baseModuleWeaver);
-                injectorCallReplacer.Execute();
-
-                injectorCallReplacer = new InjectorCallReplacer(type.Key, Consts.GeneratedMethodNames.BindViewEventsGeneratedMethodName, 
-                    _referencesProvider.BindViewEventsMethodDefinition, activityGetViewMethodImplementor, _baseModuleWeaver);
                 injectorCallReplacer.Execute();
             }
         }

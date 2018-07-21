@@ -58,7 +58,6 @@
     <Compile Include="Harvesters\MemberInfoHarvestQuery.cs" />
     <Compile Include="Harvesters\MemberInfoHarvester.cs" />
     <Compile Include="Harvesters\MenuItemHarvestQuery.cs" />
-    <Compile Include="Harvesters\ViewEventHarvestQuery.cs" />
     <Compile Include="Harvesters\ViewHarvestQuery.cs" />
     <Compile Include="Implementors\ActivityGetViewMethodImplementor.cs" />
     <Compile Include="AttributesHolders\InjectAttributeHolder.cs" />
@@ -72,7 +71,6 @@
     <Compile Include="Loggers\Logger.cs" />
     <Compile Include="Loggers\LogLevel.cs" />
     <Compile Include="Implementors\MenuItemInjectionImplementor.cs" />
-    <Compile Include="Implementors\MethodSubscriptionImplementor.cs" />
     <Compile Include="MethodSubscriptionInfo.cs" />
     <Compile Include="ModuleWeaver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
