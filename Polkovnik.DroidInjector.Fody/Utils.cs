@@ -7,13 +7,18 @@ namespace Polkovnik.DroidInjector.Fody
 {
     internal static class Utils
     {
-        public static bool IsActivity(this TypeDefinition typeDefinition)
+        public static bool IsActivity(this TypeDefinition typeDefinition) => IsDerrivedFrom(typeDefinition, "Android.App.Activity");
+        public static bool IsFragment(this TypeDefinition typeDefinition) => IsDerrivedFrom(typeDefinition, "Android.App.Fragment");
+        public static bool IsSupportFragment(this TypeDefinition typeDefinition) => IsDerrivedFrom(typeDefinition, "Android.Support.V4.App.Fragment");
+        public static bool IsRecyclerViewHolder(this TypeDefinition typeDefinition) => IsDerrivedFrom(typeDefinition, "Android.Support.V7.Widget.RecyclerView.ViewHolder");
+
+        public static bool IsDerrivedFrom(this TypeDefinition typeDefinition, string typeFullName)
         {
             var baseType = typeDefinition.BaseType;
 
             while (baseType != null)
             {
-                if (baseType.FullName == "Android.App.Activity")
+                if (baseType.FullName == typeFullName)
                 {
                     return true;
                 }

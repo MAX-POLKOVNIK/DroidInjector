@@ -282,65 +282,65 @@ namespace Polkovnik.DroidInjector.FodySample
 		public partial class Id
 		{
 			
-			// aapt resource value: 0x7f060022
-			public const int action_0 = 2131099682;
-			
 			// aapt resource value: 0x7f060023
-			public const int action_1 = 2131099683;
+			public const int action_0 = 2131099683;
 			
 			// aapt resource value: 0x7f060024
-			public const int action_2 = 2131099684;
+			public const int action_1 = 2131099684;
 			
 			// aapt resource value: 0x7f060025
-			public const int action_3 = 2131099685;
+			public const int action_2 = 2131099685;
 			
 			// aapt resource value: 0x7f060026
-			public const int action_4 = 2131099686;
+			public const int action_3 = 2131099686;
 			
-			// aapt resource value: 0x7f060013
-			public const int action_container = 2131099667;
-			
-			// aapt resource value: 0x7f06001f
-			public const int action_divider = 2131099679;
+			// aapt resource value: 0x7f060027
+			public const int action_4 = 2131099687;
 			
 			// aapt resource value: 0x7f060014
-			public const int action_image = 2131099668;
-			
-			// aapt resource value: 0x7f060015
-			public const int action_text = 2131099669;
+			public const int action_container = 2131099668;
 			
 			// aapt resource value: 0x7f060020
-			public const int actions = 2131099680;
+			public const int action_divider = 2131099680;
 			
-			// aapt resource value: 0x7f060006
-			public const int async = 2131099654;
+			// aapt resource value: 0x7f060015
+			public const int action_image = 2131099669;
 			
-			// aapt resource value: 0x7f060007
-			public const int blocking = 2131099655;
-			
-			// aapt resource value: 0x7f06001e
-			public const int chronometer = 2131099678;
-			
-			// aapt resource value: 0x7f060011
-			public const int contentLayout = 2131099665;
-			
-			// aapt resource value: 0x7f060008
-			public const int forever = 2131099656;
-			
-			// aapt resource value: 0x7f06000b
-			public const int frameLayoyt = 2131099659;
-			
-			// aapt resource value: 0x7f060017
-			public const int icon = 2131099671;
+			// aapt resource value: 0x7f060016
+			public const int action_text = 2131099670;
 			
 			// aapt resource value: 0x7f060021
-			public const int icon_group = 2131099681;
+			public const int actions = 2131099681;
 			
-			// aapt resource value: 0x7f06001a
-			public const int info = 2131099674;
+			// aapt resource value: 0x7f060007
+			public const int async = 2131099655;
+			
+			// aapt resource value: 0x7f060008
+			public const int blocking = 2131099656;
+			
+			// aapt resource value: 0x7f06001f
+			public const int chronometer = 2131099679;
+			
+			// aapt resource value: 0x7f060012
+			public const int contentLayout = 2131099666;
 			
 			// aapt resource value: 0x7f060009
-			public const int italic = 2131099657;
+			public const int forever = 2131099657;
+			
+			// aapt resource value: 0x7f06000c
+			public const int frameLayoyt = 2131099660;
+			
+			// aapt resource value: 0x7f060018
+			public const int icon = 2131099672;
+			
+			// aapt resource value: 0x7f060022
+			public const int icon_group = 2131099682;
+			
+			// aapt resource value: 0x7f06001b
+			public const int info = 2131099675;
+			
+			// aapt resource value: 0x7f06000a
+			public const int italic = 2131099658;
 			
 			// aapt resource value: 0x7f060000
 			public const int item_touch_helper_previous_elevation = 2131099648;
@@ -351,53 +351,56 @@ namespace Polkovnik.DroidInjector.FodySample
 			// aapt resource value: 0x7f060002
 			public const int line3 = 2131099650;
 			
-			// aapt resource value: 0x7f060010
-			public const int myButton = 2131099664;
+			// aapt resource value: 0x7f060011
+			public const int myButton = 2131099665;
 			
-			// aapt resource value: 0x7f06000a
-			public const int normal = 2131099658;
-			
-			// aapt resource value: 0x7f06001c
-			public const int notification_background = 2131099676;
-			
-			// aapt resource value: 0x7f060018
-			public const int notification_main_column = 2131099672;
-			
-			// aapt resource value: 0x7f060016
-			public const int notification_main_column_container = 2131099670;
-			
-			// aapt resource value: 0x7f060012
-			public const int recyclerView = 2131099666;
-			
-			// aapt resource value: 0x7f06001b
-			public const int right_icon = 2131099675;
-			
-			// aapt resource value: 0x7f060019
-			public const int right_side = 2131099673;
-			
-			// aapt resource value: 0x7f06000c
-			public const int stocktakeStoreTitle = 2131099660;
-			
-			// aapt resource value: 0x7f06000d
-			public const int stocktakingStoreState = 2131099661;
-			
-			// aapt resource value: 0x7f06000f
-			public const int subtitleTextView = 2131099663;
-			
-			// aapt resource value: 0x7f060003
-			public const int text = 2131099651;
-			
-			// aapt resource value: 0x7f060004
-			public const int text2 = 2131099652;
+			// aapt resource value: 0x7f06000b
+			public const int normal = 2131099659;
 			
 			// aapt resource value: 0x7f06001d
-			public const int time = 2131099677;
+			public const int notification_background = 2131099677;
 			
-			// aapt resource value: 0x7f060005
-			public const int title = 2131099653;
+			// aapt resource value: 0x7f060019
+			public const int notification_main_column = 2131099673;
+			
+			// aapt resource value: 0x7f060017
+			public const int notification_main_column_container = 2131099671;
+			
+			// aapt resource value: 0x7f060013
+			public const int recyclerView = 2131099667;
+			
+			// aapt resource value: 0x7f06001c
+			public const int right_icon = 2131099676;
+			
+			// aapt resource value: 0x7f06001a
+			public const int right_side = 2131099674;
+			
+			// aapt resource value: 0x7f06000d
+			public const int stocktakeStoreTitle = 2131099661;
 			
 			// aapt resource value: 0x7f06000e
-			public const int titleTextView = 2131099662;
+			public const int stocktakingStoreState = 2131099662;
+			
+			// aapt resource value: 0x7f060010
+			public const int subtitleTextView = 2131099664;
+			
+			// aapt resource value: 0x7f060003
+			public const int tag_transition_group = 2131099651;
+			
+			// aapt resource value: 0x7f060004
+			public const int text = 2131099652;
+			
+			// aapt resource value: 0x7f060005
+			public const int text2 = 2131099653;
+			
+			// aapt resource value: 0x7f06001e
+			public const int time = 2131099678;
+			
+			// aapt resource value: 0x7f060006
+			public const int title = 2131099654;
+			
+			// aapt resource value: 0x7f06000f
+			public const int titleTextView = 2131099663;
 			
 			static Id()
 			{
@@ -592,18 +595,30 @@ namespace Polkovnik.DroidInjector.FodySample
 			public const int FontFamily_fontProviderQuery = 2;
 			
 			public static int[] FontFamilyFont = new int[] {
+					16844082,
+					16844083,
+					16844095,
 					2130771983,
 					2130771984,
 					2130771985};
 			
-			// aapt resource value: 1
-			public const int FontFamilyFont_font = 1;
-			
 			// aapt resource value: 0
-			public const int FontFamilyFont_fontStyle = 0;
+			public const int FontFamilyFont_android_font = 0;
 			
 			// aapt resource value: 2
-			public const int FontFamilyFont_fontWeight = 2;
+			public const int FontFamilyFont_android_fontStyle = 2;
+			
+			// aapt resource value: 1
+			public const int FontFamilyFont_android_fontWeight = 1;
+			
+			// aapt resource value: 4
+			public const int FontFamilyFont_font = 4;
+			
+			// aapt resource value: 3
+			public const int FontFamilyFont_fontStyle = 3;
+			
+			// aapt resource value: 5
+			public const int FontFamilyFont_fontWeight = 5;
 			
 			public static int[] RecyclerView = new int[] {
 					16842948,

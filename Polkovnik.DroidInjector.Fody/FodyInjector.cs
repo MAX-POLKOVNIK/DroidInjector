@@ -11,12 +11,14 @@ namespace Polkovnik.DroidInjector.Fody
 {
     internal class FodyInjector
     {
+        private readonly bool _autoInjectionEnabled;
         private readonly BaseModuleWeaver _baseModuleWeaver;
         private readonly ModuleDefinition _moduleDefinition;
         private ReferencesProvider _referencesProvider;
         
-        public FodyInjector(ModuleDefinition moduleDefinition, BaseModuleWeaver baseModuleWeaver)
+        public FodyInjector(ModuleDefinition moduleDefinition, BaseModuleWeaver baseModuleWeaver, bool autoInjectionEnabled)
         {
+            _autoInjectionEnabled = autoInjectionEnabled;
             _baseModuleWeaver = baseModuleWeaver ?? throw new ArgumentNullException(nameof(baseModuleWeaver));
             _moduleDefinition = moduleDefinition ?? throw new ArgumentNullException(nameof(moduleDefinition));
         }
@@ -59,6 +61,8 @@ namespace Polkovnik.DroidInjector.Fody
 
                 var activityGetViewMethodImplementor = new ActivityGetViewMethodImplementor(type.Key, _referencesProvider);
 
+                Logger.Debug($"-- CHECK AUTOINJECT FOR {type.Key}. HAS MANUAL CALL = {harvestedInstructions.Any(x => x.MethodDefinition.DeclaringType == type.Key)}");
+                
                 var injectorCallReplacer = new InjectorCallReplacer(type.Key, Consts.GeneratedMethodNames.InjectViewsGeneratedMethodName, 
                     _referencesProvider.ActivityInjectViewsMethodDefinition, activityGetViewMethodImplementor, _baseModuleWeaver);
                 injectorCallReplacer.Execute();

@@ -40,7 +40,7 @@ namespace Polkovnik.DroidInjector.FodySample
             SetContentView(Resource.Layout.main);
 
             StocktakeStoreViewHolder.Create(null, null, this);
-
+            
             //DirectInjection();
             Injector.InjectViews();
             //Geneticist.Splice(this);

@@ -19,7 +19,10 @@ namespace Polkovnik.DroidInjector.Fody
 
             Logger.Init(level, LogInfo);
 
-            new FodyInjector(ModuleDefinition, this).Execute();
+            var autoInjectionAttribute = Config.Attributes().FirstOrDefault(x => x.Name == "EnableAutoInjection");
+            var autoInjectionEnabled = autoInjectionAttribute != null && bool.TryParse(autoInjectionAttribute.Value, out var enabled) && enabled;
+
+            new FodyInjector(ModuleDefinition, this, autoInjectionEnabled).Execute();
         }
         
         public override IEnumerable<string> GetAssembliesForScanning()
@@ -28,6 +31,8 @@ namespace Polkovnik.DroidInjector.Fody
             yield return "System";
             yield return "Polkovnik.DroidInjector";
             yield return "Mono.Android";
+            yield return "Xamarin.Android.Support.v7.RecyclerView";
+            yield return "Android.Support.V4.App.Fragment";
         }
     }
 }

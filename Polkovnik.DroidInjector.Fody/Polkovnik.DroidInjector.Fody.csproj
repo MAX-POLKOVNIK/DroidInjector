@@ -71,7 +71,6 @@
     <Compile Include="Loggers\Logger.cs" />
     <Compile Include="Loggers\LogLevel.cs" />
     <Compile Include="Implementors\MenuItemInjectionImplementor.cs" />
-    <Compile Include="MethodSubscriptionInfo.cs" />
     <Compile Include="ModuleWeaver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Implementors\PropertySetterImplementor.cs" />
