@@ -18,14 +18,8 @@ namespace Polkovnik.DroidInjector.FodyClassLibrarySample
             SetContentView(Resource.Layout.screen_test);
 
             Injector.InjectViews();
-            Do(Injector.InjectViews);
 
             _myButton.SetBackgroundColor(Color.AliceBlue);
-        }
-
-        private void Do(Action action)
-        {
-            action();
         }
     }
 }

@@ -28,7 +28,13 @@ namespace Polkovnik.DroidInjector.Fody.Harvesters
 
             var list = new List<HarvestedInstruction>();
 
+            var typesList = new List<TypeDefinition>(_moduleDefinition.Types);
             foreach (var typeDefinition in _moduleDefinition.Types)
+            {
+                typesList.AddRange(typeDefinition.NestedTypes);
+            }
+
+            foreach (var typeDefinition in typesList)
             {
                 foreach (var methodDefinition in typeDefinition.Methods.Where(x => x.HasBody))
                 {

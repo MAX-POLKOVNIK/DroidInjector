@@ -17,7 +17,13 @@ namespace Polkovnik.DroidInjector.Fody.Harvesters
 
         public void Execute()
         {
-            foreach (var type in _moduleDefinition.Types)
+            var types = new List<TypeDefinition>(_moduleDefinition.Types);
+            foreach (var typeDefinition in _moduleDefinition.Types)
+            {
+                types.AddRange(typeDefinition.NestedTypes);
+            }
+
+            foreach (var type in types)
             {
                 var members = new List<IMemberDefinition>();
                 members.AddRange(type.Fields);

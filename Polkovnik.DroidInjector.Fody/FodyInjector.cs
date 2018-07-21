@@ -79,6 +79,13 @@ namespace Polkovnik.DroidInjector.Fody
                     _referencesProvider.InjectMenuItemsMethodDefinition, activityGetViewMethodImplementor, _baseModuleWeaver);
                 injectorCallReplacer.Execute();
             }
+
+            harvestedInstructions = injectorCallsHarvester.Execute();
+            
+            foreach (var harvestedInstruction in harvestedInstructions)
+            {
+                throw new WeavingException($"Injector.InjectViews not removed. Are you call it in async method or in class which doesn't contains [View] attribute? {harvestedInstruction.MethodDefinition}");
+            }
         }
     }
 }
